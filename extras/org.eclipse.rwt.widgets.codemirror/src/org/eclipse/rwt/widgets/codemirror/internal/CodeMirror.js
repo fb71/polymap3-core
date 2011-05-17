@@ -13,6 +13,10 @@
  * Lesser General Public License for more details.
  */
 
+/*
+ * JavaScript of the CodeMirror RWT Widget 
+ */
+
 var loadedScripts = new Object();
 
 /**
