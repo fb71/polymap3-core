@@ -56,7 +56,6 @@ import net.refractions.udig.ui.PlatformJobs;
 import net.refractions.udig.ui.ProgressManager;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -218,10 +217,13 @@ public class GeoSelectionView
     private boolean                 allowModify = false;
     
     private boolean                 allowSearch = true;
+
+    private String                  basePartName = "";
     
 
     public GeoSelectionView() {
         log.debug( "..." );
+        basePartName = getPartName();
     }
 
     public void setAllowModify( boolean allowModify ) {
@@ -336,7 +338,8 @@ public class GeoSelectionView
     
     public void connectLayer( ILayer _layer ) {
         this.layer = _layer;
-        setPartName( layer.getLabel() );
+        this.basePartName = layer.getLabel(); 
+        setPartName( basePartName );
 
         // property listener
         ProjectRepository.instance().addPropertyChangeListener( layerChangeListener );
@@ -509,6 +512,11 @@ public class GeoSelectionView
                         //viewer.getViewer().refresh();
                         //viewer.getControl().update();
                         //viewer.getControl().redraw();
+
+                        // view title
+                        int count = fc.size();  //getviewer.getViewer().getTable().getItemCount()
+                        String title = basePartName + " (" + count + ")";
+                        setPartName( title );
                     }
                 });
             }
@@ -601,7 +609,9 @@ public class GeoSelectionView
             
             // FEATURE_SELECTED
             if (ev.getType() == GeoEvent.Type.FEATURE_SELECTED) {
-                //log.info( "fc: " + ev.getBody().size() );
+                log.info( "Resource: " + ev.getResource() );
+                log.info( "    :" + fs.getInfo().getSchema() );
+                
                 loadTable( ev.getFilter() );
             }
             
