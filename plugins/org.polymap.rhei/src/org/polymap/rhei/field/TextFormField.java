@@ -27,15 +27,30 @@ import org.polymap.rhei.form.IFormEditorToolkit;
  * 
  *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
- * @version ($Revision$)
  */
 public class TextFormField
         extends StringFormField {
 
-    private int             minHeight;
+//    private int             minHeight;
     
-    public TextFormField( int minHeight ) {
-        this.minHeight = minHeight;
+    private int                 style = SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL;
+    
+    /**
+     * Create a new field with style set: <code>SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL</code>.
+     */
+    public TextFormField() {
+    }
+
+    /**
+     * 
+     */
+    public TextFormField( int style ) {
+        this.style = style;
+    }
+
+    public TextFormField addStyle( int styleConstant ) {
+        this.style |= styleConstant;
+        return this;
     }
 
     public void init( IFormFieldSite _site ) {
@@ -46,7 +61,9 @@ public class TextFormField
     }
 
     public Control createControl( Composite parent, IFormEditorToolkit toolkit ) {
-        return createControl( parent, toolkit, SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL );
+        createControl( parent, toolkit, SWT.MULTI | style  );
+        text.setText( "*\n*\n*\n" );
+        return text;
     }
 
 }

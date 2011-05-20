@@ -109,16 +109,22 @@ public abstract class FilterEditor
     
     public Composite newFormField( Composite parent, String propName, Class propType, 
             IFormField field, IFormFieldValidator validator ) {
-        return newFormField( parent, propName, propType, field, validator, null );
+        return newFormField( parent, propName, propType, field, validator, null, null );
     }
 
     
     public Composite newFormField( Composite parent, String propName, Class propType, 
             IFormField field, IFormFieldValidator validator, String label ) {
+        return newFormField( parent, propName, propType, field, validator, label, null );
+    }
+
+    
+    public Composite newFormField( Composite parent, String propName, Class propType, 
+            IFormField field, IFormFieldValidator validator, String label, String description ) {
 
         final FilterFieldComposite fieldComposite = new FilterFieldComposite( 
                 toolkit, propName, propType, field, 
-                new DefaultFormFieldLabeler( label ), new DefaultFormFieldDecorator(), 
+                new DefaultFormFieldLabeler( label, description ), new DefaultFormFieldDecorator(), 
                 validator != null ? validator : new NullValidator() );
 
         fieldComposite.addChangeListener( this );

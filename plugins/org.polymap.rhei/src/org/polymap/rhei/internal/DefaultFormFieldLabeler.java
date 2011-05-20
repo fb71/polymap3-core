@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldSite;
@@ -40,6 +41,8 @@ public class DefaultFormFieldLabeler
     
     private String              label;
     
+    private String              description;
+    
     private int                 maxWidth = 100;
     
     
@@ -49,13 +52,12 @@ public class DefaultFormFieldLabeler
     public DefaultFormFieldLabeler() {
     }
 
-    public DefaultFormFieldLabeler( String label ) {
+    public DefaultFormFieldLabeler( String label, String description ) {
+        this.label = label;
+        this.description = description;
+
         if (label != null && label.equals( NO_LABEL )) {
-            this.label = label;
             this.maxWidth = 0;
-        }
-        else {
-            this.label = label;
         }
     }
 
@@ -67,9 +69,19 @@ public class DefaultFormFieldLabeler
     }
 
     public Control createControl( Composite parent, IFormEditorToolkit toolkit ) {
-        return toolkit.createLabel( parent, label != null
-                ? label
-                : StringUtils.capitalize( site.getFieldName() ) );
+        String normalized = label;
+        if (normalized == null) {
+            normalized = StringUtils.capitalize( site.getFieldName() );
+        }
+        if (description != null) {
+            normalized = normalized + "*";
+        }
+        
+        Label result = toolkit.createLabel( parent, normalized );
+        if (description != null) {
+            result.setToolTipText( description );
+        }
+        return result;
     }
     
     public void setMaxWidth( int maxWidth ) {

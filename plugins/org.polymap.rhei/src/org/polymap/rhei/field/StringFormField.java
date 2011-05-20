@@ -96,6 +96,10 @@ public class StringFormField
         text.setText( value != null ? (String)value : "" );
     }
     
+    public void insert( String textToInsert ) {
+        text.insert( textToInsert );
+    }
+    
     public void load() throws Exception {
         assert text != null : "Control is null, call createControl() first.";
         

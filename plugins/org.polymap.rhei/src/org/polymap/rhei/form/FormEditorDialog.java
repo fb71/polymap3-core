@@ -78,6 +78,8 @@ public class FormEditorDialog
 
     protected void cancelPressed() {
         pageContainer.dispose();
+        
+        super.cancelPressed();
     }
 
 
@@ -154,6 +156,11 @@ public class FormEditorDialog
         }
 
         public void setFormTitle( String title ) {
+            setTitle( title );
+        }
+        
+        public void setPartTitle( String title ) {
+            // XXX
             setTitle( title );
         }
         

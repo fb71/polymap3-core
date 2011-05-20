@@ -36,10 +36,26 @@ public interface IFormEditorPageSite {
 
     public void setFormTitle( String string );
 
+    public void setPartTitle( String string );
+
     public Composite getPageBody();
 
     public IFormEditorToolkit getToolkit();
 
+
+    /**
+     * 
+     * @param parent
+     * @param prop
+     * @param field
+     * @param validator A validator, or null if the {@link NullValidator} should
+     *        be used.
+     * @param label
+     * @param description A human readable description of this field, or null.
+     *        Most often this is used as the tooltip of the field.
+     */
+    public Composite newFormField( Composite parent, Property prop, IFormField field, IFormFieldValidator validator, String label, String description );
+   
     /**
      *
      * @param parent
@@ -49,7 +65,7 @@ public interface IFormEditorPageSite {
      * @param label
      */
     public Composite newFormField( Composite parent, Property prop, IFormField field, IFormFieldValidator validator, String label );
-    
+  
     /**
      *
      * @param parent

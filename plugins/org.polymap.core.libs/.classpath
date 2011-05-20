@@ -16,14 +16,14 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp-1.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-jxpath-1.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.3.jar" sourcepath="/home/falko/.m2/repository/commons-lang/commons-lang/2.3/commons-lang-2.3-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool-1.5.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eastwood-1.1.1-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ecore-2.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/geoapi-2.3-M1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/geoapi-pending-2.3-M1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/geodb-0.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/google-collections-0.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google-collections-0.8.jar" sourcepath="/home/falko/.m2/repository/com/google/collections/google-collections/0.8/google-collections-0.8-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-api-2.6.4.jar" sourcepath="lib/sources/gt-api-2.6.4-sources.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-brewer-2.6.4.jar" sourcepath="lib/sources/gt-main-2.6.4-sources.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-charts-2.6.4.jar" sourcepath="lib/sources/gt-render-2.6.4-sources.zip"/>

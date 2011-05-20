@@ -107,7 +107,7 @@ public class BetweenFormField
         layout.marginBottom = 0;
         layout.marginLeft = 0;
         layout.marginRight = 0;
-        layout.spacing = 3;
+        layout.spacing = 8;
 //        layout.justify = true;
         layout.center = true;
         contents.setLayout( layout );

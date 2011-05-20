@@ -18,7 +18,9 @@
 package org.polymap.rhei.form.json;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,6 +47,7 @@ import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.IFormField;
 import org.polymap.rhei.field.IFormFieldValidator;
 import org.polymap.rhei.field.NumberValidator;
+import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.DefaultFormPageLayouter;
 import org.polymap.rhei.form.IFormEditorPage;
@@ -159,34 +162,46 @@ public class JsonForm
     throws JSONException, ClassNotFoundException {
         IFormField formField = null;
         IFormFieldValidator validator = null;
+        Object range = field_json.opt( "range" );
         
         // check type -> build default field/validator
-        String valueTypeName = field_json.optString( "type" );
-        
-        if (valueTypeName != null) {
-            Class valueType = Thread.currentThread().getContextClassLoader().loadClass( valueTypeName );
-            // Date
-            if (Date.class.isAssignableFrom( valueType )) {
-                formField = new DateTimeFormField();
+        String valueTypeName = field_json.optString( "type", "String" );
+        Class valueType = Thread.currentThread().getContextClassLoader().loadClass( valueTypeName );
+
+        // range -> picklist
+        if (range != null && range instanceof JSONArray) {
+            JSONArray array = (JSONArray)range;
+            Map<String,Object> rangeValues = new HashMap();
+            for (int i=0; i<array.length(); i++) {
+                JSONObject elm = (JSONObject)array.get( i );
+                rangeValues.put( elm.getString( "name" ), elm.get( "value" ) );
             }
-            // String
-            else if (String.class.isAssignableFrom( valueType )) {
-                formField = new StringFormField();
-            }
-            // Integer
-            else if (Integer.class.isAssignableFrom( valueType )) {
-                formField = new StringFormField();
-                validator = new NumberValidator( Integer.class, Locale.getDefault() );
-            }
-            // Float
-            else if (Integer.class.isAssignableFrom( valueType )) {
-                formField = new StringFormField();
-                validator = new NumberValidator( Integer.class, Locale.getDefault(), 10, 2 );
-            }
-            else {
-                throw new RuntimeException( "Unhandled valueType: " + valueType );
-            }
+            formField = new PicklistFormField( rangeValues );
         }
+        // Date
+        else if (Date.class.isAssignableFrom( valueType )) {
+            formField = new DateTimeFormField();
+        }
+        // String
+        else if (String.class.isAssignableFrom( valueType )) {
+            formField = new StringFormField();
+        }
+        // Integer
+        else if (Integer.class.isAssignableFrom( valueType )) {
+            formField = new StringFormField();
+            validator = new NumberValidator( Integer.class, Locale.getDefault() );
+        }
+        // Float
+        else if (Integer.class.isAssignableFrom( valueType )) {
+            formField = new StringFormField();
+            validator = new NumberValidator( Integer.class, Locale.getDefault(), 10, 2 );
+        }
+        else {
+            throw new RuntimeException( "Unhandled valueType: " + valueType );
+        }
+
+        // description
+        String description = field_json.optString( "description", null );
 
         // create the form field
         String label = field_json.optString( "label" );
@@ -194,7 +209,7 @@ public class JsonForm
         Object defaultValue = field_json.opt( "value" );
 
         Composite result = site.newFormField( parent, 
-                findProperty( name, defaultValue ), formField, validator, label );
+                findProperty( name, defaultValue ), formField, validator, label, description );
         return result;
     }
 

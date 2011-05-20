@@ -231,15 +231,16 @@ public class FormEditor
                 List<IFormEditorPage> _pages = provider.addPages( this, getFeature() );
 
                 if (_pages != null) {
+                    boolean isFirstPage = true;                    
                     for (IFormEditorPage page : _pages) {
                         FormEditorPageContainer wrapper = new FormEditorPageContainer( page, this, page.getId(), page.getTitle() );
                         addPage( wrapper );
                         pages.add( wrapper );
                         
-                        if (ext.isStandard()) {
+                        if (ext.isStandard() && isFirstPage) {
                             setActivePage( page.getId() );
-                            setPartName( page.getTitle() );
                         }
+                        isFirstPage = false;
                         
                         wrapper.addFieldListener( this );
                     }
@@ -249,6 +250,11 @@ public class FormEditor
                 log.warn( "Exception while initializing pages of FormEditor.", e );
             }
         }
+    }
+
+
+    public void setPartName( String name ) {
+        super.setPartName( name );
     }
 
 

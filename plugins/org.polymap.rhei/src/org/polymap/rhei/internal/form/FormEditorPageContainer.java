@@ -255,13 +255,24 @@ public class FormEditorPageContainer
         form.getForm().setText( title );
     }
 
-    public Composite newFormField( Composite parent, Property prop, IFormField field, IFormFieldValidator validator ) {
-        return newFormField( parent, prop, field, validator, null );
+    public void setPartTitle( String title ) {
+        ((FormEditor)getEditor()).setPartName( title );
     }
 
-    public Composite newFormField( Composite parent, Property prop, IFormField field, IFormFieldValidator validator, String label ) {
+    public Composite newFormField( Composite parent, Property prop, IFormField field, IFormFieldValidator validator ) {
+        return newFormField( parent, prop, field, validator, null, null );
+    }
+
+    public Composite newFormField( Composite parent, Property prop, IFormField field, IFormFieldValidator validator,
+            String label ) {
+        return newFormField( parent, prop, field, validator, label, null );        
+    }
+    
+    public Composite newFormField( Composite parent, Property prop, IFormField field, IFormFieldValidator validator,
+            String label, String description ) {
+        
         FormFieldComposite result = new FormFieldComposite( getToolkit(), prop, field,
-                new DefaultFormFieldLabeler( label ), new DefaultFormFieldDecorator(), 
+                new DefaultFormFieldLabeler( label, description ), new DefaultFormFieldDecorator(), 
                 validator != null ? validator : new NullValidator() );
         fields.add( result );
         
