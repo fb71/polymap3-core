@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
@@ -68,6 +70,8 @@ public class PicklistFormField
     private boolean                 forceTextMatch = true;
     
     private LabelProvider           labelProvider = new LabelProvider();
+    
+    private Sorter                  sorter = new Sorter();
 
     /**
      * Maps display value into associated return code (when selected). The TreeMap
@@ -80,24 +84,6 @@ public class PicklistFormField
     private List<ModifyListener>    modifyListeners = new ArrayList();
 
 
-    /**
-     * 
-     */
-    public static class LabelProvider {
-        public String getText( String label, Object value ) {
-            return label;
-        }
-    }
-
-    /**
-     * A additional {@link LabelProvider} allows to transform the labels in the
-     * dropdown of the combo of this picklist.
-     */
-    public void setLabelProvider( LabelProvider labelProvider ) {
-        this.labelProvider = labelProvider;
-    }
-
-    
     public PicklistFormField( int... flags ) {
         if (flags.length > 0) {
             setTextEditable( ArrayUtils.contains( flags, TEXT_EDITABLE ) );
@@ -186,6 +172,19 @@ public class PicklistFormField
 
     
     /**
+     * A additional {@link LabelProvider} allows to transform the labels in the
+     * dropdown of the combo of this picklist.
+     * <p/>
+     * XXX This does not work when {@link #setTextEditable(boolean)} is true. The value
+     * from the combo, which is maybe set by the dropdown, does never match the original
+     * label if the label of the dropdown was changed by the {@link LabelProvider}.
+     */
+    public void setLabelProvider( LabelProvider labelProvider ) {
+        this.labelProvider = labelProvider;
+    }
+
+
+    /**
      * If true, then the current text of the {@link #combo} is returned only if
      * it matches one of the labels. Otherwise the text is returned as is.
      */
@@ -206,8 +205,10 @@ public class PicklistFormField
             combo.addModifyListener( l );
         }
         
-        // add values
-        for (Map.Entry<String,Object> entry : values.entrySet()) {
+        // sort
+        List<Map.Entry<String,Object>> sorted = sorter.sort( this, values.entrySet() );
+
+        for (Map.Entry<String,Object> entry : sorted) {
             combo.add( labelProvider.getText( entry.getKey(), entry.getValue() ) );
         }
         
@@ -277,7 +278,7 @@ public class PicklistFormField
             // find label for given value
             for (Map.Entry<String,Object> entry : values.entrySet()) {
                 if (value.equals( entry.getValue() )) {
-                    combo.setText( entry.getKey() );
+                    combo.setText( labelProvider.getText( entry.getKey(), entry.getValue() ) );
                     break;
                 }
             }
@@ -320,4 +321,31 @@ public class PicklistFormField
         site.setFieldValue( getValue() );
     }
 
+    
+    /**
+     * 
+     */
+    public static class LabelProvider {
+
+        public String getText( String label, Object value ) {
+            return label;
+        }
+        
+    }
+
+
+    /**
+     * 
+     */
+    public static class Sorter {
+
+        public List<Entry<String, Object>> sort( PicklistFormField field, Set<Map.Entry<String,Object>> elements ) {
+            List<Entry<String, Object>> result = new ArrayList();
+            // default: elements are stored in TreeMap -> sorted
+            result.addAll( elements );
+            return result;
+        }   
+    
+    }
+    
 }

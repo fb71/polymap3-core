@@ -160,8 +160,8 @@ public class FormEditorDialog
         }
         
         public void setPartTitle( String title ) {
-            // XXX
-            setTitle( title );
+            // XXX HACK: allow JSONForm to display description of the form
+            setMessage( title );
         }
         
     }

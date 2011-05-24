@@ -136,6 +136,7 @@ public class JsonForm
         DefaultFormPageLayouter layouter = new DefaultFormPageLayouter();
 
         site.setFormTitle( getTitle() );
+        site.setPartTitle( json.optString( "description", "" ) ); // see FormEditorDialog
         site.getPageBody().setLayout( new FormLayout() );
         Composite client = site.getPageBody();
         client.setLayout( layouter.newLayout() );
@@ -174,9 +175,16 @@ public class JsonForm
             Map<String,Object> rangeValues = new HashMap();
             for (int i=0; i<array.length(); i++) {
                 JSONObject elm = (JSONObject)array.get( i );
-                rangeValues.put( elm.getString( "name" ), elm.get( "value" ) );
+                rangeValues.put( (i+1) + " - " + elm.getString( "name" ), elm.get( "value" ) );
             }
-            formField = new PicklistFormField( rangeValues );
+            PicklistFormField picklist = new PicklistFormField( rangeValues );
+//            picklist.setLabelProvider( new LabelProvider() {
+//                public String getText( String label, Object value ) {
+//                    return StringUtils.substringAfterLast( label, " - " );
+//                }
+//            });
+//            picklist.setForceTextMatch( false );
+            formField = picklist;
         }
         // Date
         else if (Date.class.isAssignableFrom( valueType )) {
