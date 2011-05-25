@@ -150,7 +150,7 @@
                id="org.polymap.rhei.DownloadCsvAction"
                label="%actions_downloadCsv"
                style="push"
-               toolbarPath="rhei"
+               toolbarPath="data"
                tooltip="%actions_downloadCsvTip">
          </action>
          <action
@@ -160,7 +160,7 @@
                id="org.polymap.rhei.OpenFormAction"
                label="%actions_openForm"
                style="push"
-               toolbarPath="rhei"
+               toolbarPath="data"
                tooltip="%actions_openFormTip">
          </action>
       </viewContribution>

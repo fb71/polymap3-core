@@ -1,17 +1,17 @@
+
+/* Somewhat darker background for general contrast and button gradiensts */ 
 * {
     background-color: #f4f4fb;
 }
-
 Shell, CTabFolder, CTabItem, ToolBar, CoolBar, Group, Group-Frame, Label {
     background-color: #f4f4fb;
 }
 
-* {
-    background-color: #f4f4fb;
-}
-
-Shell, CTabFolder, CTabItem, ToolBar, CoolBar, Group, Group-Frame, Label {
-    background-color: #f4f4fb;
+CTabItem:selected {
+    background-color: #C0C0C0;
+    color: black;
+    /*background-color: #C5DCFE;
+    color: black; */
 }
 
 Shell-DisplayOverlay {
@@ -61,7 +61,7 @@ Button[PUSH]:hover {
     background-image: gradient(
       linear, left top, left bottom,
       from( #fefeff ),
-      to( #dfdfe7 )
+      to( #d9d9e0 )
     );
 }
   

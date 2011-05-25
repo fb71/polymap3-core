@@ -61,7 +61,7 @@ public class DownloadCSVAction
 
     public void run( IAction action ) {
         try {
-            final List<Feature> features = new ArrayList();
+            final List<Feature> features = new ArrayList( 1024 );
             
             view.getFeatureCollection().accepts( new FeatureVisitor() {
                 public void visit( Feature candidate ) {

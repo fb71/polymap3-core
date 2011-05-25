@@ -32,6 +32,16 @@ import org.polymap.rhei.field.IFormField;
 public interface IFormEditorPage2
         extends IFormEditorPage {
 
+    /**
+     * Check if this page has pending changes. If any page of the form editor
+     * has changes then the submit button of the form is enabled.
+     * <p/>
+     * The method might get called <b>before</b>
+     * {@link #createFormContent(IFormEditorPageSite)} was called. So the
+     * implementation must not depend on UI elements.
+     * 
+     * @return True if the page has pending changes.
+     */
     boolean isDirty();
     
     boolean isValid();
