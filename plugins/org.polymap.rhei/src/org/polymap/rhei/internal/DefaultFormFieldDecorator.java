@@ -67,6 +67,7 @@ public class DefaultFormFieldDecorator
                 RheiPlugin.getDefault().getBundle().getResource( "icons/elcl16/field_invalid.gif" ) ).createImage();
     }
     
+    
     public void init( IFormFieldSite _site ) {
         this.site = _site;    
     }

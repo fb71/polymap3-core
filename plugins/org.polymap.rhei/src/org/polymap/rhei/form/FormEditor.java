@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.geotools.data.FeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.opengis.feature.Feature;
@@ -179,9 +178,29 @@ public class FormEditor
     }
 
     
+//    private AtomicBoolean skipFieldChangeEvents = new AtomicBoolean( false );
+    
     public void fieldChange( FormFieldEvent ev ) {
-        boolean oldIsDirty = isDirty;
+//        if (skipFieldChangeEvents.get()) {
+//            return;
+//        }
+        // propagate to all pages, except active page (which has fired the event)
+        String activePageId = getActivePageInstance().getId();
+        for (FormEditorPageContainer page : pages) {
+            if (!page.getId().equals( activePageId )) {
+                page.removeFieldListener( this );
+                page.fieldChange( ev );
+                page.addFieldListener( this );
+            }
+        }
         
+        updateStatus();
+    }
+    
+
+     protected void updateStatus() {
+        // update status
+        boolean oldIsDirty = isDirty;
         isDirty = false;
         for (FormEditorPageContainer page : pages) {
             if (page.isDirty()) {
@@ -311,7 +330,7 @@ public class FormEditor
             OperationSupport.instance().execute( op, false, false );
             
             // update isDirt/isValid
-            fieldChange( null );
+            updateStatus();
         }
         catch (Exception e) {
             PolymapWorkbench.handleError( RheiPlugin.PLUGIN_ID, this, "Objekt konnte nicht gespeichert werden.", e );
@@ -326,7 +345,7 @@ public class FormEditor
                 page.doLoad( monitor );
             }
             // update isDirt/isValid
-            fieldChange( null );
+            updateStatus();
         }
         catch (Exception e) {
             PolymapWorkbench.handleError( RheiPlugin.PLUGIN_ID, this, "Objekt konnte nicht gespeichert werden.", e );

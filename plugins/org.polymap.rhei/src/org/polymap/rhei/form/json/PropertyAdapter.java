@@ -42,17 +42,23 @@ public class PropertyAdapter
     
     private Object      defaultValue;
     
+    private Class       valueType;
     
     
-    public PropertyAdapter( String name, Object defaultValue ) {
+    public PropertyAdapter( String name, Object defaultValue, Class valueType ) {
         super();
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
+        this.valueType = valueType;
     }
 
     public Name getName() {
         return new NameImpl( name );
+    }
+    
+    public Class getValueType() {
+        return valueType;
     }
 
     public PropertyType getType() {

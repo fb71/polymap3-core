@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.text.ParseException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +36,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.opengis.feature.Property;
 
+import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -163,10 +165,12 @@ public class JsonForm
     throws JSONException, ClassNotFoundException {
         IFormField formField = null;
         IFormFieldValidator validator = null;
+        String jsonValue = field_json.optString( "value", null );
+        Object value = jsonValue;
         Object range = field_json.opt( "range" );
         
         // check type -> build default field/validator
-        String valueTypeName = field_json.optString( "type", "String" );
+        String valueTypeName = field_json.optString( "type", "java.lang.String" );
         Class valueType = Thread.currentThread().getContextClassLoader().loadClass( valueTypeName );
 
         // range -> picklist
@@ -189,20 +193,30 @@ public class JsonForm
         // Date
         else if (Date.class.isAssignableFrom( valueType )) {
             formField = new DateTimeFormField();
+            try {
+                if (jsonValue != null) {
+                    value = FastDateFormat.getDateInstance( FastDateFormat.MEDIUM, Locale.GERMANY ).parseObject( jsonValue );
+                }
+            }
+            catch (ParseException e) {
+                throw new RuntimeException( e );
+            }
         }
         // String
         else if (String.class.isAssignableFrom( valueType )) {
             formField = new StringFormField();
+            value = jsonValue;
         }
         // Integer
         else if (Integer.class.isAssignableFrom( valueType )) {
             formField = new StringFormField();
-            validator = new NumberValidator( Integer.class, Locale.getDefault() );
+            validator = new NumberValidator( Integer.class, Locale.getDefault(), 10, 0 );
         }
         // Float
-        else if (Integer.class.isAssignableFrom( valueType )) {
+        else if (Float.class.isAssignableFrom( valueType )) {
             formField = new StringFormField();
-            validator = new NumberValidator( Integer.class, Locale.getDefault(), 10, 2 );
+            validator = new NumberValidator( Float.class, Locale.getDefault(), 10, 2 );
+            value = jsonValue != null ? new Float( jsonValue ) : null;
         }
         else {
             throw new RuntimeException( "Unhandled valueType: " + valueType );
@@ -214,10 +228,9 @@ public class JsonForm
         // create the form field
         String label = field_json.optString( "label" );
         String name = field_json.getString( "name" );
-        Object defaultValue = field_json.opt( "value" );
 
         Composite result = site.newFormField( parent, 
-                findProperty( name, defaultValue ), formField, validator, label, description );
+                findProperty( name, value, valueType ), formField, validator, label, description );
         return result;
     }
 
@@ -231,8 +244,8 @@ public class JsonForm
      * @param defaultValue
      * @return
      */
-    protected Property findProperty( String propName, Object defaultValue ) {
-        return new PropertyAdapter( propName, defaultValue );
+    protected Property findProperty( String propName, Object defaultValue, Class valueType ) {
+        return new PropertyAdapter( propName, defaultValue, valueType );
     }
 
 
@@ -240,4 +253,33 @@ public class JsonForm
         return null;
     }
 
+    
+//    /*
+//     * 
+//     */
+//    class NumberValidator
+//            implements IFormFieldValidator {
+//
+//        @Override
+//        public Object transform2Field( Object modelValue )
+//                throws Exception {
+//            // XXX Auto-generated method stub
+//            throw new RuntimeException( "not yet implemented." );
+//        }
+//
+//        @Override
+//        public Object transform2Model( Object fieldValue )
+//                throws Exception {
+//            // XXX Auto-generated method stub
+//            throw new RuntimeException( "not yet implemented." );
+//        }
+//
+//        @Override
+//        public String validate( Object fieldValue ) {
+//            // XXX Auto-generated method stub
+//            throw new RuntimeException( "not yet implemented." );
+//        }
+//        
+//    }
+    
 }

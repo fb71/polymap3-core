@@ -108,6 +108,7 @@ public class RheiNavigator
             }
             this.map = map;
             getCommonViewer().setInput( this.map );
+            getCommonViewer().expandAll();
             getCommonViewer().refresh();
             
             modelListener = new ModelChangeListener() {
@@ -116,6 +117,7 @@ public class RheiNavigator
                     getCommonViewer().getControl().getDisplay().asyncExec( new Runnable() {
                         public void run() {
                             getCommonViewer().setInput( RheiNavigator.this.map );
+                            getCommonViewer().expandAll();
                             getCommonViewer().refresh();
                         }
                     });
