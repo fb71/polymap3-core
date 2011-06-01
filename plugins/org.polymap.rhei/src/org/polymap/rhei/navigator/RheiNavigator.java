@@ -117,7 +117,7 @@ public class RheiNavigator
                     getCommonViewer().getControl().getDisplay().asyncExec( new Runnable() {
                         public void run() {
                             getCommonViewer().setInput( RheiNavigator.this.map );
-                            getCommonViewer().expandAll();
+                            getCommonViewer().expandToLevel( 3 );
                             getCommonViewer().refresh();
                         }
                     });

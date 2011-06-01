@@ -19,6 +19,7 @@ package org.polymap.rhei.internal;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -77,7 +78,7 @@ public class DefaultFormFieldLabeler
             normalized = normalized + "*";
         }
         
-        Label result = toolkit.createLabel( parent, normalized );
+        Label result = toolkit.createLabel( parent, normalized, SWT.NO_FOCUS );
         if (description != null) {
             result.setToolTipText( description );
         }

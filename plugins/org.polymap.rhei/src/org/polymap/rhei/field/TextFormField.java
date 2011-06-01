@@ -62,7 +62,6 @@ public class TextFormField
 
     public Control createControl( Composite parent, IFormEditorToolkit toolkit ) {
         createControl( parent, toolkit, SWT.MULTI | style  );
-        text.setText( "*\n*\n*\n" );
         return text;
     }
 

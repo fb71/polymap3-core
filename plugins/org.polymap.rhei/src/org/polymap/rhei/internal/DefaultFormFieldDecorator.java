@@ -91,6 +91,15 @@ public class DefaultFormFieldDecorator
 //        focusLabel = toolkit.createLabel( contents, "", SWT.NO_FOCUS );
         
         dirtyLabel = toolkit.createLabel( contents, "", SWT.NO_FOCUS );
+//        dirtyLabel.setEnabled( false );
+        
+//        dirtyLabel.addFocusListener( new FocusListener() {
+//            public void focusLost( FocusEvent event ) {
+//            }
+//            public void focusGained( FocusEvent event ) {
+//                dirtyLabel.setF
+//            }
+//        });
         
 //        invalidLabel = toolkit.createLabel( contents, "", SWT.NO_FOCUS );
 
