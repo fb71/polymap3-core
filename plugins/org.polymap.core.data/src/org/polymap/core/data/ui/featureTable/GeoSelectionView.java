@@ -610,9 +610,13 @@ public class GeoSelectionView
             // FEATURE_SELECTED
             if (ev.getType() == GeoEvent.Type.FEATURE_SELECTED) {
                 log.info( "Resource: " + ev.getResource() );
-                log.info( "    :" + fs.getInfo().getSchema() );
+                log.info( "    :" + fs.getName() );
                 
-                loadTable( ev.getFilter() );
+                // XXX make this check more robust; it depends on a lot of
+                // assumptions
+                if (ev.getResource().toString().indexOf( fs.getName().getLocalPart() ) >= 0) {
+                    loadTable( ev.getFilter() );
+                }
             }
             
             // FEATURE_HOVERED
