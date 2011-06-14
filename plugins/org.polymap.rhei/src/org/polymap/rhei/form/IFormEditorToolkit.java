@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -82,6 +83,8 @@ public interface IFormEditorToolkit {
     public abstract Label createSeparator( Composite parent, int style );
 
     public abstract Table createTable( Composite parent, int style );
+
+    public abstract List createList( Composite parent, int style );
 
     public abstract Text createText( Composite parent, String value, int style );
 

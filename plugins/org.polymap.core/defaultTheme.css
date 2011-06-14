@@ -42,6 +42,11 @@ DateTime.formeditor {
     background-color: #FFFDD4;
 }
 
+List.formeditor {
+    border: 1px solid #CCCCCC;
+    /*background-color: #FFFDD4;*/
+}
+
 /* Button *************************************************/
 Button[PUSH] {
     border-radius: 6px;

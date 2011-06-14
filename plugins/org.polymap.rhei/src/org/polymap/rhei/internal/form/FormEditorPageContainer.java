@@ -22,6 +22,9 @@ import java.util.Map;
 
 import org.opengis.feature.Property;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -63,7 +66,9 @@ import org.polymap.rhei.internal.DefaultFormFieldLabeler;
 public class FormEditorPageContainer
         extends FormPage
         implements IFormEditorPageSite, IFormFieldListener {
-    
+
+    private static Log log = LogFactory.getLog( FormEditorPageContainer.class );
+
     private IFormEditorPage             page;
     
     private IManagedForm                form;
@@ -279,6 +284,18 @@ public class FormEditorPageContainer
         result.addChangeListener( this );
         
         return result.createComposite( parent != null ? parent : getPageBody(), SWT.NONE );
+    }
+
+    public void removeFormField( IFormField field ) {
+        for (FormFieldComposite composite : fields) {
+            if (composite.getField().equals( field )) {
+                if (fields.remove( composite ) == false) {
+                    throw new RuntimeException( "Unable to remove container of field: " + field );
+                }
+                return;
+            }
+        }
+        log.warn( "Unable to remove field: " + field );
     }
 
     public void setFieldValue( String fieldName, Object value ) {

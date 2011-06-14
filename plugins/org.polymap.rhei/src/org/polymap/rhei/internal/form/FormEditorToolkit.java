@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -137,6 +138,13 @@ public class FormEditorToolkit
 
     public Table createTable( Composite parent, int style ) {
         return delegate.createTable( parent, style );
+    }
+
+    public List createList( Composite parent, int style ) {
+        List result = new List( parent, style );
+//        result.setBackground( textBackground );
+        result.setData( WidgetUtil.CUSTOM_VARIANT, "formeditor" );
+        return result;
     }
 
     public Text createText( Composite parent, String value, int style ) {

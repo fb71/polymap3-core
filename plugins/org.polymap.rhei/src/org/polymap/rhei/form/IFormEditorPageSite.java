@@ -66,6 +66,8 @@ public interface IFormEditorPageSite {
      */
     public Composite newFormField( Composite parent, Property prop, IFormField field, IFormFieldValidator validator, String label );
   
+    public void removeFormField( IFormField field );
+
     /**
      *
      * @param parent

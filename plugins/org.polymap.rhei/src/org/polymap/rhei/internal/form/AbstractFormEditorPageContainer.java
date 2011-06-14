@@ -208,7 +208,12 @@ public abstract class AbstractFormEditorPageContainer
         return result.createComposite( parent != null ? parent : getPageBody(), SWT.NONE );
     }
 
-    
+
+    public void removeFormField( IFormField field ) {
+        throw new RuntimeException( "not yet implemented." );
+    }
+
+
     public void setFieldValue( String fieldName, Object value ) {
         for (FormFieldComposite field : fields) {
             if (field.getFieldName().equals( fieldName )) {

@@ -88,6 +88,11 @@ public class FormFieldComposite
         this.validator = validator;
     }
     
+
+    public IFormField getField() {
+        return field;
+    }
+
     
     public Composite createComposite( Composite parent, int style ) {
         Composite result = toolkit.createComposite( parent, style );

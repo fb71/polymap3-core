@@ -48,13 +48,28 @@ public interface IFormEditorPage2
     
     void doLoad( IProgressMonitor monitor ) 
     throws Exception;
-    
+
+
+    /**
+     * Submits changes of UI elements of this page to the underlying feature.
+     * <p/>
+     * This method may also be used to calculate fields depending on current
+     * input. In order to signal changes to all form fields
+     * {@link IFormEditorPageSite#reloadEditor()} inside an <b>async</b> display
+     * action.
+     * 
+     * @param monitor
+     * @throws Exception
+     */
     void doSubmit( IProgressMonitor monitor )
     throws Exception;
     
+
     /**
-     * Dispose any resource this page may have aquired in {@link #createFormContent(IFormEditorPageSite)}.
-     * Form fields that were created via {@link IFormEditorPageSite#newFormField(org.eclipse.swt.widgets.Composite, org.opengis.feature.Property, org.polymap.rhei.field.IFormField, org.polymap.rhei.field.IFormFieldValidator)}
+     * Dispose any resource this page may have aquired in
+     * {@link #createFormContent(IFormEditorPageSite)}. Form fields that were
+     * created via
+     * {@link IFormEditorPageSite#newFormField(org.eclipse.swt.widgets.Composite, org.opengis.feature.Property, org.polymap.rhei.field.IFormField, org.polymap.rhei.field.IFormFieldValidator)}
      * are automatically disposed and must not be disposed in this method.
      */
     void dispose();
