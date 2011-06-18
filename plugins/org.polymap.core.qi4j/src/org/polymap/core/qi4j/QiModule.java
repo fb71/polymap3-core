@@ -41,6 +41,7 @@ import org.qi4j.api.unitofwork.EntityTypeNotFoundException;
 import org.qi4j.api.unitofwork.NoSuchEntityException;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
+import org.qi4j.api.value.ValueBuilder;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.SetUtils;
@@ -131,7 +132,12 @@ public abstract class QiModule
     protected void done() {
         if (uow != null) {
             globalEntityChangeSets.unregisterModule( this );
+            uow.discard();
             uow = null;
+        }
+        if (changeSets != null) {
+            changeSets.clear();
+            changeSets = null;
         }
     }
     
@@ -485,6 +491,10 @@ public abstract class QiModule
     public <T> T newOperation( Class<T> type ) {
         T result = assembler.getModule().transientBuilderFactory().newTransient( type );
         return result;
+    }
+
+    public <T> ValueBuilder<T> newValueBuilder( Class<T> type ) {
+        return assembler.getModule().valueBuilderFactory().newValueBuilder( type );
     }
 
     /**
