@@ -39,6 +39,8 @@ import org.eclipse.ui.IViewPart;
 import org.polymap.core.data.PipelineFeatureSource;
 import org.polymap.core.data.operations.NewFeatureOperation;
 import org.polymap.core.data.ui.featureTable.GeoSelectionView;
+import org.polymap.core.model.ACLUtils;
+import org.polymap.core.model.AclPermission;
 import org.polymap.core.operation.OperationSupport;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.workbench.PolymapWorkbench;
@@ -66,7 +68,7 @@ public class NewFormAction
         if (view instanceof GeoSelectionView) {
             log.debug( "init(): found GeoSelectionView..." );
             this.view = (GeoSelectionView)_view;
-            this.layer = ((GeoSelectionView)view).getLayer();
+            this.layer = (view).getLayer();
             assert layer != null : "Layer must not be null.";
         }
     }
@@ -103,6 +105,8 @@ public class NewFormAction
             
             if (elm instanceof ILayer) {
                 layer = (ILayer)elm;
+
+                action.setEnabled( ACLUtils.checkPermission( layer, AclPermission.WRITE, false ) );
             }
         }
     }

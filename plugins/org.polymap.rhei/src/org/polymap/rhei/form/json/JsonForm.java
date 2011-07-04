@@ -210,12 +210,12 @@ public class JsonForm
         // Integer
         else if (Integer.class.isAssignableFrom( valueType )) {
             formField = new StringFormField();
-            validator = new NumberValidator( Integer.class, Locale.getDefault(), 10, 0 );
+            validator = new NumberValidator( Integer.class, Locale.GERMANY, 10, 0 );
         }
         // Float
         else if (Float.class.isAssignableFrom( valueType )) {
             formField = new StringFormField();
-            validator = new NumberValidator( Float.class, Locale.getDefault(), 10, 2 );
+            validator = new NumberValidator( Float.class, Locale.GERMANY, 10, 2 );
             value = jsonValue != null ? new Float( jsonValue ) : null;
         }
         else {
