@@ -241,7 +241,7 @@ public class EntitySourceProcessor
             int count = 0;
             for (Entity entity : entities) {
                 Feature feature = buildFeature( entity );
-                if (filterFeature( feature, query.getFilter() ) != null) {
+                if (feature != null && filterFeature( feature, query.getFilter() ) != null) {
                     count++;
                 }
             }
@@ -340,7 +340,7 @@ public class EntitySourceProcessor
      * @return
      */
     private Feature filterFeature( Feature feature, Filter filter ) {
-        return filter.evaluate( feature ) ? feature : null;
+        return filter != null && filter.evaluate( feature ) ? feature : null;
     }
 
     

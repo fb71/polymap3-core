@@ -187,6 +187,7 @@ public class Qi4jPlugin
 	        }
 	    }
 	    
+
 	    public QiModule module( Class type ) {
 	        QiModule result = modules.get( type );
 	        return result;
@@ -224,7 +225,7 @@ public class Qi4jPlugin
 	        }
 	        // called by the modules
 	        else if (appliesTo instanceof Class) {
-	            return modules.get( (Class)appliesTo );
+	            return modules.get( appliesTo );
 	        }
 	        // Entity
 	        else if (appliesTo instanceof Entity) {

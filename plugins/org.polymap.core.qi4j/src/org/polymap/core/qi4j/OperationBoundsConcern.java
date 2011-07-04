@@ -55,11 +55,11 @@ public abstract class OperationBoundsConcern
 
     public IStatus execute( IProgressMonitor monitor, IAdaptable info )
     throws ExecutionException {
-        log.info( "Starting operation ... (" + hashCode() + ")" + " [" + Thread.currentThread().getId() + "]" );
         QiModule applied = null;
         try {
             // start operation
             applied = Qi4jPlugin.Session.instance().resolveModule( _module );
+            log.info( "Starting operation ... (" + applied + ")" + " [" + Thread.currentThread().getId() + "]" );
             applied.newChangeSet();
             applied.startOperation();
             

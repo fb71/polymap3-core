@@ -3,10 +3,10 @@
 	<target name="main">
 		<ant antfile="build.xml" dir="../../extras/org.eclipse.core.filesystem" target="build.jars"/>
 		<ant antfile="build.xml" dir="../../extras/org.eclipse.equinox.security" target="build.jars"/>
-		<ant antfile="build.xml" dir="../org.polymap.openlayers.rap.widget" target="build.jars"/>
+		<ant antfile="build.xml" dir="../../extras/org.eclipse.rwt.widgets.upload" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.libs" target="build.jars"/>
 		<ant antfile="build.xml" dir="../net.refractions.udig.core_p3" target="build.jars"/>
-		<ant antfile="build.xml" dir="../org.polymap.openlayers.rap.lib_provider" target="build.jars"/>
+		<ant antfile="build.xml" dir="../../extras/org.eclipse.rwt.widgets.codemirror" target="build.jars"/>
 		<ant antfile="build.xml" dir="../net.refractions.udig.ui_p3" target="build.jars"/>
 		<ant antfile="build.xml" dir="../net.refractions.udig.catalog_p3" target="build.jars"/>
 		<ant antfile="build.xml" dir="../net.refractions.udig.catalog.ui_p3" target="build.jars"/>
@@ -14,6 +14,7 @@
 		<ant antfile="build.xml" dir="../net.refractions.udig.catalog.wms_p3" target="build.jars"/>
 		<ant antfile="build.xml" dir="../net.refractions.udig.catalog.shp_p3" target="build.jars"/>
 		<ant antfile="build.xml" dir="../net.refractions.udig.catalog.postgis" target="build.jars"/>
+		<ant antfile="build.xml" dir="../../extras/org.eclipse.rap.ui.navigator" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.style" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.qi4j" target="build.jars"/>
@@ -25,10 +26,8 @@
 		<ant antfile="build.xml" dir="../net.refractions.udig.catalog.rasterings_p3" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.data" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.services" target="build.jars"/>
-		<ant antfile="build.xml" dir="../org.polymap.core.services.geoserver" target="build.jars"/>
-		<ant antfile="build.xml" dir="../org.polymap.core.mapeditor" target="build.jars"/>
-		<ant antfile="build.xml" dir="../org.polymap.styler" target="build.jars"/>
-		<ant antfile="build.xml" dir="../../../polymap-atlas/plugins/org.polymap.lka" target="build.jars"/>
+		<ant antfile="build.xml" dir="../org.polymap.rhei" target="build.jars"/>
+		<ant antfile="build.xml" dir="../../../org.polymap.anta2" target="build.jars"/>
 		<ant antfile="build.xml" dir="../net.refractions.udig.catalog.geotiff_p3" target="build.jars"/>
 	</target>
 </project>

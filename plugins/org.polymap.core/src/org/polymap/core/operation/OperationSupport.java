@@ -353,7 +353,7 @@ public class OperationSupport
         
         List                    concerns = new ArrayList();
         
-        OperationInfo() {
+        public OperationInfo() {
             super();
             this.display = Polymap.getSessionDisplay();
             assert this.display != null;

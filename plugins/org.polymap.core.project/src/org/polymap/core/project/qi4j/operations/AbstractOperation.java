@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
 /**
  * <p>
@@ -195,8 +196,10 @@ public abstract class AbstractOperation implements IUndoableOperation {
      * @see org.eclipse.core.commands.operations.IUndoableOperation#redo(org.eclipse.core.runtime.IProgressMonitor,
      *      org.eclipse.core.runtime.IAdaptable)
      */
-    public abstract IStatus redo(IProgressMonitor monitor, IAdaptable info)
-            throws ExecutionException;
+    public IStatus redo(IProgressMonitor monitor, IAdaptable info)
+            throws ExecutionException {
+        return Status.CANCEL_STATUS;
+    }
 
     /*
      * (non-Javadoc)
@@ -216,8 +219,10 @@ public abstract class AbstractOperation implements IUndoableOperation {
      * @see org.eclipse.core.commands.operations.IUndoableOperation#undo(org.eclipse.core.runtime.IProgressMonitor,
      *      org.eclipse.core.runtime.IAdaptable)
      */
-    public abstract IStatus undo(IProgressMonitor monitor, IAdaptable info)
-            throws ExecutionException;
+    public IStatus undo(IProgressMonitor monitor, IAdaptable info)
+            throws ExecutionException {
+        return Status.CANCEL_STATUS;
+    }
 
     /**
      * The string representation of this operation. Used for debugging purposes
