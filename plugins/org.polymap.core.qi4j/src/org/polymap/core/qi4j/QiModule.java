@@ -44,7 +44,6 @@ import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 import org.qi4j.api.value.ValueBuilder;
 
 import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.SetUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -365,10 +364,13 @@ public abstract class QiModule
             if (!changeSets.isEmpty()) {
                 NestedChangeSet ncs = (NestedChangeSet)currentChangeSet();
                 Set<String> ids = ncs.ids();
-                globalEntityListeners.fireEvent( this, ids, EventType.change );
+                if (ids != null && !ids.isEmpty()) {
+                    globalEntityListeners.fireEvent( this, ids, EventType.change );
+                }
             }
             else {
-                globalEntityListeners.fireEvent( this, SetUtils.EMPTY_SET, EventType.change );
+                // event if nothing has changed!?
+                //globalEntityListeners.fireEvent( this, SetUtils.EMPTY_SET, EventType.change );
             }
         }
     }

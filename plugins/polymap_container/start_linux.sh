@@ -17,7 +17,7 @@ export LANG=en_US.UTF-8
 
 cd $DIRNAME/bin
 
-export VMARGS='-Xverify:none -XX:+UseParallelGC -Xmx512M -XX:MaxPermSize=128M -Dorg.eclipse.rwt.compression=true'
+export VMARGS='-Xverify:none -XX:+UseParallelGC -Xmx2048M -XX:MaxPermSize=256M -Dorg.eclipse.rwt.compression=true'
 export ARGS='-console -consolelog -registryMultiLanguage'
 #export LOGARGS='-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog'
 

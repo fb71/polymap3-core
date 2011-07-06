@@ -169,9 +169,14 @@ public class ProjectRepositoryAssembler
                 rootMap.addPermission( Authentication.ALL.getName(), AclPermission.READ, AclPermission.WRITE );
                 rootMap.setLabel( "root" );
 
-                IMap map = start_uow.newEntity( IMap.class, "First Map" );
-                map.addPermission( Authentication.ALL.getName(), AclPermission.ALL );
-                map.setLabel( "First Map" );
+                IMap map = start_uow.newEntity( IMap.class, "antraege" );
+                map.addPermission( Authentication.ALL.getName(), AclPermission.READ );
+                map.setLabel( "Anträge" );
+                rootMap.addMap( map );
+
+                map = start_uow.newEntity( IMap.class, "kosten" );
+                map.addPermission( Authentication.ALL.getName(), AclPermission.READ );
+                map.setLabel( "Kosten" );
                 rootMap.addMap( map );
 
                 System.out.println( "rootMap: " + ((MapState)rootMap).maps().iterator().next() );

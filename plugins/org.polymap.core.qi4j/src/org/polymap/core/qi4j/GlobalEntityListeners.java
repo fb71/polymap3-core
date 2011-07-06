@@ -106,6 +106,9 @@ class GlobalEntityListeners {
 
                         // notify the listeners
                         for (Object l : ls) {
+                            if (monitor.isCanceled()) {
+                                return Status.CANCEL_STATUS;
+                            }
                             if (((GlobalModelChangeListener)l).isValid()) {
                                 ((GlobalModelChangeListener)l).modelChanged( gev );
                             }

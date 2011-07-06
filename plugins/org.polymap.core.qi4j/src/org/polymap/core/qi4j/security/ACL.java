@@ -128,21 +128,29 @@ public interface ACL
                 // listen to entity (model) changes
                 // don't care outside Session
                 if (Polymap.getSessionDisplay() != null) {
-                    final QiModule module = Qi4jPlugin.Session.instance().resolveModule( entity );
-                    if (module != null) {
-                        module.addModelChangeListener( new ModelChangeListener() {
-                            public void modelChanged( ModelChangeEvent ev ) {
-                                log.info( "modelChanged(): ..." );
-                                acl = null;
-                                entries.clear();
+                    try {
+                        final QiModule module = Qi4jPlugin.Session.instance().resolveModule( entity );
 
-                                // the next checkInit() adds a new listener again; if this
-                                // entity is no longer used, then checkInit() is never called again
-                                // and the listener was removed correctly
-                                module.removeModelChangeListener( this );
-                            }
-                        });
+                        if (module != null) {
+                            module.addModelChangeListener( new ModelChangeListener() {
+                                public void modelChanged( ModelChangeEvent ev ) {
+                                    log.info( "modelChanged(): ..." );
+                                    acl = null;
+                                    entries.clear();
+
+                                    // the next checkInit() adds a new listener again; if this
+                                    // entity is no longer used, then checkInit() is never called again
+                                    // and the listener was removed correctly
+                                    module.removeModelChangeListener( this );
+                                }
+                            });
+                        }
                     }
+                    catch (Exception e) {
+                        // with 3.1 we have listeners at each entity, which avoids such hacks
+                        log.warn( "Still about to init module!? No model listener registered." );
+                    }
+
                 }
                 else {
                     log.warn( "No module found for this ACL entity. -> no model change events are catched!" );
