@@ -119,10 +119,15 @@ public class CsvServlet
 
         response.setContentType( "text/csv; charset=ISO-8859-1" );
         response.setHeader( "Content-disposition", "attachment; filename=anta2.csv" );
+        
+        // prevent caching
+        response.setHeader( "Cache-Control", "no-cache" ); // HTTP 1.1
+        response.setHeader( "Pragma", "no-cache" ); // HTTP 1.0
+        response.setDateHeader( "Expires", 0 ); // prevents caching at the proxy
+        // MS crap!?
         response.setHeader( "Pragma", "public" );
         response.setHeader( "Cache-Control", "must-revalidate, post-check=0, pre-check=0" );
         response.setHeader( "Cache-Control", "public" );
-        response.setHeader( "Expires", "0" );
 
         PrintWriter writer = response.getWriter();
         
@@ -145,7 +150,7 @@ public class CsvServlet
                         header.add( prop.getName().getLocalPart() );
                     }
                 }
-                csvWriter.writeHeader( (String[]) header.toArray(new String[header.size()]) );
+                csvWriter.writeHeader( header.toArray(new String[header.size()]) );
                 noHeaderYet = false;
             }
             
