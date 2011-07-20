@@ -118,7 +118,7 @@ public abstract class QiModule
         if (ContextProvider.hasContext()) {
             RWT.getSessionStore().addSessionStoreListener( new SessionStoreListener() {
                 public void beforeDestroy( SessionStoreEvent ev ) {
-                    log.info( "Session closed: removing module..."  );
+                    log.info( "Session closed: removing module: " + QiModule.this.getClass().getSimpleName() );
                     done();
                 }
             });

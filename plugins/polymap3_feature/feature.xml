@@ -300,13 +300,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.polymap.core.mapeditor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.polymap.core.project"
          download-size="0"
          install-size="0"
@@ -315,20 +308,6 @@
 
    <plugin
          id="org.polymap.core.style"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.polymap.openlayers.rap.lib_provider"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.polymap.styler"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -356,13 +335,6 @@
 
    <plugin
          id="org.polymap.core.services"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.polymap.lka"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -445,13 +417,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.polymap.openlayers.rap.widget"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.equinox.security"
          download-size="0"
          install-size="0"
@@ -473,14 +438,42 @@
          unpack="false"/>
 
    <plugin
-         id="org.polymap.core.services.geoserver"
+         id="org.polymap.core.catalog"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.polymap.core.catalog"
+         id="org.polymap.rhei"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.polymap.anta2"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.rap.ui.navigator"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.rwt.widgets.codemirror"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.rwt.widgets.upload"
          download-size="0"
          install-size="0"
          version="0.0.0"
