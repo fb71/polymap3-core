@@ -16,10 +16,6 @@
 package org.polymap.rhei.calculator.spi;
 
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-
 import java.io.PrintStream;
 import java.io.Reader;
 
@@ -167,14 +163,28 @@ public class BeanShellCalculatorProvider
     }
 
     
-    public static void main(String [ ] args) {
+    public static void main(String [ ] args) 
+    throws Exception {
         long start = System.currentTimeMillis();
         
-        Random rand = new Random();
-        Set tree = new TreeSet();
+        BeanShellCalculatorProvider provider = new BeanShellCalculatorProvider();
         for (int i=0; i<100000; i++) {
-            tree.add( String.valueOf( rand.nextInt() ) );
+            ICalculator calc = provider.newCalculator( "Thread.sleep( 10 ); long result = System.currentTimeMillis(); throw new NullPointerException();" );
+            try {
+                calc.eval();
+            }
+            catch (Exception e) {
+                System.out.println( "   Exception: " + e );
+            }
+            System.out.println( "Result: " + calc.getResult( "result" ) + "Total: " + Runtime.getRuntime().totalMemory() );
         }
+        
+        
+//        Random rand = new Random();
+//        Set tree = new TreeSet();
+//        for (int i=0; i<100000; i++) {
+//            tree.add( String.valueOf( rand.nextInt() ) );
+//        }
         
         System.out.println( "Time: " + (System.currentTimeMillis()-start) + "ms" );
     }

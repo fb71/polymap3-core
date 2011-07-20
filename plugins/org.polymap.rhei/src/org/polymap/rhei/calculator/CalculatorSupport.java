@@ -56,7 +56,7 @@ public class CalculatorSupport {
     
     
     protected CalculatorSupport() {
-        // XXX make this extendible
+        // XXX make this extendable
         BeanShellCalculatorProvider provider = new BeanShellCalculatorProvider();
         providers.put( provider.getId(), provider );
     }
