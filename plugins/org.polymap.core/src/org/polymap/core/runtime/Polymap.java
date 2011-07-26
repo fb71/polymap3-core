@@ -46,8 +46,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.rwt.SessionSingletonBase;
 import org.eclipse.rwt.internal.lifecycle.RWTLifeCycle;
 
-import org.eclipse.jface.dialogs.ErrorDialog;
-
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -212,7 +210,7 @@ public final class Polymap
                 //log.warn( "Login error: " + e, e );
                 IStatus status = new Status( IStatus.ERROR, CorePlugin.PLUGIN_ID,
                         "Login fehlgeschlagen.", e );
-                ErrorDialog.openError( null, "Achtung", "Login fehlgeschlagen", status );
+                //ErrorDialog.openError( null, "Achtung", "Login fehlgeschlagen", status );
             }
         }
     }
