@@ -90,27 +90,13 @@ public abstract class EntityServiceImpl
         }
     }
 
-
-//    public EntityServiceImpl( URL id2, Map<String, Serializable> params ) {
-//        this.params = params;
-//
-//        this.id = (URL)params.get( EntityServiceExtensionImpl.KEY );
-//        this.name = (String)params.get( EntityServiceExtensionImpl.NAME_KEY );
-//
-//        boolean noMoreProviders = false;
-//        for (int i=0; !noMoreProviders; i++) {
-//            String providerClassName = (String)params.get( EntityServiceExtensionImpl.PROVIDER_BASE_KEY + i );
-//            if (providerClassName != null) {
-//                try {
-//                    EntityProvider provider = (EntityProvider)Thread.currentThread().getContextClassLoader()
-//                            .loadClass( providerClassName ).newInstance();
-//                }
-//                catch (Exception e) {
-//                    log.warn( "Unable to load EntityProvider: " + providerClassName, e );
-//                }
-//            }
-//        }
-//    }
+    
+    public void dispose( IProgressMonitor monitor ) {
+        super.dispose( monitor );
+        providers = null;
+        resources.clear();
+        resources = null;
+    }
 
 
     protected IServiceInfo createInfo( IProgressMonitor monitor )

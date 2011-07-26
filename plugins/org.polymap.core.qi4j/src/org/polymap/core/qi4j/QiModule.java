@@ -138,6 +138,14 @@ public abstract class QiModule
             changeSets.clear();
             changeSets = null;
         }
+        if (propChangeListeners != null) {
+            propChangeListeners.clear();
+            propChangeListeners = null;
+        }
+        if (modelChangeListeners != null) {
+            modelChangeListeners.clear();
+            modelChangeListeners = null;
+        }
     }
     
     public ModelChangeSet newChangeSet() {

@@ -55,7 +55,10 @@ class GlobalEntityChangeSets {
     
     void unregisterModule( QiModule module ) {
         synchronized (modules) {
-            modules.remove( module );
+            boolean ok = modules.remove( module );
+            if (!ok) {
+                throw new IllegalArgumentException( "Unable to remove module." );
+            }
         }
     }
     

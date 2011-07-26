@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 import org.qi4j.api.common.TypeName;
 import org.qi4j.api.composite.AmbiguousTypeException;
 import org.qi4j.api.entity.EntityComposite;
@@ -50,7 +49,9 @@ import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.*;
 
 public final class UnitOfWorkInstance
 {
-    public static final ThreadLocal<Stack<UnitOfWorkInstance>> current;
+// FIXME -falko: this causes mem leaks under some (ANTA anträge but not belege!?) circumstances;
+// as I don't need pause/resume it I'm disabling this completely
+//    public static final ThreadLocal<Stack<UnitOfWorkInstance>> current;
 
     final HashMap<EntityReference, EntityState> stateCache;
     final HashMap<InstanceKey, EntityInstance> instanceCache;
@@ -69,13 +70,13 @@ public final class UnitOfWorkInstance
 
     static
     {
-        current = new ThreadLocal<Stack<UnitOfWorkInstance>>()
-        {
-            protected Stack<UnitOfWorkInstance> initialValue()
-            {
-                return new Stack<UnitOfWorkInstance>();
-            }
-        };
+//        current = new ThreadLocal<Stack<UnitOfWorkInstance>>()
+//        {
+//            protected Stack<UnitOfWorkInstance> initialValue()
+//            {
+//                return new Stack<UnitOfWorkInstance>();
+//            }
+//        };
     }
 
     public UnitOfWorkInstance( Usecase usecase )
@@ -84,7 +85,7 @@ public final class UnitOfWorkInstance
         stateCache = new HashMap<EntityReference, EntityState>();
         instanceCache = new HashMap<InstanceKey, EntityInstance>();
         storeUnitOfWork = new HashMap<EntityStore, EntityStoreUnitOfWork>();
-        current.get().push( this );
+//        current.get().push( this );
         paused = false;
         this.usecase = usecase;
     }
@@ -220,7 +221,8 @@ public final class UnitOfWorkInstance
         if( !paused )
         {
             paused = true;
-            current.get().pop();
+            throw new RuntimeException( "pause()/resume() is disabled. See UnitOfWorkInstance for details." );
+//            current.get().pop();
         }
         else
         {
@@ -233,7 +235,8 @@ public final class UnitOfWorkInstance
         if( paused )
         {
             paused = false;
-            current.get().push( this );
+            throw new RuntimeException( "pause()/resume() is disabled. See UnitOfWorkInstance for details." );
+//            current.get().push( this );
         }
         else
         {
@@ -314,10 +317,10 @@ public final class UnitOfWorkInstance
     {
         checkOpen();
 
-        if( !isPaused() )
-        {
-            current.get().pop();
-        }
+//        if( !isPaused() )
+//        {
+//            current.get().pop();
+//        }
         open = false;
 
         for( EntityInstance entityInstance : instanceCache.values() )

@@ -67,6 +67,12 @@ public class EntityGeoResourceImpl
     }
 
 
+    public void dispose( IProgressMonitor monitor ) {
+        provider = null;
+        service = null;
+    }
+
+
     public <T> T resolve( Class<T> adaptee, IProgressMonitor monitor )
     throws IOException {
         if (adaptee == null) {
