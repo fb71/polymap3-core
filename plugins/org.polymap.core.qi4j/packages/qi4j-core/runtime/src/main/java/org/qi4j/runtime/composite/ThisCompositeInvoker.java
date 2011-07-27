@@ -14,6 +14,7 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -25,16 +26,22 @@ import org.qi4j.spi.composite.CompositeInstance;
 public class ThisCompositeInvoker
     implements MethodInterceptor
 {
-    private CompositeInstance compositeInstance;
+    // XXX -falko: instances are held in ThreadLocal as Enhancer Callback (see MixinModel:150);
+    // and causing mem leak; I'm not quite sure how to fix this correctly; I go with the WeakReference
+    private WeakReference<CompositeInstance> compositeInstanceRef;
 
     public ThisCompositeInvoker( CompositeInstance compositeInstance )
     {
-        this.compositeInstance = compositeInstance;
+        this.compositeInstanceRef = new WeakReference( compositeInstance );
     }
 
     public Object intercept( Object obj, Method method, Object[] args, MethodProxy proxy )
         throws Throwable
     {
+        CompositeInstance compositeInstance = compositeInstanceRef.get();
+        if (compositeInstance == null) {
+            throw new IllegalStateException( "Reference to CompositeInstance was reclamed!" );
+        }
         return compositeInstance.invokeProxy( method, args );
     }
 }
