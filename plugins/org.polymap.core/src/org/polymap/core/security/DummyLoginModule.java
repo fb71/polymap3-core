@@ -74,6 +74,8 @@ public class DummyLoginModule
     private DummyUserPrincipal              principal;
     
     private File                            configFile;
+    
+    private String                          dialogTitle = "POLYMAP3 Workbench";
 
 
     public DummyLoginModule() {
@@ -101,6 +103,9 @@ public class DummyLoginModule
                 configFile = option.getValue().startsWith( File.pathSeparator )
                         ? new File( option.getValue() )
                         : new File( Polymap.getWorkspacePath().toFile(), option.getValue() );
+            }
+            else if (option.getKey().equals( "dialogTitle" )) {
+                dialogTitle = option.getValue();
             }
             else {
                 String user = option.getKey();
@@ -142,8 +147,7 @@ public class DummyLoginModule
             }
         }
 
-        Callback label = new TextOutputCallback( TextOutputCallback.INFORMATION,
-                "POLYMAP 3 Workbench" );
+        Callback label = new TextOutputCallback( TextOutputCallback.INFORMATION, dialogTitle );
         NameCallback nameCallback = new NameCallback( "Nutzername", "admin" );
         PasswordCallback passwordCallback = new PasswordCallback( "Passwort", false );
         try {
