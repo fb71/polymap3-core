@@ -51,7 +51,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
-class FeatureTableContentProvider implements ILazyContentProvider, IProvider<Collection<SimpleFeature>> {
+class FeatureTableContentProvider 
+        implements ILazyContentProvider, IProvider<Collection<SimpleFeature>> {
 
     private static final IProgressMonitor NULL = new NullProgressMonitor();
     /** FeatureContentProvider owningFeatureTableControl field */

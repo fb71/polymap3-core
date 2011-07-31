@@ -27,8 +27,6 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.vividsolutions.jts.geom.Geometry;
 
 import org.eclipse.swt.SWT;
@@ -317,6 +315,7 @@ public class FeatureTableControl implements ISelectionProvider {
         
         tableViewer.setContentProvider(ftp);
         tableViewer.setLabelProvider(flp);
+        tableViewer.setSorter( new FeatureTableViewerSorter() );
 
         // create columns after tableViewer is created because Column listeners need to access the
         // tableViewer.
@@ -636,10 +635,12 @@ public class FeatureTableControl implements ISelectionProvider {
                 if (Geometry.class.isAssignableFrom(aType.getType().getBinding())) { // was aType.isGeometry()
                     // jg: wot is this maddness? jd: paul said so
                     column.setText("GEOMETRY"); //$NON-NLS-1$
-                } else
+                    //layout.addColumnData(new ColumnWeightData(2, 50, true));
+                } else {
                     // _p3: the capitalize does not work since some other, wonderful code seem to depend
                     // on the column text for property name :(
                     column.setText( aType.getName().getLocalPart() ); //StringUtils.capitalize(aType.getName().getLocalPart()));
+                }
 
                 // _p3: column width depending on column data type
                 if (Boolean.class.isAssignableFrom( aType.getType().getBinding() )) {
@@ -895,7 +896,7 @@ public class FeatureTableControl implements ISelectionProvider {
     }
     
     public void select( String cql, boolean selectAll ) throws CQLException {
-        Filter filter = (Filter) CQL.toFilter( cql );
+        Filter filter = CQL.toFilter( cql );
 
         FeatureTableContentProvider provider = (FeatureTableContentProvider) this.tableViewer.getContentProvider();
         List<SimpleFeature> toSearch = provider.features;
