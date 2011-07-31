@@ -18,6 +18,7 @@ package org.polymap.rhei.form;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -54,7 +55,7 @@ public class DefaultFormPageLayouter {
     public Composite setFieldLayoutData( Composite field ) {
         assert field.getParent().getLayout() instanceof FormLayout;
         
-        FormData layoutData = new FormData();
+        FormData layoutData = new FormData( 200, SWT.DEFAULT );
         layoutData.left = new FormAttachment( 0, DEFAULT_FIELD_SPACING_H );
         layoutData.right = new FormAttachment( 100, -DEFAULT_FIELD_SPACING_H );
         layoutData.top = lastLayoutElm != null

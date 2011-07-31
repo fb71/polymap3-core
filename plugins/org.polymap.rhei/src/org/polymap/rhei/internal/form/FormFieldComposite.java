@@ -118,7 +118,7 @@ public class FormFieldComposite
         // field
         field.init( this );
         Control fieldControl = field.createControl( result, toolkit );
-        layoutData = new FormData( 100, SWT.DEFAULT );
+        layoutData = new FormData( 50, SWT.DEFAULT );
         layoutData.top = new FormAttachment( 0 );
         layoutData.bottom = new FormAttachment( 100 );
         layoutData.left = new FormAttachment( labelControl, 5 );
