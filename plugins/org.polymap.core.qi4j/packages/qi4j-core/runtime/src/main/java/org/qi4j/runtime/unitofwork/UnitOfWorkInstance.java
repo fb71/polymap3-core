@@ -16,11 +16,18 @@
  */
 package org.qi4j.runtime.unitofwork;
 
+import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.COMPLETED;
+import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.DISCARDED;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.map.ReferenceMap;
+
 import org.qi4j.api.common.TypeName;
 import org.qi4j.api.composite.AmbiguousTypeException;
 import org.qi4j.api.entity.EntityComposite;
@@ -45,17 +52,15 @@ import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.entitystore.StateCommitter;
 import org.qi4j.spi.structure.ModuleSPI;
 
-import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.*;
-
 public final class UnitOfWorkInstance
 {
 // FIXME -falko: this causes mem leaks under some (ANTA anträge but not belege!?) circumstances;
-// as I don't need pause/resume it I'm disabling this completely
+// as I don't need pause/resume I'm disabling this completely
 //    public static final ThreadLocal<Stack<UnitOfWorkInstance>> current;
 
-    final HashMap<EntityReference, EntityState> stateCache;
-    final HashMap<InstanceKey, EntityInstance> instanceCache;
-    final HashMap<EntityStore, EntityStoreUnitOfWork> storeUnitOfWork;
+    final Map<EntityReference, EntityState> stateCache;
+    final Map<InstanceKey, EntityInstance> instanceCache;
+    final Map<EntityStore, EntityStoreUnitOfWork> storeUnitOfWork;
 
     private boolean open;
 
@@ -82,10 +87,19 @@ public final class UnitOfWorkInstance
     public UnitOfWorkInstance( Usecase usecase )
     {
         this.open = true;
-        stateCache = new HashMap<EntityReference, EntityState>();
-        instanceCache = new HashMap<InstanceKey, EntityInstance>();
+        stateCache = new ReferenceMap( ReferenceMap.HARD, ReferenceMap.SOFT, 1024, 0.75f );
+        instanceCache = new ReferenceMap( ReferenceMap.HARD, ReferenceMap.SOFT, 1024, 0.75f );
+
+// UoW is for one thread, no need to synchronize
+//        stateCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 1, ReferenceType.SOFT, ReferenceType.SOFT, null );
+//        instanceCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 1, ReferenceType.SOFT, ReferenceType.SOFT, null );
+
+//        stateCache = new HashMap( 1024 );
+//        instanceCache = new HashMap( 1024 );
+
         storeUnitOfWork = new HashMap<EntityStore, EntityStoreUnitOfWork>();
-//        current.get().push( this );
+
+        //        current.get().push( this );
         paused = false;
         this.usecase = usecase;
     }
@@ -156,6 +170,7 @@ public final class UnitOfWorkInstance
             entityInstance = new EntityInstance( uow, module, model, entityState );
 
             stateCache.put( identity, entityState );
+//            System.out.println( "# stateCache: size=" + stateCache.size() );
             InstanceKey instanceKey = new InstanceKey( model.entityType().type(), identity );
             instanceCache.put( instanceKey, entityInstance );
         }
