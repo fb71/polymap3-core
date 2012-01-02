@@ -81,12 +81,12 @@ class LuceneQueryParserImpl {
     }
 
 
-    public Query createQuery( final String resultType, final BooleanExpression whereClause,
+    public Query createQuery( final Class<?> resultType, final BooleanExpression whereClause,
             final OrderBy[] orderBySegments ) {
 
         Query filterQuery = processFilter( whereClause );
 
-        Query typeQuery = new TermQuery( new Term( "type", resultType ) );
+        Query typeQuery = new TermQuery( new Term( "type", resultType.getName() ) );
         Query result = null;
         if (!filterQuery.equals( ALL )) {
             result = new BooleanQuery();

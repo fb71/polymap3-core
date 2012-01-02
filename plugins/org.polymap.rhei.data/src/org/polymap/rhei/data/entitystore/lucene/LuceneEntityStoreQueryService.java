@@ -69,7 +69,7 @@ public interface LuceneEntityStoreQueryService
 
         
         public Iterable<EntityReference> findEntities( 
-                String resultType,
+                Class<?> resultType,
                 BooleanExpression whereClause, 
                 OrderBy[] orderBySegments, 
                 Integer firstResult,
@@ -139,7 +139,7 @@ public interface LuceneEntityStoreQueryService
 
 
         public EntityReference findEntity( 
-                String resultType, BooleanExpression whereClause )
+                Class resultType, BooleanExpression whereClause )
                 throws EntityFinderException {
             
             try {
@@ -181,7 +181,7 @@ public interface LuceneEntityStoreQueryService
         }
 
         
-        public long countEntities( String resultType, BooleanExpression whereClause )
+        public long countEntities( Class resultType, BooleanExpression whereClause )
         throws EntityFinderException {
             log.debug( "countEntities(): resultType=" + resultType + ", where=" + whereClause );
 

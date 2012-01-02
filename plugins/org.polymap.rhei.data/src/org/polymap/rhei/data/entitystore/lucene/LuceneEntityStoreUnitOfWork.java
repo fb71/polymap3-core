@@ -90,14 +90,21 @@ public final class LuceneEntityStoreUnitOfWork
     }
 
 
-    public StateCommitter apply()
+    public StateCommitter applyChanges()
             throws EntityStoreException {
-        StateCommitter result = entityStoreSPI.apply( states, identity );
+        StateCommitter result = entityStoreSPI.applyChanges( this, states );
         return result;
     }
 
 
     public void discard() {
+    }
+
+
+    @Override
+    public long currentTime() {
+        // XXX Auto-generated method stub
+        throw new RuntimeException( "not yet implemented." );
     }
 
 }

@@ -21,8 +21,10 @@ import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.entity.EntityReference;
+import org.qi4j.api.entity.association.EntityStateHolder.EntityStateVisitor;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.injection.scope.Uses;
+import org.qi4j.api.io.Input;
 import org.qi4j.api.service.Activatable;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.unitofwork.EntityTypeNotFoundException;
@@ -110,8 +112,14 @@ public class LuceneEntityStoreMixin
     }
 
 
-    public EntityStoreUnitOfWork newUnitOfWork( Usecase usecase, Module module ) {
+    public EntityStoreUnitOfWork newUnitOfWork( Usecase usecase, ModuleSPI module, long currentTime ) {
         return new LuceneEntityStoreUnitOfWork( entityStoreSpi, newUnitOfWorkId(), module );
+    }
+
+
+    public Input<EntityState, EntityStoreException> entityStates( ModuleSPI module ) {
+        // XXX Auto-generated method stub
+        throw new RuntimeException( "not yet implemented." );
     }
 
 
@@ -184,7 +192,8 @@ public class LuceneEntityStoreMixin
     }
 
 
-    public StateCommitter apply( final Iterable<EntityState> states, final String version ) {
+    public StateCommitter applyChanges( EntityStoreUnitOfWork unitOfWork,
+            final Iterable<EntityState> states ) {
 
         return new StateCommitter() {
 
@@ -204,13 +213,13 @@ public class LuceneEntityStoreMixin
 
                                 switch (state.status()) {
                                     case NEW : {
-                                        state.writeBack( version );
+                                        state.writeBack();
                                         updater.store( state.state() );
                                         //log.debug( "    added: " + doc );
                                         break;
                                     }
                                     case UPDATED : {
-                                        state.writeBack( version );
+                                        state.writeBack();
                                         updater.store( state.state() );
                                         log.debug( "    updated: " + state );
                                         break;

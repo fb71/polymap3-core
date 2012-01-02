@@ -45,6 +45,7 @@ import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entity.EntityType;
 import org.qi4j.spi.entity.ManyAssociationState;
+import org.qi4j.spi.entity.NamedAssociationState;
 import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.property.PropertyDescriptor;
 import org.qi4j.spi.property.PropertyType;
@@ -73,8 +74,6 @@ public class LuceneEntityState
     protected LuceneEntityStoreUnitOfWork   uow;
 
     protected EntityStatus                  status;
-
-    protected String                        version;
 
     protected long                          lastModified;
 
@@ -109,9 +108,6 @@ public class LuceneEntityState
         this.entityDescriptor = entityDescriptor;
         this.record = state;
 
-        version = record.get( "version" );
-        version = version != null ? version : uow.identity();
-
         String lastModifiedValue = record.get( "modified" );
         lastModified = lastModifiedValue != null
                 ? Long.parseLong( lastModifiedValue )
@@ -120,11 +116,6 @@ public class LuceneEntityState
 
 
     // EntityState implementation *************************
-
-    public final String version() {
-        return version;
-    }
-
 
     public long lastModified() {
         return lastModified;
@@ -283,7 +274,7 @@ public class LuceneEntityState
                     public <T> Property<T> getProperty( QualifiedName name ) {
                         return null;
                     }
-                    public void visitProperties( StateVisitor visitor ) {
+                    public void visitProperties( StateVisitor visitor ) throws Throwable {
                         for (Map.Entry<QualifiedName, Object> entry : values.entrySet()) {
                             visitor.visitProperty( entry.getKey(), entry.getValue() );
                         }
@@ -330,7 +321,7 @@ public class LuceneEntityState
             StateHolder state = valueComposite.state();
             final Map<QualifiedName, Object> values = new HashMap<QualifiedName, Object>();
     
-            state.visitProperties( new StateHolder.StateVisitor() {
+            state.visitProperties( new StateHolder.StateVisitor<RuntimeException>() {
                 public void visitProperty( QualifiedName name, Object value ) {
                     values.put( name, value );
                 }
@@ -386,17 +377,10 @@ public class LuceneEntityState
     }
 
 
-    void writeBack( String newVersion ) {
+    void writeBack() {
         // entity header info
         EntityType entityType = entityDescriptor.entityType();
         record.put( "type", entityType.type().name() );
-
-        version = newVersion;
-        record.put( "version", version );
-//        // XXX what is the semantic?
-//        if (!newVersion.equals( identity.identity() )) {
-//            log.warn( "writeBack(): VERSIONS: " + newVersion + " - " + identity.identity() );
-//        }
 
         lastModified = System.currentTimeMillis();
         record.put( "modified", String.valueOf( lastModified ) );
@@ -493,6 +477,18 @@ public class LuceneEntityState
             store();
             return result;
         }
+    }
+
+
+    public NamedAssociationState getNamedAssociation( QualifiedName stateName ) {
+        // XXX Auto-generated method stub
+        throw new RuntimeException( "not yet implemented." );
+    }
+
+
+    public String version() {
+        // XXX Auto-generated method stub
+        throw new RuntimeException( "not yet implemented." );
     }
     
 }
