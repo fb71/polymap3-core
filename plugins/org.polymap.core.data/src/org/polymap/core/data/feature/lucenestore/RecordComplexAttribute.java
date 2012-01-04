@@ -14,13 +14,23 @@
  */
 package org.polymap.core.data.feature.lucenestore;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.identity.Identifier;
+
+import com.google.common.base.Joiner;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * 
@@ -31,8 +41,11 @@ public class RecordComplexAttribute
         extends RecordAttribute
         implements ComplexAttribute {
 
-    public RecordComplexAttribute( RecordProperty parent, AttributeDescriptor descriptor, Identifier id ) {
-        super( parent, descriptor, id );
+    protected Map<String,List<Property>>    properties = new HashMap();
+    
+    
+    public RecordComplexAttribute( RecordProperty parent, String recordKey, AttributeDescriptor descriptor, Identifier id ) {
+        super( parent, recordKey, descriptor, id );
     }
 
     
@@ -42,53 +55,69 @@ public class RecordComplexAttribute
 
     
     public Collection<? extends Property> getValue() {
-        throw new RuntimeException( "not yet implemented." );
+        return getProperties();
     }
 
 
-    public void setValue(Collection<Property> values) {
+    public void setValue( Collection<Property> values ) {
         throw new RuntimeException( "not yet implemented." );
     }
 
 
     public Collection<Property> getProperties() {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        List<Property> result = new ArrayList();
+        // init all properties
+        for (PropertyDescriptor descr : getType().getDescriptors()) {
+            result.addAll( getProperties( descr.getName() ) );
+        }
+        return result;
     }
-
-    @Override
+    
+    
     public Collection<Property> getProperties( Name name ) {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        return getProperties( name.getLocalPart() );
     }
 
-    @Override
+    
     public Collection<Property> getProperties( String name ) {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        List<Property> result = properties.get( name );
+        if (result == null) {
+            PropertyDescriptor childDescriptor = getType().getDescriptor( name );
+            // check type
+            if (childDescriptor == null) {
+                throw new RuntimeException( "No such property: " + name );
+            }
+            // init properties
+            if (childDescriptor.getMaxOccurs() == 1) {
+                String propRecordKey = Joiner.on( '/' ).skipNulls().join( recordKey, childDescriptor.getName().getLocalPart() ).intern();
+//                String propRecordKey = new StringBuilder( 128 )
+//                        .append( recordKey ).append( '/' ).append( childDescriptor.getName().getLocalPart() )
+//                        .toString().intern();
+                
+                RecordAttribute property = childDescriptor.getType() instanceof ComplexType
+                        // ComplexType
+                        ? new RecordComplexAttribute( this, propRecordKey, (AttributeDescriptor)childDescriptor, null )
+                        // Attribute
+                        : new RecordAttribute( this, propRecordKey, (AttributeDescriptor)childDescriptor, null );
+                        
+                result = Collections.singletonList( property );
+            }
+            else {
+                throw new RuntimeException( "Collection attributes are not implemented yet." );
+            }
+        }
+        return result;
     }
 
-    @Override
     public Property getProperty( Name name ) {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        return getProperty( name.getLocalPart() );
     }
 
-    @Override
     public Property getProperty( String name ) {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        return ((List<Property>)getProperties( name )).get( 0 );
     }
     
     
     // ****************************************************
     
-    protected void load() {
-        
-    }
-    
-    protected String stateKey( RecordProperty child ) {
-    }
-
-
 }

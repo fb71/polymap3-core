@@ -21,6 +21,9 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.filter.identity.Identifier;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * 
  *
@@ -30,20 +33,34 @@ public class RecordAttribute
         extends RecordProperty
         implements Attribute {
 
+    private static Log log = LogFactory.getLog( RecordAttribute.class );
+
     protected Identifier            id;
 
     
-    public RecordAttribute( RecordProperty parent, AttributeDescriptor descriptor, Identifier id ) {
-        super( parent, descriptor );
+    public RecordAttribute( RecordProperty parent, String recordKey, AttributeDescriptor descriptor, Identifier id ) {
+        super( parent, recordKey, descriptor );
         this.id = id;
-        Types.validate( this, getValue() );
+        
+        log.warn( "No Types check." );
+        //Types.validate( this, getValue() );
     }
 
 
-    public RecordAttribute( RecordProperty parent, AttributeType type, Identifier id ) {
-        this( parent, new AttributeDescriptorImpl( type, type.getName(), 1, 1, true, null ), id );
+    public RecordAttribute( RecordProperty parent, String recordKey, AttributeType type, Identifier id ) {
+        this( parent, recordKey, new AttributeDescriptorImpl( type, type.getName(), 1, 1, true, null ), id );
     }
 
+
+    public Object getValue() {
+        return state().get( recordKey );
+    }
+    
+    
+    public void setValue( Object value ) {
+        state().put( recordKey, value );
+    }
+    
 
     public Identifier getIdentifier() {
         return id;
@@ -62,11 +79,6 @@ public class RecordAttribute
 
     public void validate() {
         Types.validate(this, this.getValue() );
-    }
-
-
-    protected String stateKey( RecordProperty child ) {
-        throw new RuntimeException( "RecordAttribute.stateKey() must not be called." );
     }
 
 }

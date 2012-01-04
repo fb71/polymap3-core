@@ -34,25 +34,19 @@ public abstract class RecordProperty
 
     protected RecordProperty            parent;
     
+    protected String                    recordKey;
+    
     protected PropertyDescriptor        descriptor;
     
     protected Map<Object,Object>        userData;
 
 
-    protected RecordProperty( RecordProperty parent, PropertyDescriptor descriptor ) {
+    protected RecordProperty( RecordProperty parent, String recordKey, PropertyDescriptor descriptor ) {
         this.parent = parent;
+        this.recordKey = recordKey;
         this.descriptor = descriptor;
         assert descriptor != null : "descriptor == null";
     }
-    
-    public Object getValue() {
-        return state().get( parent.stateKey( this ) );
-    }
-    
-    public void setValue( Object value ) {
-        state().put( parent.stateKey( this ), value );
-    }
-    
     
     public PropertyDescriptor getDescriptor() {
         return descriptor;
@@ -99,14 +93,14 @@ public abstract class RecordProperty
     
     
     public String toString() {
-        StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( ":" );
-        sb.append( getName().getLocalPart() );
-        sb.append( "<" );
-        sb.append( getType().getName().getLocalPart() );
-        sb.append( ">=" );
-        sb.append( getValue() );
-
-        return sb.toString();
+        return new StringBuilder( 128 ) 
+                .append( getClass().getSimpleName() ).append( ":" )
+                .append( getName().getLocalPart() )
+                .append( "<" )
+                .append( getType().getName().getLocalPart() )
+                .append( ">=" )
+                .append( getValue() )
+                .toString();
     }
 
     
@@ -116,14 +110,5 @@ public abstract class RecordProperty
         assert parent != null : "parent == null -> RecordFeature must implement state()!";
         return parent.state();
     }
-    
-    
-    /**
-     * Creates the record key for the given child property 
-     *
-     * @param child
-     * @return
-     */
-    protected abstract String stateKey( RecordProperty child );
     
 }

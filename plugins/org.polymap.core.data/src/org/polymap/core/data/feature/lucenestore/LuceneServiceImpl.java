@@ -24,6 +24,8 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.opengis.feature.type.FeatureType;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,10 +56,10 @@ public class LuceneServiceImpl
     
     private LuceneFeatureStore          store;
     
-    private List<LuceneGeoResourceImpl> resources; 
+    private List<LuceneGeoResourceImpl> geores = new ArrayList();
 
     
-    public LuceneServiceImpl( String name, String id ) {
+    public LuceneServiceImpl( String name, String id, FeatureType[] schemas ) {
         try {
             this.id = new URL( id );
         }
@@ -66,20 +68,18 @@ public class LuceneServiceImpl
         }
         this.name = name;
         
-        // providers / resources
-        this.providers = providers;
-        this.resources = new ArrayList( providers.length );
-        for (EntityProvider provider : providers) {
-            resources.add( new LuceneGeoResourceImpl( this, provider ) );
+        // geores
+        for (FeatureType schema : schemas) {
+            geores.add( new LuceneGeoResourceImpl( this, schema ) );
         }
         
         // build params
         this.params = new HashMap();
-        this.params.put( EntityServiceExtensionImpl.KEY, id );
-        this.params.put( EntityServiceExtensionImpl.NAME_KEY, name );
+        this.params.put( LuceneServiceExtensionImpl.KEY, id );
+        this.params.put( LuceneServiceExtensionImpl.NAME_KEY, name );
         for (int i=0; i<providers.length; i++) {
             this.params.put( 
-                    EntityServiceExtensionImpl.PROVIDER_BASE_KEY + i,
+                    LuceneServiceExtensionImpl.PROVIDER_BASE_KEY + i,
                     providers[i].getClass().getName() );
             
         }

@@ -14,36 +14,34 @@
  */
 package org.polymap.core.data.feature.lucenestore;
 
-import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.Property;
+import org.opengis.feature.type.Name;
+
+import com.google.common.base.Predicate;
 
 /**
- * 
+ * Static helpers for working with {@link Property} instances.
  *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-public class FeatureTypeCoder {
+public class Properties {
 
-
-    public static String encode( FeatureType schema ) {
-        return new Encoder( schema ).encode();
+    
+    public static Predicate<Property> isNamed( final Name name ) {
+        return new Predicate<Property>() {
+            public boolean apply( Property input ) {
+                return name.equals( input.getName() );
+            }
+        };
     }
     
     
-    /*
-     * 
-     */
-    static class Encoder {
-        
-        private FeatureType     schema;
-
-        public Encoder( FeatureType schema ) {
-            this.schema = schema;
-        }
-       
-        public String encode() {
-            throw new RuntimeException( "not implemented yet." );    
-        }
-        
+    public static Predicate<Property> isNamed( final String name ) {
+        return new Predicate<Property>() {
+            public boolean apply( Property input ) {
+                return name.equals( input.getName().getLocalPart() );
+            }
+        };
     }
     
 }

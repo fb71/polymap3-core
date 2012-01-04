@@ -14,10 +14,14 @@
  */
 package org.polymap.core.data.feature.lucenestore;
 
+import org.geotools.filter.identity.FeatureIdImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.geometry.BoundingBox;
 
 import org.apache.commons.logging.Log;
@@ -39,26 +43,46 @@ public class RecordFeature
     private IRecordState            record;
 
 
-    public FeatureType getType() {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+    public RecordFeature( AttributeDescriptor descriptor, Identifier id ) {
+        super( null, null, descriptor, id );
     }
 
+
+    public RecordFeature( IRecordState record, AttributeDescriptor descriptor ) {
+        super( null, null, descriptor, new FeatureIdImpl( (String)record.get( "identity" ) ) );
+        this.record = record;
+    }
+
+
+    protected IRecordState state() {
+        return record;
+    }
+
+
+    public FeatureType getType() {
+        return (FeatureType)super.getType();
+    }
+
+    
     public FeatureId getIdentifier() {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        return (FeatureId)super.getIdentifier();
     }
     
+    
     public BoundingBox getBounds() {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        GeometryAttribute prop = getDefaultGeometryProperty();
+        return prop != null
+                ? prop.getBounds()
+                : new ReferencedEnvelope();
     }
 
+    
     public GeometryAttribute getDefaultGeometryProperty() {
         // XXX Auto-generated method stub
         throw new RuntimeException( "not yet implemented." );
     }
 
+    
     public void setDefaultGeometryProperty( GeometryAttribute geometryAttribute ) {
         // XXX Auto-generated method stub
         throw new RuntimeException( "not yet implemented." );

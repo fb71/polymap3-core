@@ -27,7 +27,7 @@ import net.refractions.udig.catalog.ServiceExtension;
  *
  * @author <a href="http://www.polymap.de">Falko Braeutigam</a>
  */
-public class EntityServiceExtensionImpl
+public class LuceneServiceExtensionImpl
         implements ServiceExtension {
 
     /**
@@ -35,7 +35,7 @@ public class EntityServiceExtensionImpl
      */
     public static final String KEY = "org.polymap.core.data.lucenestore";
 
-    public static final String PROVIDER_BASE_KEY = "entityProviderClass";
+    public static final String FOLDER_BASE_KEY = "folder";
 
     public static final String NAME_KEY = "name";
 

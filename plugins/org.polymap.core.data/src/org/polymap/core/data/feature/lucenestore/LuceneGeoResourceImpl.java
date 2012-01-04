@@ -27,6 +27,7 @@ import net.refractions.udig.catalog.ITransientResolve;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.apache.commons.logging.Log;
@@ -45,16 +46,16 @@ public class LuceneGeoResourceImpl
 
     private static final Log log = LogFactory.getLog( LuceneGeoResourceImpl.class );
 
-    private EntityProvider      provider;
+    private FeatureType         schema;
 
     private volatile Status     status;
 
     private volatile Throwable  message;
 
 
-    public LuceneGeoResourceImpl( LuceneServiceImpl service, EntityProvider provider ) {
+    public LuceneGeoResourceImpl( LuceneServiceImpl service, FeatureType schema ) {
         this.service = service;
-        this.provider = provider;
+        this.schema = schema;
     }
 
 
@@ -85,8 +86,8 @@ public class LuceneGeoResourceImpl
             throw new RuntimeException( "not implemented, see source for more information." );
 //            return adaptee.cast( provider.getSchema() );
         }
-        if (adaptee.isAssignableFrom( EntityProvider.class )) {
-            return adaptee.cast( provider );
+        if (adaptee.isAssignableFrom( FeatureType.class )) {
+            return adaptee.cast( schema );
         }
 
         return super.resolve( adaptee, monitor );
@@ -103,7 +104,7 @@ public class LuceneGeoResourceImpl
                 || adaptee.isAssignableFrom( IService.class )
                 || adaptee.isAssignableFrom( ITransientResolve.class )
                 || adaptee.isAssignableFrom( SimpleFeatureType.class )
-                || adaptee.isAssignableFrom( EntityProvider.class )
+                || adaptee.isAssignableFrom( FeatureType.class )
                 || super.canResolve( adaptee );
     }
 
@@ -126,7 +127,7 @@ public class LuceneGeoResourceImpl
 
     public URL getIdentifier() {
         try {
-            return new URL( service.getIdentifier().toString() + "#" + provider.getClass().getName() ); //$NON-NLS-1$
+            return new URL( service.getIdentifier().toString() + "#" + schema.getName() ); //$NON-NLS-1$
         }
         catch (MalformedURLException e) {
             return service.getIdentifier();
@@ -135,18 +136,18 @@ public class LuceneGeoResourceImpl
 
 
     protected IGeoResourceInfo createInfo( IProgressMonitor monitor )
-            throws IOException {
-        return new EntityResourceInfo();
+    throws IOException {
+        return new LuceneResourceInfo();
     }
 
 
     /**
      * 
      */
-    class EntityResourceInfo
+    class LuceneResourceInfo
             extends IGeoResourceInfo {
 
-        EntityResourceInfo()
+        LuceneResourceInfo()
         throws IOException {
 //            try {
 //                schema = (SimpleFeatureType)provider.getSchema();
@@ -168,8 +169,7 @@ public class LuceneGeoResourceImpl
 
 
         public String getName() {
-            return provider.getEntityName().getLocalPart();
-//            return schema.getName().getLocalPart();
+            return schema.getName().getLocalPart();
         }
 
 
@@ -208,4 +208,5 @@ public class LuceneGeoResourceImpl
         }
 
     }
+    
 }
