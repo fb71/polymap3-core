@@ -58,12 +58,12 @@ public class LuceneFeatureStore
     
     private FeatureType             schema;
     
-    private LuceneRecordStore       store;
+    private LuceneDataStore         dataStore;
     
     
-    public LuceneFeatureStore( LuceneRecordStore store, FeatureType schema ) {
+    public LuceneFeatureStore( LuceneDataStore dataStore, FeatureType schema ) {
         this.schema = schema;
-        this.store = store;
+        this.dataStore = dataStore;
         this.name = schema.getName();
     }
 
@@ -78,8 +78,13 @@ public class LuceneFeatureStore
     }
 
     
-    public LuceneRecordStore getStore() {
-        return store;
+    public DataAccess<FeatureType, Feature> getDataStore() {
+        return dataStore;
+    }
+
+
+    public LuceneRecordStore getRecordStore() {
+        return dataStore.getRecordStore();
     }
     
     
@@ -123,21 +128,39 @@ public class LuceneFeatureStore
     }
 
 
-    public FeatureCollection<FeatureType, Feature> getFeatures()
+    public int getCount( Query query )
+    throws IOException {
+        return getFeatures( query ).size();
+    }
+
+
+    public ReferencedEnvelope getBounds()
+    throws IOException {
+        return getBounds( new Query( schema.getName().getLocalPart(), Filter.INCLUDE ) );
+    }
+
+
+    public ReferencedEnvelope getBounds( Query query )
+    throws IOException {
+        return getFeatures( query ).getBounds();
+    }
+
+
+    public LuceneFeatureCollection getFeatures()
     throws IOException {
         return getFeatures( Filter.INCLUDE );
     }
 
     
-    public FeatureCollection<FeatureType, Feature> getFeatures( Filter filter )
+    public LuceneFeatureCollection getFeatures( Filter filter )
     throws IOException {
         return getFeatures( new Query( schema.getName().getLocalPart(), filter ) ); 
     }
 
 
-    public FeatureCollection<FeatureType, Feature> getFeatures( Query query )
+    public LuceneFeatureCollection getFeatures( Query query )
     throws IOException {
-        org.apache.lucene.search.Query luceneQuery = LuceneQueryBuilder.query( store, query );
+        org.apache.lucene.search.Query luceneQuery = LuceneQueryBuilder.query( getRecordStore(), query );
         return new LuceneFeatureCollection( this, luceneQuery, query ); 
     }
 
@@ -209,40 +232,14 @@ public class LuceneFeatureStore
     }
 
     @Override
-    public ReferencedEnvelope getBounds()
-            throws IOException {
+    public void removeFeatureListener( FeatureListener arg0 ) {
         // XXX Auto-generated method stub
         throw new RuntimeException( "not yet implemented." );
     }
 
-    @Override
-    public ReferencedEnvelope getBounds( Query arg0 )
-            throws IOException {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
-    }
-
-    @Override
-    public int getCount( Query arg0 )
-            throws IOException {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
-    }
-
-    @Override
-    public DataAccess<FeatureType, Feature> getDataStore() {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
-    }
 
     @Override
     public Set<Key> getSupportedHints() {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
-    }
-
-    @Override
-    public void removeFeatureListener( FeatureListener arg0 ) {
         // XXX Auto-generated method stub
         throw new RuntimeException( "not yet implemented." );
     }

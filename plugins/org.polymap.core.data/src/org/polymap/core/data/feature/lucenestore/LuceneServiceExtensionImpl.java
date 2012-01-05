@@ -46,15 +46,16 @@ public class LuceneServiceExtensionImpl
 
 
     public IService createService( URL id, Map<String, Serializable> params ) {
-        if (params != null) {
-            // check for the properties service key
-            if (params.containsKey( KEY )) {
-                // found it, create the service handle
-                return new LuceneServiceImpl( id, params );
-            }
-        }
-        // key not found
-        return null;
+        throw new RuntimeException( "not yet implemented." );
+//        if (params != null) {
+//            // check for the properties service key
+//            if (params.containsKey( KEY )) {
+//                // found it, create the service handle
+//                return new LuceneServiceImpl( id, params );
+//            }
+//        }
+//        // key not found
+//        return null;
     }
 
 }

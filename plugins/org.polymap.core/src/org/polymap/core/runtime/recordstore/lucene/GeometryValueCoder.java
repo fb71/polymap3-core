@@ -39,6 +39,9 @@ import org.polymap.core.runtime.recordstore.QueryExpression.Equal;
 /**
  * Encode/Decode {@link Geometry} values using {@link NumericField} build-in support of
  * Lucene.
+ * <p/>
+ * This is a non-standard value encoder. It can be activated by calling
+ * {@link LuceneRecordStore#getValueCoders()}.add().
  * 
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */

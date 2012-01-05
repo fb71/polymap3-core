@@ -15,7 +15,9 @@
 package org.polymap.core.data.feature.lucenestore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,6 +35,7 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.util.ProgressListener;
@@ -47,6 +50,10 @@ import org.apache.lucene.search.TopDocs;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.vividsolutions.jts.geom.Geometry;
+
+import org.polymap.core.runtime.mp.ForEach;
+import org.polymap.core.runtime.mp.Parallel;
 import org.polymap.core.runtime.recordstore.IRecordState;
 
 /**
@@ -84,7 +91,7 @@ public class LuceneFeatureCollection
         }
         
         // execute Lucene query        
-        IndexSearcher searcher = store.getStore().getIndexSearcher();
+        IndexSearcher searcher = store.getRecordStore().getIndexSearcher();
         if (query.getSortBy() != null && query.getSortBy() != SortBy.UNSORTED) {
 //            List<SortBy> sortBy = Arrays.asList( query.getSortBy() );
 //            Sort sort = new Sort( Iterables.toArray( 
@@ -160,7 +167,7 @@ public class LuceneFeatureCollection
                 throw new NoSuchElementException( "index=" + index + " >= " + scoreDocs.length );
             }
             try {
-                IRecordState record = store.getStore().get( scoreDocs[index++].doc );
+                IRecordState record = store.getRecordStore().get( scoreDocs[index++].doc );
                 return new RecordFeature( record, descriptor );
             }
             catch (Exception e) {
@@ -182,15 +189,12 @@ public class LuceneFeatureCollection
         return scoreDocs.length == 0;
     }
 
-
     public int size() {
         return scoreDocs.length;
     }
 
-
     public void close( FeatureIterator<Feature> close ) {
     }
-
 
     public void close( Iterator<Feature> close ) {
     }
@@ -225,11 +229,60 @@ public class LuceneFeatureCollection
 
 
     public ReferencedEnvelope getBounds() {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        final GeometryDescriptor geomDescr = getSchema().getGeometryDescriptor();
+        if (geomDescr == null) {
+            throw new RuntimeException( "No Geometry descriptor in feature type." );
+        }
+        try {
+            return getBounds1P( geomDescr );
+        }
+        catch (Exception e) {
+            throw new RuntimeException( e );
+        }
     }
 
+    
+    protected ReferencedEnvelope getBounds1P( GeometryDescriptor geomDescr )
+    throws Exception {
+        ReferencedEnvelope result = new ReferencedEnvelope( geomDescr.getCoordinateReferenceSystem() );
+        for (ScoreDoc scoreDoc : scoreDocs) {
+            IRecordState record = store.getRecordStore().get( scoreDoc.doc );
+            
+            Geometry geom = record.get( geomDescr.getLocalName() );
+            result.expandToInclude( geom.getEnvelopeInternal() );
+        }
+        return result;        
+    }
+    
+    
+    protected ReferencedEnvelope getBoundsMP( final GeometryDescriptor geomDescr ) {
+        final List<ReferencedEnvelope> results = Collections.synchronizedList( new ArrayList<ReferencedEnvelope>() );
+        // parallel process partitions
+        ForEach.in( Arrays.asList( scoreDocs ) ).doFirst(
+                new Parallel<ScoreDoc,ScoreDoc>() {
 
+                    ThreadLocal<ReferencedEnvelope> result = new ThreadLocal();
+
+                    public ScoreDoc process( ScoreDoc input ) throws Exception {
+                        if (result.get() == null) {
+                            result.set( new ReferencedEnvelope( geomDescr.getCoordinateReferenceSystem() ) );
+                            results.add( result.get() );
+                        }
+                        IRecordState record = store.getRecordStore().get( input.doc );
+                        Geometry geom = record.get( geomDescr.getLocalName() );
+                        result.get().expandToInclude( geom.getEnvelopeInternal() );
+                        return input;
+                    }
+                }).start();
+        // unify partitions
+        ReferencedEnvelope result = new ReferencedEnvelope( geomDescr.getCoordinateReferenceSystem() );
+        for (ReferencedEnvelope envelop : results) {
+            result.expandToInclude( envelop );
+        }
+        return result;
+    }
+
+    
     public Object[] toArray() {
         return Iterables.toArray( this, Object.class );
     }

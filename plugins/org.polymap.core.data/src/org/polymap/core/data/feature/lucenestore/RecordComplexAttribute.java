@@ -89,10 +89,8 @@ public class RecordComplexAttribute
             }
             // init properties
             if (childDescriptor.getMaxOccurs() == 1) {
-                String propRecordKey = Joiner.on( '/' ).skipNulls().join( recordKey, childDescriptor.getName().getLocalPart() ).intern();
-//                String propRecordKey = new StringBuilder( 128 )
-//                        .append( recordKey ).append( '/' ).append( childDescriptor.getName().getLocalPart() )
-//                        .toString().intern();
+                String propRecordKey = Joiner.on( '/' ).skipNulls()
+                        .join( recordKey, childDescriptor.getName().getLocalPart() ).intern();
                 
                 RecordAttribute property = childDescriptor.getType() instanceof ComplexType
                         // ComplexType

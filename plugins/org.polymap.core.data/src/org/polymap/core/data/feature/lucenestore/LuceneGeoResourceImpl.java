@@ -25,6 +25,7 @@ import net.refractions.udig.catalog.IGeoResourceInfo;
 import net.refractions.udig.catalog.IService;
 import net.refractions.udig.catalog.ITransientResolve;
 
+import org.geotools.data.FeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
@@ -52,13 +53,23 @@ public class LuceneGeoResourceImpl
 
     private volatile Throwable  message;
 
+    private LuceneFeatureStore  fs;
+
 
     public LuceneGeoResourceImpl( LuceneServiceImpl service, FeatureType schema ) {
         this.service = service;
         this.schema = schema;
     }
 
+    
+    public synchronized LuceneFeatureStore getFeatureStore() throws IOException {
+        if (fs == null) {
+            this.fs = ((LuceneServiceImpl)service).getDataStore().getFeatureSource( schema.getName() );            
+        }
+        return fs;
+    }
 
+    
     public <T> T resolve( Class<T> adaptee, IProgressMonitor monitor )
     throws IOException {
         if (adaptee == null) {
@@ -76,20 +87,15 @@ public class LuceneGeoResourceImpl
         if (adaptee.isAssignableFrom( IGeoResourceInfo.class )) {
             return adaptee.cast( createInfo( monitor ) );
         }
-//        if (adaptee.isAssignableFrom( FeatureStore.class )) {
-//            return adaptee.cast( service.getDS().getFeatureSource( type ) );
-//        }
+        if (adaptee.isAssignableFrom( FeatureStore.class )) {
+            return adaptee.cast( getFeatureStore() );
+        }
 //        if (adaptee.isAssignableFrom( FeatureSource.class )) {
 //            return adaptee.cast( service.getDS().getFeatureSource( type ) );
 //        }
-        if (adaptee.isAssignableFrom( SimpleFeatureType.class )) {
-            throw new RuntimeException( "not implemented, see source for more information." );
-//            return adaptee.cast( provider.getSchema() );
-        }
         if (adaptee.isAssignableFrom( FeatureType.class )) {
             return adaptee.cast( schema );
         }
-
         return super.resolve( adaptee, monitor );
     }
 
@@ -99,7 +105,7 @@ public class LuceneGeoResourceImpl
             return false;
         }
         return adaptee.isAssignableFrom( IGeoResourceInfo.class )
-//                || adaptee.isAssignableFrom( FeatureStore.class )
+                || adaptee.isAssignableFrom( FeatureStore.class )
 //                || adaptee.isAssignableFrom( FeatureSource.class )
                 || adaptee.isAssignableFrom( IService.class )
                 || adaptee.isAssignableFrom( ITransientResolve.class )
@@ -164,18 +170,18 @@ public class LuceneGeoResourceImpl
 
 
         public CoordinateReferenceSystem getCRS() {
-            return provider.getCoordinateReferenceSystem( provider.getDefaultGeometry() );
+            return LuceneGeoResourceImpl.this.schema.getCoordinateReferenceSystem();
         }
 
 
         public String getName() {
-            return schema.getName().getLocalPart();
+            return LuceneGeoResourceImpl.this.schema.getName().getLocalPart();
         }
 
 
         public URI getSchema() {
             try {
-                return new URI( provider.getEntityName().getNamespaceURI() );
+                return new URI( LuceneGeoResourceImpl.this.schema.getName().getNamespaceURI() );
             }
             catch (URISyntaxException e) {
                 return null;
@@ -184,12 +190,17 @@ public class LuceneGeoResourceImpl
 
 
         public String getTitle() {
-            return provider.getEntityName().getLocalPart();
+            return getName();
         }
 
 
         public ReferencedEnvelope getBounds() {
-            return provider.getBounds();
+            try {
+                return getFeatureStore().getBounds();
+            }
+            catch (IOException e) {
+                throw new RuntimeException( e );
+            }
                 
 //            Envelope bounds;
 //            try {

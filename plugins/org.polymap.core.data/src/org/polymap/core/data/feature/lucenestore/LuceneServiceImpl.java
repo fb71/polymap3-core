@@ -36,7 +36,6 @@ import net.refractions.udig.catalog.IServiceInfo;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.data.Messages;
-import org.polymap.core.runtime.recordstore.lucene.LuceneRecordStore;
 
 /**
  * This service references a {@link LuceneFeatureStore}.
@@ -54,22 +53,23 @@ public class LuceneServiceImpl
     
     private Map<String,Serializable>    params;
     
-    private LuceneFeatureStore          store;
-    
     private List<LuceneGeoResourceImpl> geores = new ArrayList();
+    
+    private LuceneDataStore             dataStore;
 
     
-    public LuceneServiceImpl( String name, String id, FeatureType[] schemas ) {
+    public LuceneServiceImpl( String name, String id, LuceneDataStore dataStore ) {
+        this.name = name;
+        this.dataStore = dataStore;
         try {
             this.id = new URL( id );
         }
         catch (MalformedURLException e) {
             throw new RuntimeException( e );
         }
-        this.name = name;
         
         // geores
-        for (FeatureType schema : schemas) {
+        for (FeatureType schema : dataStore.getSchemas()) {
             geores.add( new LuceneGeoResourceImpl( this, schema ) );
         }
         
@@ -77,12 +77,31 @@ public class LuceneServiceImpl
         this.params = new HashMap();
         this.params.put( LuceneServiceExtensionImpl.KEY, id );
         this.params.put( LuceneServiceExtensionImpl.NAME_KEY, name );
-        for (int i=0; i<providers.length; i++) {
-            this.params.put( 
-                    LuceneServiceExtensionImpl.PROVIDER_BASE_KEY + i,
-                    providers[i].getClass().getName() );
-            
+    }
+
+
+    public <T> T resolve( Class<T> adaptee, IProgressMonitor monitor ) throws IOException {
+        if (adaptee == null) {
+            throw new NullPointerException("No adaptor specified");
         }
+        if (adaptee.isAssignableFrom( LuceneDataStore.class )) {
+            return adaptee.cast( dataStore );
+        }
+        return super.resolve(adaptee, monitor);
+    }
+    
+    
+    public <T> boolean canResolve( Class<T> adaptee ) {
+        if (adaptee == null) {
+            return false;
+        }
+        return adaptee.isAssignableFrom( LuceneDataStore.class )
+                || super.canResolve( adaptee );
+    }
+
+    
+    public LuceneDataStore getDataStore() {
+        return dataStore;
     }
 
 
@@ -90,11 +109,9 @@ public class LuceneServiceImpl
     throws IOException {
         
         return new IServiceInfo() {
-
             public String getTitle() {
                 return name; //Messages.get( "Qi4jServiceImpl_title" ); 
             }
-
             public String getDescription() {
                 return Messages.get( "LuceneServiceImpl_description" ); 
             }
@@ -108,8 +125,8 @@ public class LuceneServiceImpl
 
 
     public List<? extends IGeoResource> resources( IProgressMonitor monitor )
-            throws IOException {
-        return resources;
+    throws IOException {
+        return geores;
     }
 
 
