@@ -22,7 +22,7 @@
  */
 package org.polymap.core.data.feature;
 
-import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 import org.polymap.core.data.pipeline.ProcessorRequest;
@@ -37,15 +37,15 @@ import org.polymap.core.data.pipeline.ProcessorRequest;
 public class ModifyFeaturesRequest
         implements ProcessorRequest {
 
-    private AttributeDescriptor[]   type;
+    private Name[]                  name;
     
     private Object[]                value;
     
     private Filter                  filter;
     
 
-    public ModifyFeaturesRequest( AttributeDescriptor[] type, Object[] value, Filter filter ) {
-        this.type = type;
+    public ModifyFeaturesRequest( Name[] names, Object[] value, Filter filter ) {
+        this.name = names;
         this.value = value;
         this.filter = filter;
     }
@@ -54,8 +54,8 @@ public class ModifyFeaturesRequest
         return filter;
     }
 
-    public AttributeDescriptor[] getType() {
-        return type;
+    public Name[] getName() {
+        return name;
     }
     
     public Object[] getValue() {

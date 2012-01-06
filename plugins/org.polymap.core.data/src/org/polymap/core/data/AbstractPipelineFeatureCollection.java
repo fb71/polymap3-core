@@ -12,34 +12,24 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * $Id$
  */
 package org.polymap.core.data;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.util.ProgressListener;
 
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.feature.CollectionEvent;
-import org.geotools.feature.CollectionListener;
 import org.geotools.feature.collection.AbstractFeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.util.ProgressListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides {@link CollectionEven} and {@link FeatureListener} handling methods.
  *
  * @author <a href="http://www.polymap.de">Falko Braeutigam</a>
- * @version POLYMAP3 ($Revision$)
  * @since 3.0
  */
 abstract class AbstractPipelineFeatureCollection
@@ -63,7 +53,7 @@ abstract class AbstractPipelineFeatureCollection
 
     protected void fireChange( CollectionEvent ev ) {
         for (int i = 0, ii = listeners.size(); i < ii; i++) {
-            ((CollectionListener)listeners.get(i)).collectionChanged( ev );
+            (listeners.get(i)).collectionChanged( ev );
         }
     }
 

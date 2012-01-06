@@ -26,19 +26,20 @@ import org.apache.commons.logging.LogFactory;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.util.ProgressListener;
 
-import org.geotools.data.AbstractFeatureSource;
+import org.geotools.data.AbstractFeatureStore;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -76,8 +77,8 @@ import org.polymap.core.project.LayerUseCase;
  * @since 3.0
  */
 public class PipelineFeatureSource
-        extends AbstractFeatureSource
-        implements FeatureStore<SimpleFeatureType, SimpleFeature> {
+        extends AbstractFeatureStore
+        implements SimpleFeatureStore/*<SimpleFeatureType, SimpleFeature>*/ {
 
     private static final Log log = LogFactory.getLog( PipelineFeatureSource.class );
 
@@ -197,7 +198,7 @@ public class PipelineFeatureSource
     }
 
 
-    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures( Query query )
+    public SimpleFeatureCollection getFeatures( Query query )
     throws IOException {
         log.debug( "query= " + query );
         return new AsyncPipelineFeatureCollection( this, query );
@@ -373,17 +374,11 @@ public class PipelineFeatureSource
     }
 
 
-    public void modifyFeatures( AttributeDescriptor type, Object value, Filter filter )
-    throws IOException {
-        modifyFeatures( new AttributeDescriptor[] { type, }, new Object[] { value, }, filter );
-    }
-
-
-    public void modifyFeatures( AttributeDescriptor[] type, Object[] value, Filter filter )
+    public void modifyFeatures( Name[] names, Object[] values, Filter filter )
     throws IOException {
         try {
             // request
-            ModifyFeaturesRequest request = new ModifyFeaturesRequest( type, value, filter );
+            ModifyFeaturesRequest request = new ModifyFeaturesRequest( names, values, filter );
             final ModifyFeaturesResponse[] response = new ModifyFeaturesResponse[1];
             pipeline.process( request, new ResponseHandler() {
                 public void handle( ProcessorResponse r )
@@ -394,8 +389,8 @@ public class PipelineFeatureSource
             // fire event
             log.info( "Event: type=" + getName().getLocalPart() );
             store.listeners.fireFeaturesChanged( getName().getLocalPart(), tx, null, false );
-//            store.listeners.fireEvent( getName().getLocalPart(), tx,
-//                    new FeatureEvent( this, FeatureEvent.Type.CHANGED, null, filter ) );
+            //      store.listeners.fireEvent( getName().getLocalPart(), tx,
+            //              new FeatureEvent( this, FeatureEvent.Type.CHANGED, null, filter ) );
             return;
         }
         catch (RuntimeException e) {
@@ -408,6 +403,45 @@ public class PipelineFeatureSource
             throw new IOException( e );
         }
     }
+
+
+
+
+//    public void modifyFeatures( AttributeDescriptor type, Object value, Filter filter )
+//    throws IOException {
+//        modifyFeatures( new AttributeDescriptor[] { type, }, new Object[] { value, }, filter );
+//    }
+//
+//
+//    public void modifyFeatures( AttributeDescriptor[] type, Object[] value, Filter filter )
+//    throws IOException {
+//        try {
+//            // request
+//            ModifyFeaturesRequest request = new ModifyFeaturesRequest( type, value, filter );
+//            final ModifyFeaturesResponse[] response = new ModifyFeaturesResponse[1];
+//            pipeline.process( request, new ResponseHandler() {
+//                public void handle( ProcessorResponse r )
+//                throws Exception {
+//                    response[0] = (ModifyFeaturesResponse)r;
+//                }
+//            });
+//            // fire event
+//            log.info( "Event: type=" + getName().getLocalPart() );
+//            store.listeners.fireFeaturesChanged( getName().getLocalPart(), tx, null, false );
+////            store.listeners.fireEvent( getName().getLocalPart(), tx,
+////                    new FeatureEvent( this, FeatureEvent.Type.CHANGED, null, filter ) );
+//            return;
+//        }
+//        catch (RuntimeException e) {
+//            throw e;
+//        }
+//        catch (IOException e) {
+//            throw e;
+//        }
+//        catch (Exception e) {
+//            throw new IOException( e );
+//        }
+//    }
 
 
     public void setFeatures( FeatureReader<SimpleFeatureType, SimpleFeature> reader )

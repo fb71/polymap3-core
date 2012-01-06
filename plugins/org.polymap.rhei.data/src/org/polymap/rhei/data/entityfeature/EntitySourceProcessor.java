@@ -35,6 +35,7 @@ import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
@@ -213,7 +214,7 @@ public class EntitySourceProcessor
         // ModifyFeatures
         else if (r instanceof ModifyFeaturesRequest) {
             ModifyFeaturesRequest request = (ModifyFeaturesRequest)r;
-            modifyFeatures( request.getType(), request.getValue(), request.getFilter() );
+            modifyFeatures( request.getName(), request.getValue(), request.getFilter() );
             context.sendResponse( ProcessorResponse.EOP );
         }
         // GetFeatures
@@ -403,7 +404,7 @@ public class EntitySourceProcessor
     }
 
 
-    protected void modifyFeatures( AttributeDescriptor[] type, Object[] value, Filter filter )
+    protected void modifyFeatures( Name[] names, Object[] value, Filter filter )
     throws IOException {
         log.debug( "            Filter: " + filter );
 
@@ -421,9 +422,9 @@ public class EntitySourceProcessor
         // set values
         EntityType entityType = entityProvider.getEntityType();
         for (Entity entity : entities) {
-            for (int i=0; i<type.length; i++) {
+            for (int i=0; i<names.length; i++) {
                 try {
-                    String propName = type[i].getLocalName();
+                    String propName = names[i].getLocalPart();
                     log.debug( "    modifying: prop=" + propName + ", value=" + value[i] + ", entity=" + entity );
                     if (entityProvider instanceof EntityProvider2) {
                         ((EntityProvider2)entityProvider).modifyFeature( entity, propName, value[i] );

@@ -26,7 +26,7 @@ import java.io.StringReader;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geojson.geom.GeometryJSON;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.IllegalAttributeException;

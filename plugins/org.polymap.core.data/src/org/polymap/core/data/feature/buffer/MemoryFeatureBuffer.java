@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.geotools.data.Query;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
 
@@ -165,7 +165,7 @@ class MemoryFeatureBuffer
     }
 
 
-    public List<FeatureId> markModified( Filter filter, AttributeDescriptor[] type, Object[] value )
+    public List<FeatureId> markModified( Filter filter, Name[] name, Object[] value )
     throws Exception {
         try {
             lock.writeLock().lock();
@@ -177,7 +177,7 @@ class MemoryFeatureBuffer
 
                 if (filter.evaluate( buffered.feature() )) {
                     buffered.evolveState( FeatureBufferState.State.MODIFIED );
-                    modifyFeature( buffered.feature(), type, value );
+                    modifyFeature( buffered.feature(), name, value );
                     
                     features.add( buffered.feature() );
                     fids.add( buffered.feature().getIdentifier() );
@@ -300,10 +300,10 @@ class MemoryFeatureBuffer
     }
 
 
-    protected void modifyFeature( Feature feature, AttributeDescriptor[] type, Object[] value ) {
-        for (int i=0; i<type.length; i++ ) {
+    protected void modifyFeature( Feature feature, Name[] names, Object[] value ) {
+        for (int i=0; i<names.length; i++ ) {
             if (feature instanceof SimpleFeature) {
-                ((SimpleFeature)feature).setAttribute( type[i].getName(), value[i] );
+                ((SimpleFeature)feature).setAttribute( names[i], value[i] );
             }
             else {
                 // XXX complex features

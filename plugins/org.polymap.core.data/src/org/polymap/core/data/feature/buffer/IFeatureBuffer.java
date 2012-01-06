@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.geotools.data.Query;
 import org.opengis.feature.Feature;
-import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
 
@@ -78,7 +78,7 @@ public interface IFeatureBuffer {
     throws Exception;
     
     
-    public List<FeatureId> markModified( Filter filter, AttributeDescriptor[] type, Object[] value )
+    public List<FeatureId> markModified( Filter filter, Name[] names, Object[] value )
     throws Exception;
 
 

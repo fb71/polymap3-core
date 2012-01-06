@@ -219,7 +219,7 @@ public class FeatureBufferProcessor
             if ("modifying".equals( state )) {
                 ModifyFeaturesRequest request = (ModifyFeaturesRequest)context.get( "request" );
                 List<FeatureId> ids = buffer.markModified( 
-                        request.getFilter(), request.getType(), request.getValue() );
+                        request.getFilter(), request.getName(), request.getValue() );
   
                 context.sendResponse( new ModifyFeaturesResponse( ids ) );    
             }

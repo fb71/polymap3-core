@@ -37,13 +37,13 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
 
-import org.geotools.data.DataStore;
+import org.geotools.data.DataAccess;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
@@ -104,8 +104,7 @@ public class DataSourceProcessor
         // WFS, Memory, ...
         else {
             try {
-                DataStore dataStore = service.resolve( DataStore.class, null );
-                if (dataStore != null) {
+                if (service.resolve( DataAccess.class, null ) != null) {
                     return true;
                 }
             }
@@ -172,7 +171,7 @@ public class DataSourceProcessor
         else if (r instanceof ModifyFeaturesRequest) {
             ModifyFeaturesRequest request = (ModifyFeaturesRequest)r;
             FeatureStore fs = geores.resolve( FeatureStore.class, null );
-            modifyFeatures( fs, request.getType(), request.getValue(), request.getFilter() );
+            modifyFeatures( fs, request.getName(), request.getValue(), request.getFilter() );
             context.sendResponse( ProcessorResponse.EOP );
         }
         // GetFeatures
@@ -298,10 +297,10 @@ public class DataSourceProcessor
 
 
     protected void modifyFeatures( FeatureStore fs,
-            AttributeDescriptor[] type, Object[] value, Filter filter )
+            Name[] name, Object[] value, Filter filter )
             throws IOException {
         log.debug( "            Filter: " + filter );
-        fs.modifyFeatures( type, value, filter );
+        fs.modifyFeatures( name, value, filter );
     }
 
 

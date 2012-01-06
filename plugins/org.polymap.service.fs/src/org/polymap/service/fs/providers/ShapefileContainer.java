@@ -281,7 +281,7 @@ class ShapefileContainer
                 params.put( "url", file.toURI().toURL() );
                 params.put( "create spatial index", Boolean.TRUE );
 
-                ShapefileDataStore modifiedDs = shapeFactory.createDataStore( params );
+                ShapefileDataStore modifiedDs = (ShapefileDataStore)shapeFactory.createDataStore( params );
                 String typeName = modifiedDs.getTypeNames()[0];
                 final FeatureSource<SimpleFeatureType, SimpleFeature> modifiedFs = modifiedDs.getFeatureSource( typeName );
 
@@ -290,7 +290,7 @@ class ShapefileContainer
                 params.put( "url", new File( origDataDir, file.getName() ).toURI().toURL() );
                 params.put( "create spatial index", Boolean.TRUE );
 
-                ShapefileDataStore origDs = shapeFactory.createDataStore( params );
+                ShapefileDataStore origDs = (ShapefileDataStore)shapeFactory.createDataStore( params );
                 final FeatureSource<SimpleFeatureType, SimpleFeature> origFs = origDs.getFeatureSource( typeName );
 
                 // modifications

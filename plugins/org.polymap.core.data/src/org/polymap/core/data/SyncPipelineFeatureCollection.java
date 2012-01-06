@@ -35,6 +35,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import org.polymap.core.data.PipelineFeatureSource.FeatureResponseHandler;
 
@@ -42,7 +43,6 @@ import org.polymap.core.data.PipelineFeatureSource.FeatureResponseHandler;
  * 
  *
  * @author <a href="http://www.polymap.de">Falko Braeutigam</a>
- * @version POLYMAP3 ($Revision$)
  * @since 3.0
  */
 class SyncPipelineFeatureCollection
@@ -78,20 +78,19 @@ class SyncPipelineFeatureCollection
         }
     }
 
-    protected void closeIterator( Iterator close ) {
-        log.debug( "close= " + close );
+    protected void closeIterator( Iterator it ) {
+        log.debug( "close= " + it );
     }
-
-//    public void close( Iterator<SimpleFeature> close ) {
-//        // XXX Auto-generated method stub
-//        throw new RuntimeException( "not yet implemented." );
-//    }
 
     public int size() {
         if (size < 0) {
             size = fs.getFeaturesSize( query );
         }
         return size;
+    }
+
+    public ReferencedEnvelope getBounds() {
+        throw new RuntimeException( "not yet implemented." );
     }
 
 
@@ -113,12 +112,10 @@ class SyncPipelineFeatureCollection
             
             final List<Feature> buffer = new ArrayList();
             fs.fetchFeatures( query, new FeatureResponseHandler() {
-                public void handle( List<Feature> features )
-                throws Exception {
+                public void handle( List<Feature> features ) throws Exception {
                     buffer.addAll( features );
                 }
-                public void endOfResponse()
-                throws Exception {
+                public void endOfResponse() throws Exception {
                 }
             });
             it = buffer.iterator();
