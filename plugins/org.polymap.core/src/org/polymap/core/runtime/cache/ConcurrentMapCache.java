@@ -14,9 +14,7 @@
  */
 package org.polymap.core.runtime.cache;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,6 +23,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
 
 import org.polymap.core.runtime.ListenerList;
+import org.polymap.core.runtime.cache.ConcurrentMapCacheManager.AccessPeriod;
 
 /**
  * In-memory cache backed by a {@link ConcurrentHashMap}.
@@ -36,17 +35,17 @@ final class ConcurrentMapCache<K,V>
 
     private static Log log = LogFactory.getLog( ConcurrentMapCache.class );
     
-    private volatile static int         accessCounter = 0;
+    private String                          name;
     
-    private String                      name;
-    
-    private ConcurrentMapCacheManager   manager;
+    private ConcurrentMapCacheManager       manager;
 
-    private ConcurrentMap<K,CacheEntry> entries;
+    private ConcurrentMap<K,CacheEntry<V>>  entries;
 
     private ListenerList<CacheEvictionListener> listeners;
     
-    private CacheConfig                 config;
+    private CacheConfig                     config;
+    
+    //private ReentrantReadWriteLock      lock = new ReentrantReadWriteLock();
     
 
     ConcurrentMapCache( ConcurrentMapCacheManager manager, String name, CacheConfig config ) {
@@ -87,7 +86,8 @@ final class ConcurrentMapCache<K,V>
         assert key != null : "Null keys are not allowed.";
         assert entries != null : "Cache is closed.";
 
-        CacheEntry entry = entries.get( key );
+        CacheEntry<V> entry = entries.get( key );
+        manager.countAccess( entry );
         return entry != null ? entry.value() : null;
     }
 
@@ -96,15 +96,17 @@ final class ConcurrentMapCache<K,V>
         assert key != null : "Null keys are not allowed.";
         assert entries != null : "Cache is closed.";
         
-        CacheEntry entry = entries.get( key );
+        CacheEntry<V> entry = entries.get( key );
         if (entry != null) {
+            manager.countAccess( entry );
             return entry.value();
         }
         else {
             entry = new CacheEntry( null, ELEMENT_SIZE_UNKNOW );
-            CacheEntry previous = entries.putIfAbsent( key, entry );
+            CacheEntry<V> previous = entries.putIfAbsent( key, entry );
             if (previous == null) {
                 try {
+                    manager.countAccess( entry );
                     entry.setValue( loader.load( key ), loader.size() );
                     return entry.value();
                 }
@@ -114,6 +116,7 @@ final class ConcurrentMapCache<K,V>
                 }
             }
             else {
+                manager.countAccess( previous );
                 return previous.value();
             }
         }
@@ -129,7 +132,8 @@ final class ConcurrentMapCache<K,V>
         assert key != null : "Null keys are not allowed.";
         assert entries != null : "Cache is closed.";
 
-        CacheEntry entry = entries.putIfAbsent( key, new CacheEntry( value, elementSize ) );
+        CacheEntry<V> entry = entries.putIfAbsent( key, new CacheEntry( value, elementSize ) );
+        manager.countAccess( entry );
         return entry != null ? entry.value() : null;
     }
     
@@ -138,8 +142,16 @@ final class ConcurrentMapCache<K,V>
         assert key != null : "Null keys are not allowed.";
         assert entries != null : "Cache is closed.";
 
-        CacheEntry entry = entries.remove( key );
-        return entry != null ? entry.value() : null;
+        CacheEntry<V> entry = entries.remove( key );
+        if (entry != null) {
+            // wait for the loader to set value and set accessPeriod
+            entry.value();
+            entry.accessPeriod.countRemove( entry );
+            return entry.value();
+        }
+        else {
+            return null;
+        }
     }
 
     
@@ -149,9 +161,24 @@ final class ConcurrentMapCache<K,V>
     }
 
     
-    public Iterable<Map.Entry<K,CacheEntry>> entries() {
-        assert entries != null : "Cache is closed.";
-        return entries.entrySet();
+//    static interface EntryVisitor<K,V> {
+//        boolean visit( K key, CacheEntry<V> entry );
+//    }
+//    
+//    synchronized int stableEntries( EntryVisitor<K,V> visitor ) {
+//        assert entries != null : "Cache is closed.";
+//        int count = 0;
+//        for (Map.Entry<K,CacheEntry<V>> cursor : entries.entrySet()) {
+//            if (! visitor.visit( cursor.getKey(), cursor.getValue() )) {
+//                return count;
+//            }
+//            ++count;
+//        }
+//        return count;
+//    }
+
+    Iterable<CacheEntry<V>> cacheEntries() {
+        return entries.values();
     }
 
     
@@ -164,8 +191,8 @@ final class ConcurrentMapCache<K,V>
     public Iterable<V> values() {
         assert entries != null : "Cache is closed.";
         
-        return Iterables.transform( entries.values(), new Function<CacheEntry,V>() {
-            public V apply( CacheEntry input ) {
+        return Iterables.transform( entries.values(), new Function<CacheEntry<V>,V>() {
+            public V apply( CacheEntry<V> input ) {
                 return input.value();
             }
         });
@@ -197,13 +224,13 @@ final class ConcurrentMapCache<K,V>
     /**
      * 
      */
-    class CacheEntry {
+    static class CacheEntry<V> {
 
         private V               value;
         
         private byte            sizeInKB;
         
-        private int             accessed = accessCounter++;
+        AccessPeriod            accessPeriod;
         
         
         CacheEntry( V data, int elementSize ) {
@@ -228,18 +255,9 @@ final class ConcurrentMapCache<K,V>
                     }
                 }
             }
-            
-            accessed = accessCounter++;
-            if (accessed <= 0) {
-                throw new CacheException( "Access counter exceeded!" );
-            }
             return value;
         }
 
-        public int accessed() {
-            return accessed;
-        }
-        
     }
 
 }

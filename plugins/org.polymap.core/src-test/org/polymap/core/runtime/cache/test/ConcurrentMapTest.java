@@ -14,6 +14,9 @@
  */
 package org.polymap.core.runtime.cache.test;
 
+import java.util.Random;
+
+import org.polymap.core.runtime.Timer;
 import org.polymap.core.runtime.cache.Cache;
 import org.polymap.core.runtime.cache.CacheConfig;
 import org.polymap.core.runtime.cache.CacheLoader;
@@ -29,7 +32,7 @@ import junit.framework.TestCase;
 public class ConcurrentMapTest
         extends TestCase {
 
-    Cache<Object,byte[]>        cache;
+    Cache<Integer,byte[]>        cache;
     
 
     protected void setUp() throws Exception {
@@ -43,22 +46,24 @@ public class ConcurrentMapTest
 
     
     public void tstEviction() throws InterruptedException {
+        int count = 0;
         while (true) {
             System.out.println( "adding 1000 to " + cache.size() );
             for (int i=0; i<1000; i++) {
-                cache.putIfAbsent( new Object(), new byte[1024] );
+                cache.putIfAbsent( new Integer(count++), new byte[1024] );
             }
             Thread.sleep( 100 );
         }            
     }
     
     
-    public void testLoader() throws Exception {
+    public void tstCreation() throws Exception {
+        int count = 0;
         while (true) {
             System.out.println( "adding 1000 to " + cache.size() );
             for (int i=0; i<1000; i++) {
-                cache.get( new Object(), new CacheLoader<Object,byte[]>() {
-                    public byte[] load( Object key ) throws Exception {
+                cache.get( new Integer(count++), new CacheLoader<Integer,byte[]>() {
+                    public byte[] load( Integer key ) throws Exception {
                         return new byte[1024];
                     }
                     public int size() throws Exception {
@@ -68,7 +73,52 @@ public class ConcurrentMapTest
             }
             Thread.sleep( 200 );
         }        
+    }
     
+    
+    public void testRandom() throws Exception {
+        
+        for (int t=0; t<3; t++) {
+
+            Thread thread = new Thread( "" + t ) {
+                public void run() {
+                    try {
+                        Random random = new Random();
+                        while (true) {
+                            System.out.println( Thread.currentThread().getName() + ": processing 1000 to " + cache.size() );
+                            Timer timer = new Timer();
+
+                            for (int i=0; i<1000; i++) {
+                                Integer key = (int)(random.nextGaussian() * 50000);
+
+                                if (random.nextBoolean()) {
+                                    // access
+                                    cache.get( key, new CacheLoader<Integer,byte[]>() {
+                                        public byte[] load( Integer _key ) throws Exception {
+                                            return new byte[1024];
+                                        }
+                                        public int size() throws Exception {
+                                            return 1024;
+                                        }
+                                    });
+                                }
+                                else {
+                                    // remove
+                                    cache.remove( key );
+                                }
+                            }
+                            System.out.println( Thread.currentThread().getName() + "    time: " + timer.elapsedTime() + "ms" );
+                            Thread.sleep( random.nextInt( 100 ) + 100 );
+                        }
+                    }
+                    catch (Exception e) {
+                        throw new RuntimeException( e );
+                    }
+                }
+            };
+            thread.start();
+        }
+        Thread.sleep( 1000*1000 );
     }
 
 }
