@@ -40,6 +40,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import org.eclipse.jface.util.IOpenEventListener;
+import org.eclipse.jface.util.OpenStrategy;
+
 import org.polymap.rhei.form.IFormEditorToolkit;
 import org.polymap.rhei.model.ConstantWithSynonyms;
 
@@ -260,7 +263,15 @@ public class PicklistFormField
                 site.fireEvent( this, IFormFieldListener.FOCUS_GAINED, combo.getText() );
             }
         });
-        
+        // ENTER -> submit
+        OpenStrategy handler = new OpenStrategy( combo );
+        handler.addOpenListener( new IOpenEventListener() {
+            public void handleOpen( SelectionEvent ev ) {
+                log.debug( "Event: " + ev );
+                site.fireEvent( PicklistFormField.this, IFormFieldListener.DEFAULT_ACTION, combo.getText() );
+            }
+        });
+
         return combo;
     }
 

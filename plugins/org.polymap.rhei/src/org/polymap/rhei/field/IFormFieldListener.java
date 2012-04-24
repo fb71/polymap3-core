@@ -34,6 +34,12 @@ public interface IFormFieldListener
     
     public static final int     FOCUS_LOST = 3;
     
+    /**
+     * Fired when the default action of a field was triggered. For example
+     * {@link StringFormField} fires this when the ENTER key is pressed.
+     */
+    public static final int     DEFAULT_ACTION = 4;
+    
 
     public void fieldChange( FormFieldEvent ev );
     

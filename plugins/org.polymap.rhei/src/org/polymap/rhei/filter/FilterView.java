@@ -24,6 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -34,8 +35,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 
+import org.eclipse.jface.util.IOpenEventListener;
+import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
@@ -239,6 +243,11 @@ public class FilterView
                 resetBtn.setEnabled( filterEditor.isDirty() );
             }
         }
+        else if (ev.getEventCode() == IFormFieldListener.DEFAULT_ACTION) {
+            if (submitBtn != null && submitBtn.isEnabled()) {
+                submitBtn.notifyListeners( SWT.Selection, new Event() );
+            }
+        }
     }
 
 
@@ -307,6 +316,22 @@ public class FilterView
         content.setExpandHorizontal( true );
         content.setExpandVertical( true );
         content.setShowFocusedControl( true );
+        
+        // ENTER -> submit
+        OpenStrategy handler = new OpenStrategy( content );
+        handler.addSelectionListener( new SelectionListener() {
+            public void widgetSelected( SelectionEvent ev ) {
+            }
+            public void widgetDefaultSelected( SelectionEvent ev ) {
+                log.info( "Event: " + ev );
+            }
+        });
+        handler.addOpenListener( new IOpenEventListener() {
+            public void handleOpen( SelectionEvent ev ) {
+                log.info( "Event: " + ev );
+            }
+        });
+
     }
 
 

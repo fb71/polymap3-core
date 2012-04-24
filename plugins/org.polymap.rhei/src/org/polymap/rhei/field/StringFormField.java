@@ -25,9 +25,13 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+
+import org.eclipse.jface.util.IOpenEventListener;
+import org.eclipse.jface.util.OpenStrategy;
 
 import org.polymap.rhei.form.IFormEditorToolkit;
 
@@ -81,6 +85,15 @@ public class StringFormField
                 site.fireEvent( StringFormField.this, IFormFieldListener.FOCUS_GAINED, text.getText() );
             }
         });
+        // ENTER -> submit
+        OpenStrategy handler = new OpenStrategy( text );
+        handler.addOpenListener( new IOpenEventListener() {
+            public void handleOpen( SelectionEvent ev ) {
+                log.debug( "Event: " + ev );
+                site.fireEvent( StringFormField.this, IFormFieldListener.DEFAULT_ACTION, text.getText() );
+            }
+        });
+
         return text;
     }
 

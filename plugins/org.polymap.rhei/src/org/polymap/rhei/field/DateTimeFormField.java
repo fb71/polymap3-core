@@ -33,6 +33,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 
+import org.eclipse.jface.util.IOpenEventListener;
+import org.eclipse.jface.util.OpenStrategy;
+
 import org.polymap.rhei.form.IFormEditorToolkit;
 
 /**
@@ -87,7 +90,7 @@ public class DateTimeFormField
                 cal.set( dateTime.getYear(), dateTime.getMonth(), dateTime.getDay(),
                         dateTime.getHours(), dateTime.getMinutes(), dateTime.getSeconds() );
                 Date date = cal.getTime();
-                log.info( "widgetSelected(): test= " + date );
+                log.debug( "widgetSelected(): test= " + date );
                 
                 site.fireEvent( DateTimeFormField.this, IFormFieldListener.VALUE_CHANGE, 
                         loadedValue == null && date.equals( nullValue ) ? null : date );
@@ -103,6 +106,15 @@ public class DateTimeFormField
                 site.fireEvent( DateTimeFormField.this, IFormFieldListener.FOCUS_GAINED, null );
             }
         });
+        // ENTER -> submit
+        OpenStrategy handler = new OpenStrategy( dateTime );
+        handler.addOpenListener( new IOpenEventListener() {
+            public void handleOpen( SelectionEvent ev ) {
+                log.debug( "Event: " + ev );
+                site.fireEvent( DateTimeFormField.this, IFormFieldListener.DEFAULT_ACTION, null );
+            }
+        });
+
         return dateTime;
     }
 
