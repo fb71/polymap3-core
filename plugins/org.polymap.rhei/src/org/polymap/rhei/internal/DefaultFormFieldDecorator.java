@@ -79,7 +79,7 @@ public class DefaultFormFieldDecorator
     }
 
     public Control createControl( Composite parent, IFormEditorToolkit toolkit ) {
-        contents = toolkit.createComposite( parent, SWT.NONE );
+        contents = toolkit.createComposite( parent, SWT.NO_FOCUS );
         RowLayout layout = new RowLayout( SWT.HORIZONTAL );
         layout.marginWidth = 0;
         layout.marginHeight = 0;
@@ -91,15 +91,6 @@ public class DefaultFormFieldDecorator
 //        focusLabel = toolkit.createLabel( contents, "", SWT.NO_FOCUS );
         
         dirtyLabel = toolkit.createLabel( contents, "", SWT.NO_FOCUS );
-//        dirtyLabel.setEnabled( false );
-        
-//        dirtyLabel.addFocusListener( new FocusListener() {
-//            public void focusLost( FocusEvent event ) {
-//            }
-//            public void focusGained( FocusEvent event ) {
-//                dirtyLabel.setF
-//            }
-//        });
         
 //        invalidLabel = toolkit.createLabel( contents, "", SWT.NO_FOCUS );
 

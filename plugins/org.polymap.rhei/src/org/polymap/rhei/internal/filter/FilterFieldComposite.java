@@ -81,8 +81,8 @@ public class FilterFieldComposite
 
     public FilterFieldComposite( IFormEditorToolkit toolkit,
             String propName, Class propType,
-            IFormField field, IFormFieldLabel labeler, IFormFieldDecorator decorator,
-            IFormFieldValidator validator ) {
+            IFormField field, IFormFieldLabel labeler, 
+            IFormFieldDecorator decorator, IFormFieldValidator validator ) {
         this.propName = propName;
         this.propType = propType;
         this.toolkit = toolkit;
@@ -94,7 +94,7 @@ public class FilterFieldComposite
     
     
     public Composite createComposite( Composite parent, int style ) {
-        Composite result = toolkit.createComposite( parent, style );
+        Composite result = toolkit.createComposite( parent, style | SWT.NO_FOCUS );
         result.setLayout( new FormLayout() );
         
         // label
@@ -248,4 +248,10 @@ public class FilterFieldComposite
         this.externalErrorMsg = errorMsg;
     }
 
+
+//    public void advanceFocus() {
+//        parent.getShell().
+//    }
+
+    
 }

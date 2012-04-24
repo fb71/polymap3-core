@@ -87,5 +87,5 @@ public interface IFormFieldSite {
     public String getErrorMessage();
 
     public void setErrorMessage( String msg );
-    
+
 }

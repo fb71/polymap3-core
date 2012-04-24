@@ -23,6 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -95,7 +97,7 @@ public class FormFieldComposite
 
     
     public Composite createComposite( Composite parent, int style ) {
-        Composite result = toolkit.createComposite( parent, style );
+        Composite result = toolkit.createComposite( parent, style | SWT.NO_FOCUS );
         result.setLayout( new FormLayout() );
         
         // label
@@ -124,7 +126,17 @@ public class FormFieldComposite
         layoutData.left = new FormAttachment( labelControl, 5 );
         layoutData.right = new FormAttachment( decoControl, -3 );
         fieldControl.setLayoutData( layoutData );
-        
+
+        // focus listener
+        result.addFocusListener( new FocusListener() {
+            public void focusLost( FocusEvent ev ) {
+                log.info( ev );
+            }
+            public void focusGained( FocusEvent ev ) {
+                log.info( ev );
+            }
+        });
+
         result.pack( true );
         return result;
     }
