@@ -30,9 +30,12 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ISelection;
 
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.navigator.CommonNavigator;
 
 import org.polymap.core.model.ModelChangeEvent;
@@ -40,6 +43,7 @@ import org.polymap.core.model.ModelChangeListener;
 import org.polymap.core.project.IMap;
 import org.polymap.core.project.ProjectRepository;
 import org.polymap.core.project.ui.DefaultPartListener;
+import org.polymap.core.runtime.Polymap;
 
 /**
  * Spread the Rhei while listening to Charlotte McKinnon... :) 
@@ -64,6 +68,34 @@ public class RheiNavigator
     private ModelChangeListener modelListener;
 
 
+    public void init( IViewSite _site, IMemento _memento )
+            throws PartInitException {
+        super.init( _site, _memento );
+        
+        // restore state
+        if (memento != null) {
+            final String mapId = memento.getString( "mapId" );
+            if (mapId != null) {
+                // set input *after* createPartControl()
+                Polymap.getSessionDisplay().asyncExec( new Runnable() {
+                    public void run() {
+                        IMap _map = ProjectRepository.instance().findEntity( IMap.class, mapId );
+                        if (_map != null) {
+                            setInputMap( _map );
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+
+    public void saveState( IMemento _memento ) {
+        log.info( "Memento ID: " + _memento.getID() );
+        _memento.putString( "mapId", map != null ? map.id() : "" );
+    }
+
+
     public void createPartControl( Composite parent ) {
         super.createPartControl( parent );
         
@@ -85,7 +117,7 @@ public class RheiNavigator
         
         // part listener
         partListener = new PartListener();
-        page = getSite().getWorkbenchWindow().getActivePage();
+        page = getSite().getPage();  //getWorkbenchWindow().getActivePage();
         page.addPartListener( partListener );
     }
 

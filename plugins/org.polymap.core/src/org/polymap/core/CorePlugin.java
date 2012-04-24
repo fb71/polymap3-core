@@ -111,7 +111,7 @@ public class CorePlugin
         System.setProperty( "org.apache.commons.logging.simplelog.log.org.eclipse.rwt.widgets.codemirror", "debug" );
 	}
 	
-	
+
 	public CorePlugin() {
 		log.debug( "Hello from the first POLYMAP3 plugin! :)" );
 

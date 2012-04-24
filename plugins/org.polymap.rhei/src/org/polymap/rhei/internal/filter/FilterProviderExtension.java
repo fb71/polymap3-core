@@ -31,7 +31,7 @@ import org.polymap.rhei.filter.IFilterProvider;
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  * @version ($Revision$)
  */
-class FilterProviderExtension {
+public class FilterProviderExtension {
 
     public static final String          EXTENSION_POINT_NAME = "filter.filterProviders";
 

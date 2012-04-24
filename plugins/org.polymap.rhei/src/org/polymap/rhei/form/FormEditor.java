@@ -42,6 +42,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPersistableEditor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -69,7 +71,7 @@ import org.polymap.rhei.internal.form.FormPageProviderExtension;
 @SuppressWarnings("deprecation")
 public class FormEditor
         extends org.eclipse.ui.forms.editor.FormEditor 
-        implements IFormFieldListener {
+        implements IFormFieldListener, IPersistableEditor {
 
     private static Log log = LogFactory.getLog( FormEditor.class );
 
@@ -132,9 +134,6 @@ public class FormEditor
     private Action                      revertAction;
     
     
-    public FormEditor() {
-    }
-
 
     public void init( IEditorSite site, IEditorInput input )
             throws PartInitException {
@@ -178,8 +177,14 @@ public class FormEditor
     }
 
     
-//    private AtomicBoolean skipFieldChangeEvents = new AtomicBoolean( false );
-    
+    public void saveState( IMemento memento ) {
+    }
+
+
+    public void restoreState( IMemento memento ) {
+    }
+
+
     public void fieldChange( FormFieldEvent ev ) {
 //        if (skipFieldChangeEvents.get()) {
 //            return;

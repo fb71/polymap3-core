@@ -29,6 +29,8 @@ import java.util.Set;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.logging.Log;
@@ -40,15 +42,19 @@ import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.identity.FeatureId;
-
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.v1_1.OGCConfiguration;
+import org.geotools.xml.Configuration;
+import org.geotools.xml.Encoder;
+import org.geotools.xml.Parser;
 
 import net.refractions.udig.core.StaticProvider;
 import net.refractions.udig.ui.FeatureTableControl;
@@ -82,10 +88,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerSorter;
 
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
@@ -216,14 +225,70 @@ public class GeoSelectionView
 
     private boolean                 allowModify = false;
     
-    private boolean                 allowSearch = true;
+    private boolean                 allowSearch = false;
 
     private String                  basePartName = "";
     
 
-    public GeoSelectionView() {
-        log.debug( "..." );
+    public void init( IViewSite site, IMemento memento )
+            throws PartInitException {
+        super.init( site, memento );
         basePartName = getPartName();
+        
+        // restore state
+        if (memento != null) {
+            final String layerId = memento.getString( "layerId" );
+            final String filterText = memento.getTextData();
+            if (layerId != null && filterText != null) {
+                // set input *after* createPartControl()
+                Polymap.getSessionDisplay().asyncExec( new Runnable() {
+                    public void run() {
+                        try {
+                            ILayer _layer = ProjectRepository.instance().findEntity( ILayer.class, layerId );
+                            if (_layer != null) {
+                                Configuration config = new org.geotools.filter.v1_1.OGCConfiguration();
+                                Parser parser = new Parser( config );
+                                Filter _filter = (Filter)parser.parse( new ByteArrayInputStream( filterText.getBytes( "UTF8" ) ) );
+
+                                connectLayer( _layer );
+                                loadTable( _filter );
+                            }
+                        }
+                        catch (Exception e) {
+                            log.warn( "Unable to restore state.", e );
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    public void saveState( IMemento memento ) {
+        if (layer != null && filter != null) {
+            try {
+                if (filter instanceof Id) {
+                    // save max. 500 Fids
+                    if (((Id)filter).getIdentifiers().size() > 300) {
+                        return;
+                    }
+                }
+                OGCConfiguration config = new org.geotools.filter.v1_1.OGCConfiguration();
+                Encoder encoder = new Encoder( config );
+                encoder.setIndenting( true );
+                encoder.setIndentSize( 4 );
+                ByteArrayOutputStream bout = new ByteArrayOutputStream( 4096 );
+                encoder.encode( filter, org.geotools.filter.v1_0.OGC.Filter, bout );
+                
+                if (bout.size() < 10*1024) {
+                    memento.putTextData( bout.toString( "UTF8" ) );
+                    memento.putString( "layerId", layer.id() );
+                    log.info( bout.toString( "UTF8" ) );
+                }
+            }
+            catch (Exception e) {
+                log.warn( "Unable to save state.", e );
+            }
+        }
     }
 
     public void setAllowModify( boolean allowModify ) {

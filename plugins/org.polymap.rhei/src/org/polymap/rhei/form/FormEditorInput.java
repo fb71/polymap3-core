@@ -32,7 +32,10 @@ import org.geotools.data.FeatureStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
+
+import org.polymap.core.data.PipelineFeatureSource;
 
 /**
  * 
@@ -42,9 +45,11 @@ import org.eclipse.ui.IPersistableElement;
  * @since 3.0
  */
 public class FormEditorInput
-        implements IEditorInput {
+        implements IEditorInput, IPersistableElement {
 
     private static Log log = LogFactory.getLog( FormEditorInput.class );
+    
+    public static final String  FACTORY_ID = "org.polymap.rhei.FormEditorInputFactory";
 
     private FeatureStore        fs;
     
@@ -57,6 +62,21 @@ public class FormEditorInput
         assert feature != null : "feature is null!";
         this.feature = feature;
         this.fs = fs;
+    }
+
+    public IPersistableElement getPersistable() {
+        return this;
+    }
+
+    public void saveState( IMemento memento ) {
+        if (feature != null && (fs instanceof PipelineFeatureSource)) {
+            memento.putString( "fid", feature.getIdentifier().getID() );
+            memento.putString( "layerId", ((PipelineFeatureSource)fs).getLayer().id() );
+        }
+    }
+
+    public String getFactoryId() {
+        return FACTORY_ID;
     }
 
     public boolean equals( Object obj ) {
@@ -97,10 +117,6 @@ public class FormEditorInput
 
     public String getName() {
         return "FormEditorInput";
-    }
-
-    public IPersistableElement getPersistable() {
-        return null;
     }
 
     public String getToolTipText() {

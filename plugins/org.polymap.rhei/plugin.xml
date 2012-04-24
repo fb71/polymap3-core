@@ -198,5 +198,12 @@
             path="/csv">
       </servlet>
    </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="org.polymap.rhei.form.FormEditorInputFactory"
+            id="org.polymap.rhei.FormEditorInputFactory">
+      </factory>
+   </extension>
 
 </plugin>
