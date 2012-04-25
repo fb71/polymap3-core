@@ -44,6 +44,7 @@ import org.eclipse.jface.util.IOpenEventListener;
 import org.eclipse.jface.util.OpenStrategy;
 
 import org.polymap.rhei.form.IFormEditorToolkit;
+import org.polymap.rhei.internal.form.FormEditorToolkit;
 import org.polymap.rhei.model.ConstantWithSynonyms;
 
 /**
@@ -202,6 +203,7 @@ public class PicklistFormField
                 ? comboStyle | SWT.READ_ONLY
                 : comboStyle & ~SWT.READ_ONLY;
         combo = toolkit.createCombo( parent, Collections.EMPTY_SET, comboStyle );
+        combo.setVisibleItemCount( 10 );
         
         //
         for (ModifyListener l : modifyListeners) {
@@ -257,9 +259,11 @@ public class PicklistFormField
         // focus listener
         combo.addFocusListener( new FocusListener() {
             public void focusLost( FocusEvent event ) {
+                combo.setBackground( FormEditorToolkit.textBackground );
                 site.fireEvent( this, IFormFieldListener.FOCUS_LOST, combo.getText() );
             }
             public void focusGained( FocusEvent event ) {
+                combo.setBackground( FormEditorToolkit.textBackgroundFocus );
                 site.fireEvent( this, IFormFieldListener.FOCUS_GAINED, combo.getText() );
             }
         });

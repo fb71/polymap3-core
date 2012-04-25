@@ -25,11 +25,13 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import org.polymap.rhei.form.IFormEditorToolkit;
+import org.polymap.rhei.internal.form.FormEditorToolkit;
 
 /**
  * 
@@ -49,6 +51,8 @@ public class CheckboxFormField
     // XXX use (proper) validator to make the translation to String 
     private Object              loadedValue;
 
+    private Color               bg;
+
 
     public void init( IFormFieldSite _site ) {
         this.site = _site;
@@ -59,6 +63,7 @@ public class CheckboxFormField
 
     public Control createControl( Composite parent, IFormEditorToolkit toolkit ) {
         checkbox = toolkit.createButton( parent, "", SWT.CHECK );
+        bg = checkbox.getBackground();
 
         // modify listener
         checkbox.addSelectionListener( new SelectionListener() {
@@ -73,9 +78,11 @@ public class CheckboxFormField
         // focus listener
         checkbox.addFocusListener( new FocusListener() {
             public void focusLost( FocusEvent event ) {
+                checkbox.setBackground( bg );
                 site.fireEvent( this, IFormFieldListener.FOCUS_LOST, checkbox.getText() );
             }
             public void focusGained( FocusEvent event ) {
+                checkbox.setBackground( FormEditorToolkit.textBackgroundFocus );
                 site.fireEvent( this, IFormFieldListener.FOCUS_GAINED, checkbox.getText() );
             }
         });

@@ -12,8 +12,6 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
- * $Id: $
  */
 package org.polymap.rhei.internal.form;
 
@@ -53,16 +51,21 @@ import org.polymap.rhei.form.IFormEditorToolkit;
  * Basically this implementation delegates method calls to {@link FormToolkit}.
  *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
- * @version ($Revision$)
  */
 public class FormEditorToolkit
         implements IFormEditorToolkit {
 
     private FormToolkit         delegate;
 
-    public Color                textBackground = Graphics.getColor( 0xFF, 0xFE, 0xE1 );
+    public static final Color   textBackground = Graphics.getColor( 0xFF, 0xFE, 0xE1 );
     
-    private Color               labelForeground = Graphics.getColor( 0x70, 0x70, 0x70 );
+    public static final Color   textBackgroundFocus = Graphics.getColor( /*0xE6, 0xED, 0xFF*/ /*0xFA, 0xEB, 0xFF*/ 0xFF, 0xED, 0xD2 );
+
+    public static final Color   textBackgroundDisabled = Graphics.getColor( 0xF6, 0xF4, 0xF4 );
+
+    public static final Color   borderFocus = Graphics.getColor( 0xC0, 0xC0, 0xC0 );
+    
+    public static final Color   labelForeground = Graphics.getColor( 0x70, 0x70, 0x70 );
     
     
     public FormEditorToolkit( FormToolkit delegate ) {
@@ -72,15 +75,17 @@ public class FormEditorToolkit
     }
 
     public Button createButton( Composite parent, String text, int style ) {
-        return delegate.createButton( parent, text, style );
+        Button result = delegate.createButton( parent, text, style );
+        //result.setData( WidgetUtil.CUSTOM_VARIANT, "formeditor" );
+        return result;
     }
 
     public Composite createComposite( Composite parent, int style ) {
-        return delegate.createComposite( parent, style );
+        return delegate.createComposite( parent, style | SWT.NO_FOCUS );
     }
 
     public Composite createComposite( Composite parent ) {
-        return delegate.createComposite( parent );
+        return delegate.createComposite( parent, SWT.NO_FOCUS );
     }
 
     public Composite createCompositeSeparator( Composite parent ) {
@@ -88,7 +93,7 @@ public class FormEditorToolkit
     }
 
     public ExpandableComposite createExpandableComposite( Composite parent, int expansionStyle ) {
-        return delegate.createExpandableComposite( parent, expansionStyle );
+        return delegate.createExpandableComposite( parent, expansionStyle | SWT.NO_FOCUS );
     }
 
     public Form createForm( Composite parent ) {
@@ -125,24 +130,25 @@ public class FormEditorToolkit
     }
 
     public ScrolledForm createScrolledForm( Composite parent ) {
-        return delegate.createScrolledForm( parent );
+        return delegate.createScrolledForm( parent/*, SWT.NO_FOCUS*/ );
     }
 
     public Section createSection( Composite parent, int sectionStyle ) {
-        return delegate.createSection( parent, sectionStyle );
+        Section result = delegate.createSection( parent, sectionStyle | SWT.NO_FOCUS /*| ExpandableComposite.FOCUS_TITLE*/ );
+        return result;
     }
 
     public Label createSeparator( Composite parent, int style ) {
-        return delegate.createSeparator( parent, style );
+        return delegate.createSeparator( parent, style | SWT.NO_FOCUS );
     }
 
     public Table createTable( Composite parent, int style ) {
-        return delegate.createTable( parent, style );
+        return delegate.createTable( parent, style | SWT.NO_FOCUS );
     }
 
     public List createList( Composite parent, int style ) {
         List result = new List( parent, style );
-//        result.setBackground( textBackground );
+        result.setBackground( textBackground );
         result.setData( WidgetUtil.CUSTOM_VARIANT, "formeditor" );
         return result;
     }

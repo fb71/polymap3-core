@@ -34,6 +34,7 @@ import org.eclipse.jface.util.IOpenEventListener;
 import org.eclipse.jface.util.OpenStrategy;
 
 import org.polymap.rhei.form.IFormEditorToolkit;
+import org.polymap.rhei.internal.form.FormEditorToolkit;
 
 /**
  * 
@@ -52,6 +53,8 @@ public class StringFormField
     
     // XXX use (proper) validator to make the translation to String 
     private Object                  loadedValue;
+
+    private boolean                 deferredEnabled = true;
 
 
     public void init( IFormFieldSite _site ) {
@@ -79,9 +82,11 @@ public class StringFormField
         // focus listener
         text.addFocusListener( new FocusListener() {
             public void focusLost( FocusEvent event ) {
+                text.setBackground( FormEditorToolkit.textBackground );
                 site.fireEvent( StringFormField.this, IFormFieldListener.FOCUS_LOST, text.getText() );
             }
             public void focusGained( FocusEvent event ) {
+                text.setBackground( FormEditorToolkit.textBackgroundFocus );
                 site.fireEvent( StringFormField.this, IFormFieldListener.FOCUS_GAINED, text.getText() );
             }
         });
@@ -94,11 +99,19 @@ public class StringFormField
             }
         });
 
+        text.setEnabled( deferredEnabled );
+        text.setBackground( deferredEnabled ? FormEditorToolkit.textBackground : FormEditorToolkit.textBackgroundDisabled );
         return text;
     }
 
     public void setEnabled( boolean enabled ) {
-        text.setEnabled( enabled );
+        if (text != null) {
+            text.setEnabled( enabled );
+            text.setBackground( enabled ? FormEditorToolkit.textBackground : FormEditorToolkit.textBackgroundDisabled );
+        }
+        else {
+            deferredEnabled = enabled;
+        }
     }
 
     /**

@@ -37,6 +37,7 @@ import org.eclipse.jface.util.IOpenEventListener;
 import org.eclipse.jface.util.OpenStrategy;
 
 import org.polymap.rhei.form.IFormEditorToolkit;
+import org.polymap.rhei.internal.form.FormEditorToolkit;
 
 /**
  * A date/time form field based on the {@link DateTime} widget.
@@ -100,9 +101,11 @@ public class DateTimeFormField
         // focus listener
         dateTime.addFocusListener( new FocusListener() {
             public void focusLost( FocusEvent event ) {
+                dateTime.setBackground( FormEditorToolkit.textBackground );
                 site.fireEvent( DateTimeFormField.this, IFormFieldListener.FOCUS_LOST, null );
             }
             public void focusGained( FocusEvent event ) {
+                dateTime.setBackground( FormEditorToolkit.textBackgroundFocus );
                 site.fireEvent( DateTimeFormField.this, IFormFieldListener.FOCUS_GAINED, null );
             }
         });
