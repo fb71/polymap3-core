@@ -138,10 +138,19 @@ public class PicklistFormField
         setTextEditable( false );
         
         for (ConstantWithSynonyms constant : constants) {
-            this.values.put( (String)constant.label, constant.id );
+            values.put( (String)constant.label, constant.id );
         }
     }
 
+    /**
+     * Add one single value. Can be used to add a "null" field. 
+     * 
+     * @return this
+     */
+    public PicklistFormField addValue( String label, Object value ) {
+        values.put( label, value );
+        return this;
+    }
     
     public void init( IFormFieldSite _site ) {
         this.site = _site;
