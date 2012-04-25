@@ -182,14 +182,14 @@
          </action>
       </objectContribution>
    </extension>
-   <extension
+   <!--extension
          point="org.polymap.rhei.form.pageProviders">
       <pageProvider
             class="org.polymap.rhei.form.StandardPageProvider"
             id="org.polymap.rhei.form.StandardPageProvider"
             name="StandardPageProvider">
       </pageProvider>
-   </extension>
+   </extension-->
    <extension
          point="org.polymap.core.http.servlets">
       <servlet

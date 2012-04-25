@@ -1,15 +1,14 @@
-
 /* Somewhat darker background for general contrast and button gradiensts */ 
 * {
-    background-color: #f4f4fb;
+    background-color: #ebebf0;
 }
 Shell, CTabFolder, CTabItem, ToolBar, CoolBar, Group, Group-Frame, Label {
-    background-color: #f4f4fb;
+    background-color: #ebebf0;
 }
 
 CTabItem:selected {
-    background-color: #C0C0C0;
-    color: black;
+    background-color: #9090a0;
+    color: white;
     /*background-color: #C5DCFE;
     color: black; */
 }
@@ -29,31 +28,46 @@ Menu {
 /* Form widgets *******************************************/
 Text.formeditor {
     border: 1px solid #CCCCCC;
-    background-color: #FFFDD4;
+    /*background-color: #FFFDD4;*/
+}
+Text.formeditor:disabled {
+    color: #202020;
 }
 
 Combo.formeditor {
     border: 1px solid #CCCCCC;
-    background-color: #FFFDD4;
+    /*background-color: #FFFDD4;*/
 }
 
 DateTime.formeditor {
     border: 1px solid #CCCCCC;
-    background-color: #FFFDD4;
+    /*background-color: #FFFDD4;*/
+}
+DateTime.formeditor:disabled {
+    color: #202020;
 }
 
 List.formeditor {
     border: 1px solid #CCCCCC;
     /*background-color: #FFFDD4;*/
 }
-
-/* Button *************************************************/
-Button[PUSH] {
-    border-radius: 6px;
+/*Button.formeditor[PUSH] {
+    border-radius: 2px;
     background-image: gradient(
       linear, left top, left bottom,
       from( #f8f8fb ),
-      to( #ebebf3 )
+      to( #dbdbe0 )
+    );
+}*/
+
+/* Button *************************************************/
+Button[PUSH] {
+    border: 1px solid #bababa;
+    border-radius: 2px;
+    background-image: gradient(
+      linear, left top, left bottom,
+      from( #ffffff ),
+      to( #dbdbe0 )
     );
 }
   
@@ -62,14 +76,22 @@ Button[PUSH]:pressed {
 }
   
 Button[PUSH]:hover {
+    border: 1px solid #a5a5a5;
     background-color: #ffffff;
     background-image: gradient(
       linear, left top, left bottom,
-      from( #fefeff ),
-      to( #d9d9e0 )
+      from( #ffffff ),
+      to( #F7DAAF )
     );
 }
-  
+
+ToolItem:hover {    
+    border: 1px solid #bdbdbd;
+    border-radius: 2px;
+    border-radius: 2px;
+    background-color: #FFEBCD
+}
+ 
 /* Table **************************************************/
 TableColumn {
   background-color: #f8f8ff;

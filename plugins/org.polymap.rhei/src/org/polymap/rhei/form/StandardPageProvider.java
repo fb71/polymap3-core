@@ -50,7 +50,7 @@ public class StandardPageProvider
         implements IFormPageProvider {
 
     private static Log log = LogFactory.getLog( StandardPageProvider.class );
-
+    
     
     public List<IFormEditorPage> addPages( final FormEditor formEditor, final Feature feature ) {
         log.debug( "feature= " + feature );

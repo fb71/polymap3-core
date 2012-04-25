@@ -274,6 +274,27 @@ public class FormEditor
                 log.warn( "Exception while initializing pages of FormEditor.", e );
             }
         }
+        // no pages -> StandardPageProvider
+        if (pages.isEmpty()) {
+            StandardPageProvider provider = new StandardPageProvider();
+            List<IFormEditorPage> _pages = provider.addPages( this, getFeature() );
+
+            if (_pages != null) {
+                for (IFormEditorPage page : _pages) {
+                    try {
+                        FormEditorPageContainer wrapper = new FormEditorPageContainer( page, this, page.getId(), page.getTitle() );
+                        addPage( wrapper );
+                        pages.add( wrapper );
+                        setActivePage( page.getId() );
+                        wrapper.addFieldListener( this );
+                    }
+                    catch (PartInitException e) {
+                        log.warn( "Exception while initializing pages of FormEditor.", e );
+                    }
+                }
+            }
+            
+        }
     }
 
 
