@@ -172,6 +172,12 @@ public class PicklistFormField
         }
     }
 
+    public void removeModifyListener( ModifyListener l ) {
+        modifyListeners.remove( l );
+        if (combo != null) {
+            combo.removeModifyListener( l );
+        }
+    }
 
     /**
      * Sets the text of the combo editable.
