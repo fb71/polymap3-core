@@ -65,6 +65,8 @@ public class FormEditorInputFactory
             }
             catch (Exception e) {
                 log.warn( "Unable to restore FormEditorInput.", e );
+            }
+            finally {
                 if (it != null) { it.close(); }
             }
         }

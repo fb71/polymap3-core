@@ -2,7 +2,7 @@
 * {
     background-color: #ebebf0;
 }
-Shell, CTabFolder, CTabItem, ToolBar, CoolBar, Group, Group-Frame, Label {
+Shell, CTabFolder, CTabItem, ToolBar, CoolBar, Group, Group-Frame, Label, Label:hover, CLabel {
     background-color: #ebebf0;
 }
 
@@ -38,6 +38,11 @@ Combo.formeditor {
     border: 1px solid #CCCCCC;
     /*background-color: #FFFDD4;*/
 }
+Combo.formeditor:disabled {
+    color: #202020;
+    border: 1px solid #CCCCCC;
+    /*background-color: #FFFDD4;*/
+}
 
 DateTime.formeditor {
     border: 1px solid #CCCCCC;
@@ -69,12 +74,10 @@ Button[PUSH] {
       from( #ffffff ),
       to( #dbdbe0 )
     );
-}
-  
+}  
 Button[PUSH]:pressed {
     background-color: #ffffff;
-}
-  
+} 
 Button[PUSH]:hover {
     border: 1px solid #a5a5a5;
     background-color: #ffffff;
@@ -85,13 +88,28 @@ Button[PUSH]:hover {
     );
 }
 
-ToolItem:hover {    
-    border: 1px solid #bdbdbd;
+ToolItem:selected {
+    border: 1px solid #b0b0b0;
     border-radius: 2px;
-    border-radius: 2px;
-    background-color: #FFEBCD
+    background-color: #d0d0d0;
+    background-image: gradient(
+      linear, left top, left bottom,
+      from( #e5e5e5 ),
+      to( #c8c8c8 )
+    );
+    padding: 0px 0px 0px 0px;
 }
- 
+ToolItem:hover {    
+    border: 1px solid #b0b0b0;
+    border-radius: 2px;
+    background-color: #FFEBCD;
+    background-image: gradient(
+      linear, left top, left bottom,
+      from( #ffffff ),
+      to( #F7DAAF )
+    );
+}
+
 /* Table **************************************************/
 TableColumn {
   background-color: #f8f8ff;

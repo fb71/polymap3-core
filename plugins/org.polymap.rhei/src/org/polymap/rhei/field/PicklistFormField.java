@@ -87,6 +87,8 @@ public class PicklistFormField
     
     private List<ModifyListener>    modifyListeners = new ArrayList();
 
+    private boolean                 enabled = true;
+
 
     public PicklistFormField( int... flags ) {
         if (flags.length > 0) {
@@ -218,8 +220,11 @@ public class PicklistFormField
                 ? comboStyle | SWT.READ_ONLY
                 : comboStyle & ~SWT.READ_ONLY;
         combo = toolkit.createCombo( parent, Collections.EMPTY_SET, comboStyle );
-        combo.setVisibleItemCount( 10 );
-        
+        combo.setVisibleItemCount( 12 );
+
+        combo.setEnabled( enabled );
+        combo.setBackground( enabled ? FormEditorToolkit.textBackground : FormEditorToolkit.textBackgroundDisabled );
+
         //
         for (ModifyListener l : modifyListeners) {
             combo.addModifyListener( l );
@@ -290,13 +295,16 @@ public class PicklistFormField
                 site.fireEvent( PicklistFormField.this, IFormFieldListener.DEFAULT_ACTION, combo.getText() );
             }
         });
-
         return combo;
     }
 
     
     public void setEnabled( boolean enabled ) {
-        combo.setEnabled( enabled );
+        this.enabled = enabled;
+        if (combo != null) {
+            combo.setEnabled( enabled );
+            combo.setBackground( enabled ? FormEditorToolkit.textBackground : FormEditorToolkit.textBackgroundDisabled );
+        }
     }
 
 
