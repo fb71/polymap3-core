@@ -29,14 +29,17 @@ import org.apache.commons.logging.LogFactory;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
 
+import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.FidFilterImpl;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPartConstants;
 
 import org.polymap.core.data.ui.featureTable.GeoSelectionView;
 import org.polymap.core.workbench.PolymapWorkbench;
@@ -63,6 +66,27 @@ public class OpenFormAction
         if (_view instanceof GeoSelectionView) {
             log.debug( "init(): found GeoSelectionView..." );
             this.view = (GeoSelectionView)_view;
+
+            // if view input has changed: open editor if just one feature is selected
+            view.addPropertyListener( new IPropertyListener() {
+                public void propertyChanged( Object source, int propId ) {
+                    if (view != null && propId == IWorkbenchPartConstants.PROP_INPUT) {
+                        FeatureCollection fc = view.getFeatureCollection();
+                        if (fc != null && fc.size() == 1) {
+                            try {
+                                fc.accepts( new FeatureVisitor() {
+                                    public void visit( Feature feature ) {
+                                        FormEditor.open( view.getFeatureStore(), feature );
+                                    }
+                                }, null );
+                            }
+                            catch (IOException e) {
+                                PolymapWorkbench.handleError( RheiPlugin.PLUGIN_ID, this, e.getLocalizedMessage(), e );
+                            }
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -92,7 +116,7 @@ public class OpenFormAction
         }
     }
 
-
+    
     public void selectionChanged( IAction action, ISelection sel ) {
         log.debug( "selectionChanged(): sel= " + sel );
 

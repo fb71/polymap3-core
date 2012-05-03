@@ -94,6 +94,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -582,6 +583,9 @@ public class GeoSelectionView
                         int count = fc.size();  //getviewer.getViewer().getTable().getItemCount()
                         String title = basePartName + " (" + count + ")";
                         setPartName( title );
+                                                
+                        // part event
+                        GeoSelectionView.this.firePropertyChange( IWorkbenchPartConstants.PROP_INPUT );
                     }
                 });
             }
