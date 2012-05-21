@@ -1,7 +1,5 @@
 package org.polymap.core.workbench;
 
-import java.util.Dictionary;
-
 import java.net.URL;
 
 import org.apache.commons.logging.Log;
@@ -193,17 +191,19 @@ public class PolymapActionBarAdvisor
                 Shell shell = window.getShell();
                 
                 Bundle rapBundle = Platform.getBundle( PlatformUI.PLUGIN_ID );
-                Dictionary rapHeaders = rapBundle.getHeaders();
-                Object rapVersion = rapHeaders.get( Constants.BUNDLE_VERSION );
+                Object rapVersion = rapBundle.getHeaders().get( Constants.BUNDLE_VERSION );
                 
                 Bundle coreBundle = Platform.getBundle( CorePlugin.PLUGIN_ID );
-                Dictionary coreHeaders = coreBundle.getHeaders();
-                Object coreVersion = coreHeaders.get( Constants.BUNDLE_VERSION );
+                Object coreVersion = coreBundle.getHeaders().get( Constants.BUNDLE_VERSION );
                 
-                MessageDialog.openInformation( shell, Messages.get( "PolymapActionBarAdvisor_about" ), //$NON-NLS-1$
-                        "POLYMAP " + coreVersion + "\n" + //$NON-NLS-1$
-                        "Running on RAP version " + rapVersion + "\n" +
-                        "GeoTools version " + GeoTools.getVersion() ); //$NON-NLS-1$
+                Bundle anta2Bundle = Platform.getBundle( "org.polymap.anta2" );
+                Object anta2Version = anta2Bundle.getHeaders().get( Constants.BUNDLE_VERSION );
+                
+                MessageDialog.openInformation( shell, Messages.get( "PolymapActionBarAdvisor_about" ),
+                        "Vanko " + anta2Version + " -- www.polymap.org/vanko/\n" +
+                        "POLYMAP " + coreVersion + " -- www.polymap.org/polymap3/\n" +
+                        "Eclipse/RAP version " + rapVersion + "\n" +
+                        "GeoTools version " + GeoTools.getVersion() );
             }
         };
         aboutAction.setText( Messages.get( "PolymapActionBarAdvisor_about" ) ); //$NON-NLS-1$
