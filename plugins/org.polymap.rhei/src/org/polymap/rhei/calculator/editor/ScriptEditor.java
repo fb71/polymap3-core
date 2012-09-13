@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownServiceException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -334,8 +335,13 @@ public class ScriptEditor
                 out.close();
             }
         }
+        catch (UnknownServiceException e) {
+            PolymapWorkbench.handleError( RheiPlugin.PLUGIN_ID, this, 
+                    "Das Script konnte nicht gespeichert werden.\nFür die Position 'Freier Text' muss über die Funktion 'Neues Script anlegen'\nzunächst eine Datei im forms/ Verzeichnis angelegt werden bevor diese geändert werden kann.", e );
+        }
         catch (IOException e) {
-            PolymapWorkbench.handleError( RheiPlugin.PLUGIN_ID, this, e.getLocalizedMessage(), e );
+            PolymapWorkbench.handleError( RheiPlugin.PLUGIN_ID, this, 
+                    "Script konnte nicht gespeichert werden.", e );
         }
     }
 
