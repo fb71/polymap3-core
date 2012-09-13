@@ -80,6 +80,7 @@ public class JsonForm
     
     
     public JsonForm( JSONObject json ) {
+        assert json != null;
         this.json = json;
     }
     
@@ -97,6 +98,7 @@ public class JsonForm
         try {
             in = new BufferedReader( new InputStreamReader( url.openStream(), "ISO-8859-1" ) );
             json = new JSONObject( new JSONTokener( in ) );
+            assert json != null : "Das Formular konnte nicht gelesen werden, da es fehlerhaft ist: " + url;
         }
         finally {
             if (in != null) {
@@ -107,6 +109,7 @@ public class JsonForm
 
     
     protected void setJson( JSONObject json ) {
+        assert json != null;
         this.json = json;
     }
 
