@@ -28,7 +28,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 
 import net.refractions.udig.core.IProvider;
@@ -586,36 +585,36 @@ class FeatureTableContentProvider
                         " not the same instance"); //$NON-NLS-1$
         }
     }
-    /**
-     * Removes the selected features (the features selected by the owning {@link FeatureTableControl}).
-     * @return returns a collection of the deleted features
-     */
-    public FeatureCollection<SimpleFeatureType, SimpleFeature> deleteSelection() {
-        final FeatureCollection<SimpleFeatureType, SimpleFeature> deletedFeatures = FeatureCollections.newCollection();
-        Runnable updateTable = new Runnable(){
-            @SuppressWarnings("unchecked")
-            public void run() {
-                Collection<String> selectionFids = owningFeatureTableControl.getSelectionProvider().getSelectionFids();
-                for( Iterator<SimpleFeature> iter = features.iterator(); iter.hasNext(); ) {
-                    SimpleFeature feature =  iter.next();
-                    if( selectionFids.contains(feature.getID()) ){
-                        deletedFeatures.add(feature);
-                        iter.remove();
-                        lookup.remove(feature.getID());
-                    }
-                }
-                
-                selectionFids.clear();
-                owningFeatureTableControl.getViewer().getTable().clearAll();
-            }
-        };
-        
-        if( Display.getCurrent()==null ){
-            PlatformGIS.syncInDisplayThread(owningFeatureTableControl.getControl().getDisplay(), updateTable);
-        }else{
-            updateTable.run();
-        }
-        
-        return deletedFeatures;
-    }
+//    /**
+//     * Removes the selected features (the features selected by the owning {@link FeatureTableControl}).
+//     * @return returns a collection of the deleted features
+//     */
+//    public FeatureCollection<SimpleFeatureType, SimpleFeature> deleteSelection() {
+//        final FeatureCollection<SimpleFeatureType, SimpleFeature> deletedFeatures = FeatureCollections.newCollection();
+//        Runnable updateTable = new Runnable(){
+//            @SuppressWarnings("unchecked")
+//            public void run() {
+//                Collection<String> selectionFids = owningFeatureTableControl.getSelectionProvider().getSelectionFids();
+//                for( Iterator<SimpleFeature> iter = features.iterator(); iter.hasNext(); ) {
+//                    SimpleFeature feature =  iter.next();
+//                    if( selectionFids.contains(feature.getID()) ){
+//                        deletedFeatures.add(feature);
+//                        iter.remove();
+//                        lookup.remove(feature.getID());
+//                    }
+//                }
+//                
+//                selectionFids.clear();
+//                owningFeatureTableControl.getViewer().getTable().clearAll();
+//            }
+//        };
+//        
+//        if( Display.getCurrent()==null ){
+//            PlatformGIS.syncInDisplayThread(owningFeatureTableControl.getControl().getDisplay(), updateTable);
+//        }else{
+//            updateTable.run();
+//        }
+//        
+//        return deletedFeatures;
+//    }
 }

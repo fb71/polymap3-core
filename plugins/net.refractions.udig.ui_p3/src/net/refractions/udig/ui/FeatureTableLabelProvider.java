@@ -116,9 +116,9 @@ implements ITableLabelProvider, IColorProvider {
         }
         if( element instanceof SimpleFeature ){
             SimpleFeature feature=(SimpleFeature) element;
-            if( owningFeatureTableControl.getSelectionProvider().getSelectionFids().contains(feature.getID()) ){
-                return getSelectionColor(currentDisplay);
-            }
+//            if( owningFeatureTableControl.getSelectionProvider().getSelectionFids().contains(feature.getID()) ){
+//                return getSelectionColor(currentDisplay);
+//            }
         }
 
         return null;
@@ -152,13 +152,13 @@ implements ITableLabelProvider, IColorProvider {
         }
         if( element instanceof SimpleFeature ){
             SimpleFeature feature=(SimpleFeature) element;
-            if( owningFeatureTableControl.getSelectionProvider().getSelectionFids().contains(feature.getID()) ){
-                if( darkBackground() ){
-                    return currentDisplay.getSystemColor(SWT.COLOR_WHITE);
-                }else{
-                    return currentDisplay.getSystemColor(SWT.COLOR_BLACK);
-                }
-            }
+//            if( owningFeatureTableControl.getSelectionProvider().getSelectionFids().contains(feature.getID()) ){
+//                if( darkBackground() ){
+//                    return currentDisplay.getSystemColor(SWT.COLOR_WHITE);
+//                }else{
+//                    return currentDisplay.getSystemColor(SWT.COLOR_BLACK);
+//                }
+//            }
         }
 
         return null;

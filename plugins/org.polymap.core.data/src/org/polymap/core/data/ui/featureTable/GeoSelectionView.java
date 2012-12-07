@@ -76,11 +76,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -332,6 +336,20 @@ public class GeoSelectionView
         viewer.addSelectionChangedListener( tableSelectionListener );
         getSite().setSelectionProvider( viewer );
 
+        // 185: Suchergebnisse mit Doppelklick öffnen (http://polymap.org/svn-anta2/ticket/185)
+        viewer.addDClickListener( new IDoubleClickListener() {
+            public void doubleClick( DoubleClickEvent event ) {
+                for (IContributionItem item : getViewSite().getActionBars().getToolBarManager().getItems()) {
+                    log.info( "   item: " + item.getId() );
+                    if (item.getId() != null
+                            && item.getId().contains( "OpenFormAction" )
+                            && item instanceof ActionContributionItem) {
+                        ((ActionContributionItem)item).getAction().run();
+                    }
+                }
+            }
+        });
+        
         if (allowSearch) {
             // attrCombo
             attrCombo = new Combo( parent, SWT.BORDER );

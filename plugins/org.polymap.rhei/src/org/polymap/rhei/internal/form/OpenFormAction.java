@@ -125,11 +125,15 @@ public class OpenFormAction
         if (!sel.isEmpty() && sel instanceof IStructuredSelection) {
             Object elm = ((IStructuredSelection)sel).getFirstElement();
             
-            // called when the entity is clicked in GeoSellectionView
+            // called when the entity is clicked in GeoSellectionView (old)
             if (elm instanceof FidFilterImpl) {
                 Set fids = ((FidFilterImpl)elm).getIDs();
                 selectedFid = fids.size() == 1 
                         ? (String)fids.iterator().next() : null;
+            }
+            // 185: Suchergebnisse mit Doppelklick öffnen (http://polymap.org/svn-anta2/ticket/185)
+            else if (elm instanceof Feature) {
+                selectedFid = ((Feature)elm).getIdentifier().getID();
             }
         }
         action.setEnabled( view != null && selectedFid != null );
