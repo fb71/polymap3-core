@@ -1,0 +1,118 @@
+
+var body = document.body;
+ 
+// init event handlers
+function initDropHandler( elementId ) {
+    var elm = document.getElementById( elementId );
+    if (elm && elm.addEventListener) {
+        elm.addEventListener( "dragenter", noopHandler, false );
+        elm.addEventListener( "dragexit", noopHandler, false );
+        elm.addEventListener( "dragover", noopHandler, false );
+        elm.addEventListener( "drop", dropHandler, false );
+    }
+}
+   
+function dropHandler( ev ) {
+    var files = ev.dataTransfer.files;
+    var elm = ev.target ? ev.target : ev.srcElement;
+
+    // find parent with id
+    while (elm && !elm.id) {
+        elm = elm.parentNode;
+    }
+    
+    // upload files
+    if (files.length > 0) {
+        showWaitHint();
+        var uploaded = 0;
+        for (var i=0; i<files.length; i++) {
+            //alert( 'Sending file for element: ' + elm.id );
+            sendFile( files[i], elm.id, function( xhr ) {
+                if (xhr.readyState == 4) {
+                    if (++uploaded >= files.length) {
+                        hideWaitHint();
+                        endTransmission();
+                    }
+                }
+            });
+        }
+    }
+    // send eot with parameter
+    else {
+        var eventText = ev.dataTransfer.getData( 'Text' );
+        endTransmission( eventText, elm.id );
+    }
+}
+
+function endTransmission( eventText, elementId ) {
+    //qx.client.Timer.once( this._showWaitHint, this, 500 );
+    setTimeout( function() {
+        // signal end of transmission
+        var xhr = (window.XMLHttpRequest)
+            ? new XMLHttpRequest()  // code for IE7+, Firefox, Chrome, Opera, Safari
+            : new ActiveXObject( 'Microsoft.XMLHTTP' ); // code for IE6, IE5
+        var url = '?custom_service_handler=org.polymap.core.DndServiceHandler';
+        xhr.open( 'POST', url, true );
+        xhr.setRequestHeader( 'Content-type', 'application/x-www-form-urlencoded' ); 
+        xhr.setRequestHeader( 'Connection', 'close' );
+        var params = eventText ? 'eventText=' + encodeURIComponent( eventText ) : '';
+        params += elementId ? 'elementId=' + encodeURIComponent( elementId ) : '';
+        xhr.send( params );    
+        
+        // force UI update?
+        qx.ui.core.Widget.flushGlobalQueues();
+        var req = org.eclipse.swt.Request.getInstance();
+        req.enableUICallBack();
+    }, 500 );
+}
+
+function sendFile( file, elementId, callback ) {
+    var xhr = (window.XMLHttpRequest)
+        ? new XMLHttpRequest()  // code for IE7+, Firefox, Chrome, Opera, Safari
+        : new ActiveXObject( 'Microsoft.XMLHTTP' ); // code for IE6, IE5
+
+    var upload = xhr.upload;
+ 
+    var url = 'dndupload?filename=' + file.name;
+    xhr.open( 'POST', url, true );
+    xhr.setRequestHeader( 'X-Filename', encodeURIComponent( file.name ) );
+    xhr.setRequestHeader( 'X-ElementId', encodeURIComponent( elementId ) );
+    xhr.setRequestHeader( 'Content-type', file.type );
+    xhr.setRequestHeader( 'Content-length', file.size );
+    xhr.setRequestHeader( 'Connection', 'close' );
+    xhr.onreadystatechange = function () {
+        callback.call( {}, xhr );
+    };
+    xhr.send( file );    
+}
+
+/*function request( params ) {
+    var xhr = (window.XMLHttpRequest)
+        ? new XMLHttpRequest()  // code for IE7+, Firefox, Chrome, Opera, Safari
+        : new ActiveXObject( 'Microsoft.XMLHTTP' ); // code for IE6, IE5
+
+    var upload = xhr.upload;
+ 
+    var url = 'dndupload?filename=' + file.name;
+    xhr.open( 'POST', url, true );
+    xhr.setRequestHeader( 'X-Filename', file.name );
+    xhr.setRequestHeader( 'Content-type', file.type );
+    xhr.setRequestHeader( 'Content-length', file.size );
+    //xhr.setRequestHeader( 'Connection', 'close' );
+    xhr.send( file );    
+}*/
+
+function showWaitHint() {
+    var doc = qx.ui.core.ClientDocument.getInstance();
+    doc.setGlobalCursor( qx.constant.Style.CURSOR_PROGRESS );
+}
+
+function hideWaitHint() {
+    var doc = qx.ui.core.ClientDocument.getInstance();
+    doc.setGlobalCursor( null );
+}
+    
+function noopHandler( ev ) {
+    ev.stopPropagation();
+    ev.preventDefault();
+}

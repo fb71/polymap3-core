@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import org.eclipse.rwt.graphics.Graphics;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rwt.widgets.Upload;
 
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Form;
@@ -202,6 +203,13 @@ public class FormEditorToolkit
             result.setDate( cal.get( Calendar.YEAR ), cal.get( Calendar.MONTH ), cal.get( Calendar.DATE ) );
             result.setTime( cal.get( Calendar.HOUR_OF_DAY ), cal.get( Calendar.MINUTE ), cal.get( Calendar.SECOND ) );
         }
+        return result;
+    }
+
+    public Upload createUpload( Composite parent, int style, int options ) {
+        Upload result = new Upload( parent, style, options );
+        result.setBackground( textBackground );
+        result.setData( WidgetUtil.CUSTOM_VARIANT, "formeditor" );
         return result;
     }
     
