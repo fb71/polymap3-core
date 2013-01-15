@@ -161,8 +161,8 @@ public class CoreLibsPlugin
 //            CRS.main( new String[] { "-dependencies" } ); //$NON-NLS-1$
 //        }
 
-        verifyReferencingEpsg();
-        verifyReferencingOperation();   
+//        verifyReferencingEpsg();
+//        verifyReferencingOperation();   
     }
 
 

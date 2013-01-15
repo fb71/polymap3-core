@@ -51,7 +51,6 @@ import org.eclipse.rwt.internal.service.ServiceContext;
 import org.eclipse.rwt.lifecycle.UICallBack;
 
 import org.eclipse.ui.PlatformUI;
-import org.geotools.brewer.color.ColorBrewer;
 import org.jfree.util.Log;
 
 /**
@@ -75,7 +74,7 @@ public class PlatformGIS
     
     // instance *******************************************
     
-    private ColorBrewer         colorBrewer;
+//    private ColorBrewer         colorBrewer;
     private ThreadPoolExecutor  executor;
     
     
@@ -365,14 +364,14 @@ public class PlatformGIS
     }
     
     
-    public static ColorBrewer getColorBrewer() {
-        synchronized (ColorBrewer.class) {
-            if (getInstance().colorBrewer == null) {
-                getInstance().colorBrewer = ColorBrewer.instance();
-            }
-        }
-        return getInstance().colorBrewer;
-    }
+//    public static ColorBrewer getColorBrewer() {
+//        synchronized (ColorBrewer.class) {
+//            if (getInstance().colorBrewer == null) {
+//                getInstance().colorBrewer = ColorBrewer.instance();
+//            }
+//        }
+//        return getInstance().colorBrewer;
+//    }
 
     /**
      * Acts as a safer alternative to Display.syncExec(). If readAndDispatch is being called from

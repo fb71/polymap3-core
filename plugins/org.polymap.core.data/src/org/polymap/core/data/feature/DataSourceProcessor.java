@@ -50,8 +50,6 @@ import org.geotools.feature.FeatureCollections;
 
 import net.refractions.udig.catalog.IGeoResource;
 import net.refractions.udig.catalog.IService;
-import net.refractions.udig.catalog.PostgisService2;
-
 import org.polymap.core.data.pipeline.ITerminalPipelineProcessor;
 import org.polymap.core.data.pipeline.ProcessorRequest;
 import org.polymap.core.data.pipeline.ProcessorResponse;
@@ -96,11 +94,11 @@ public class DataSourceProcessor
 
     public static boolean isCompatible( IService service ) {
         // Postgres
-        if (service instanceof PostgisService2) {
-            return true;
-        }
+//        if (service instanceof PostgisService2) {
+//            return true;
+//        }
         // WFS, Memory, ...
-        else {
+//        else {
             try {
                 DataStore dataStore = service.resolve( DataStore.class, null );
                 if (dataStore != null) {
@@ -110,7 +108,7 @@ public class DataSourceProcessor
             catch (IOException e) {
                 log.warn( e.getMessage() );
             }
-        }
+//        }
         return false;
     }
 
@@ -139,7 +137,7 @@ public class DataSourceProcessor
         else if (r instanceof AddFeaturesRequest) {
             AddFeaturesRequest request = (AddFeaturesRequest)r;
             FeatureStore fs = geores.resolve( FeatureStore.class, null );
-            List<FeatureId> result = addFeatures( (FeatureStore)fs, request.getFeatures() );
+            List<FeatureId> result = addFeatures( fs, request.getFeatures() );
             context.sendResponse( new ModifyFeaturesResponse( result ) );
             context.sendResponse( ProcessorResponse.EOP );
         }
@@ -147,14 +145,14 @@ public class DataSourceProcessor
         else if (r instanceof RemoveFeaturesRequest) {
             RemoveFeaturesRequest request = (RemoveFeaturesRequest)r;
             FeatureStore fs = geores.resolve( FeatureStore.class, null );
-            removeFeatures( (FeatureStore)fs, request.getFilter() );
+            removeFeatures( fs, request.getFilter() );
             context.sendResponse( ProcessorResponse.EOP );
         }
         // ModifyFeatures
         else if (r instanceof ModifyFeaturesRequest) {
             ModifyFeaturesRequest request = (ModifyFeaturesRequest)r;
             FeatureStore fs = geores.resolve( FeatureStore.class, null );
-            modifyFeatures( (FeatureStore)fs, request.getType(), request.getValue(), request.getFilter() );
+            modifyFeatures( fs, request.getType(), request.getValue(), request.getFilter() );
             context.sendResponse( ProcessorResponse.EOP );
         }
         // GetFeatures

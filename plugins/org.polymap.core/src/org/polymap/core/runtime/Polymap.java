@@ -30,6 +30,7 @@ import java.util.Set;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
@@ -37,9 +38,9 @@ import java.security.Principal;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.lf5.util.StreamUtils;
 
 import org.eclipse.swt.widgets.Display;
 
@@ -166,14 +167,21 @@ public final class Polymap
         
         // create default config
         if (!configFile.exists()) {
+            InputStream in = null;
+            FileOutputStream out = null;
             try {
                 log.info( "Creating default JAAS config: " + configFile.getAbsolutePath() );
                 URL defaultConfigUrl = CorePlugin.getDefault().getBundle().getEntry( jaasConfigFile );
-                StreamUtils.copyThenClose( defaultConfigUrl.openStream(), 
-                        new FileOutputStream( configFile ) );
+                in = defaultConfigUrl.openStream();
+                out = new FileOutputStream( configFile );
+                IOUtils.copy( in, out );
             }
             catch (Exception e) {
                 throw new RuntimeException( "Unable to create default jaas_config.txt in workspace.", e );
+            }
+            finally {
+                IOUtils.closeQuietly( in );
+                IOUtils.closeQuietly( out );
             }
         }
 

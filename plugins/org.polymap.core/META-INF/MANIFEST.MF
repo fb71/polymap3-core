@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: org.polymap.core Plug-in
+Bundle-Name: org.polymap.core
 Bundle-SymbolicName: org.polymap.core;singleton:=true
-Bundle-Version: 3.1.0.vanko
+Bundle-Version: 3.0.5.vanko
 Bundle-Activator: org.polymap.core.CorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.rap.jface;visibility:=reexport,
@@ -28,7 +28,8 @@ Export-Package: org.polymap.core,
  org.polymap.core.operation,
  org.polymap.core.runtime,
  org.polymap.core.security,
- org.polymap.core.workbench
+ org.polymap.core.workbench,
+ org.polymap.core.workbench.dnd
 Bundle-ClassPath: .
 Import-Package: org.osgi.service.http
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -29,28 +29,7 @@
          unpack="false"/>
 
    <plugin
-         id="net.refractions.udig.catalog.shp"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="net.refractions.udig.catalog.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="net.refractions.udig.catalog.wfs"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="net.refractions.udig.catalog.wms"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -389,49 +368,7 @@
          unpack="false"/>
 
    <plugin
-         id="net.refractions.udig.catalog.postgis"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="eu.hydrologis.jgrass.csv2shape"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="eu.hydrologis.jgrass.libs"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="eu.hydrologis.udig.catalog.jgrass"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.equinox.security"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="net.refractions.udig.catalog.rasterings"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="net.refractions.udig.catalog.geotiff"
          download-size="0"
          install-size="0"
          version="0.0.0"

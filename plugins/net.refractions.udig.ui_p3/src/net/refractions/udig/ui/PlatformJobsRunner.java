@@ -5,8 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.mysql.jdbc.Messages;
-
 import net.refractions.udig.core.internal.CorePlugin;
 import net.refractions.udig.internal.ui.UiPlugin;
 
@@ -47,7 +45,7 @@ class PlatformJobsRunner
     
 
     public PlatformJobsRunner( String title ) {
-        super( title ); //$NON-NLS-1$
+        super( title ); 
         assert display != null : "No display. Job started outside UI thread.";
     }
 

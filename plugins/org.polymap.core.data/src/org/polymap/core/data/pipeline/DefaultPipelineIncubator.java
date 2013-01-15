@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.polymap.core.data.DataPlugin;
 import org.polymap.core.data.feature.AddFeaturesRequest;
 import org.polymap.core.data.feature.DataSourceProcessor;
-import org.polymap.core.data.feature.FeatureRenderProcessor2;
 import org.polymap.core.data.feature.GetFeatureTypeRequest;
 import org.polymap.core.data.feature.GetFeatureTypeResponse;
 import org.polymap.core.data.feature.GetFeaturesRequest;
@@ -55,8 +54,6 @@ import org.polymap.core.data.image.GetMapRequest;
 import org.polymap.core.data.image.ImageDecodeProcessor;
 import org.polymap.core.data.image.ImageEncodeProcessor;
 import org.polymap.core.data.image.ImageResponse;
-import org.polymap.core.data.image.RasterRenderProcessor;
-import org.polymap.core.data.image.WmsRenderProcessor;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.project.IMap;
 import org.polymap.core.project.LayerUseCase;
@@ -89,10 +86,10 @@ public class DefaultPipelineIncubator
         }
         synchronized (terminals) {
             log.info( "Initializing standard terminal processors..." );
-            terminals.add( WmsRenderProcessor.class );
-            terminals.add( FeatureRenderProcessor2.class );
+            //terminals.add( WmsRenderProcessor.class );
+            //terminals.add( FeatureRenderProcessor2.class );
             terminals.add( DataSourceProcessor.class );
-            terminals.add( RasterRenderProcessor.class );
+            //terminals.add( RasterRenderProcessor.class );
             
             for (ProcessorExtension ext : ProcessorExtension.allExtensions()) {
                 if (ext.isTerminal()) {

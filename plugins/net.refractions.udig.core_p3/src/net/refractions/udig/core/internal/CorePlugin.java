@@ -13,9 +13,6 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
 import org.osgi.framework.BundleContext;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.defaults.DefaultPicoContainer;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -82,7 +79,7 @@ public class CorePlugin
         try {
             return new URL(null, spec, RELAXED_HANDLER);
         } catch (MalformedURLException e) {
-            throw (RuntimeException) new RuntimeException( e );
+            throw new RuntimeException( e );
         }
     }
     /**
@@ -98,7 +95,7 @@ public class CorePlugin
         try {
             return new URI( spec );
         } catch (URISyntaxException e) {
-            throw (RuntimeException) new RuntimeException( e );
+            throw new RuntimeException( e );
         }
     }
 
@@ -111,7 +108,7 @@ public class CorePlugin
         return plugin;
     }
 
-    private static volatile MutablePicoContainer blackboard = null;
+//    private static volatile MutablePicoContainer blackboard = null;
 
     /**
      * This is intended to return the top level Pico Container to use for blackBoarding.
@@ -148,16 +145,16 @@ public class CorePlugin
      * 
      * @return
      */
-    public static MutablePicoContainer getBlackBoard() {
-        if (blackboard == null) {
-            synchronized (CorePlugin.class) {
-                if (blackboard == null) {
-                    blackboard = new DefaultPicoContainer();
-                }
-            }
-        }
-        return blackboard;
-    }
+//    public static MutablePicoContainer getBlackBoard() {
+//        if (blackboard == null) {
+//            synchronized (CorePlugin.class) {
+//                if (blackboard == null) {
+//                    blackboard = new DefaultPicoContainer();
+//                }
+//            }
+//        }
+//        return blackboard;
+//    }
 
     /**
      * Takes a string, and splits it on '\n' and calls stringsToURLs(String[])

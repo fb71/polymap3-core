@@ -31,10 +31,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownServiceException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.lf5.util.StreamUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -329,7 +329,7 @@ public class ScriptEditor
             
             InputStream in = new ByteArrayInputStream( text.getText().getBytes( "ISO-8859-1" ) );
             try {
-                StreamUtils.copy( in, out );
+                IOUtils.copy( in, out );
             }
             finally {
                 out.close();
@@ -356,7 +356,7 @@ public class ScriptEditor
             InputStream in = urlConn.getInputStream();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             try {
-                StreamUtils.copy( in, out );
+                IOUtils.copy( in, out );
                 text.setText( out.toString( "ISO-8859-1" ) );
             }
             finally {
