@@ -57,8 +57,6 @@ import org.geotools.styling.Style;
 import org.geotools.util.logging.Logging;
 
 import net.refractions.udig.catalog.IService;
-import net.refractions.udig.catalog.PostgisService2;
-
 import org.polymap.core.data.PipelineFeatureSource;
 import org.polymap.core.data.image.GetLayerTypesRequest;
 import org.polymap.core.data.image.GetLayerTypesResponse;
@@ -103,12 +101,12 @@ public class FeatureRenderProcessor2
     }
 
     public static boolean isCompatible( IService service ) {
-        // Postgres
-        if (service instanceof PostgisService2) {
-            return true;
-        }
-        // WFS, Memory, ...
-        else {
+//        // Postgres
+//        if (service instanceof PostgisService2) {
+//            return true;
+//        }
+//        // WFS, Memory, ...
+//        else {
             try {
                 DataStore dataStore = service.resolve( DataStore.class, null );
                 if (dataStore != null) {
@@ -118,7 +116,7 @@ public class FeatureRenderProcessor2
             catch (Exception e) {
                 log.warn( e.getMessage() );
             }
-        }
+//        }
         return false;
     }
     
