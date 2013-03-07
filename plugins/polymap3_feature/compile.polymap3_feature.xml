@@ -15,10 +15,10 @@
 		<ant antfile="build.xml" dir="../org.polymap.core.style" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.qi4j" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.project" target="build.jars"/>
-		<ant antfile="build.xml" dir="../org.polymap.core.catalog" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.data" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.core.services" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.polymap.rhei" target="build.jars"/>
 		<ant antfile="build.xml" dir="../../../org.polymap.anta2" target="build.jars"/>
+		<ant antfile="build.xml" dir="../org.polymap.core.catalog" target="build.jars"/>
 	</target>
 </project>

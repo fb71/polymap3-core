@@ -321,6 +321,8 @@ public class FormEditorPageContainer
     public void reloadEditor()
     throws Exception {
         ((FormEditor)getEditor()).doLoad( new NullProgressMonitor() );
+
+        //((FormEditor)getEditor()).getSite().getPage().i
     }
 
 }

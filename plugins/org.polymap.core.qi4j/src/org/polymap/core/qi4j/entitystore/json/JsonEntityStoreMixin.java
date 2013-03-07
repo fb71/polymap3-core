@@ -138,6 +138,8 @@ public class JsonEntityStoreMixin
             DefaultEntityStoreUnitOfWork desuw = (DefaultEntityStoreUnitOfWork)unitOfWork;
             ModuleSPI module = (ModuleSPI)desuw.module();
 
+            assert identity != null && identity.identity().length() > 0;
+            
             File f = new File( dir, identity.identity() );
             if (!f.exists()) {
                 throw new NoSuchEntityException( identity );

@@ -1210,6 +1210,8 @@ Export-Package: .,
    org.opengis.metadata.identification",
  org.opengis.webservice.feature;uses:="org.opengis.webservice,org.opengis.webservice.capability",
  org.polymap.core.libs,
+ org.slf4j,
+ org.slf4j.helpers,
  org.w3c.dom,
  org.w3c.dom.bootstrap,
  org.w3c.dom.css,
@@ -1290,6 +1292,7 @@ Bundle-ClassPath: .,
  lib/guava-10.0.1.jar,
  lib/ant-1.8.1.jar,
  lib/ant-launcher-1.8.1.jar,
- lib/ant-optional-1.5.1.jar
+ lib/ant-optional-1.5.1.jar,
+ lib/slf4j-simple-1.5.3.jar
 Import-Package: javax.servlet;version="2.5.0",
  javax.servlet.http;version="2.5.0"
