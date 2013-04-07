@@ -18,8 +18,6 @@ import java.util.Iterator;
 
 import java.io.IOException;
 
-import org.apache.lucene.document.DocumentStoredFieldVisitor;
-import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -27,7 +25,6 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TopDocs;
 
-import org.polymap.core.runtime.recordstore.IRecordFieldSelector;
 import org.polymap.core.runtime.recordstore.IRecordState;
 import org.polymap.core.runtime.recordstore.RecordQuery;
 import org.polymap.core.runtime.recordstore.ResultSet;
@@ -105,30 +102,9 @@ public class LuceneRecordQuery
 
         protected ScoreDoc[]                scoreDocs;
 
-//        protected FieldSelector       idFieldSelector = new IdFieldSelector();
-        
-        protected DocumentStoredFieldVisitor fieldSelector;
-
 
         protected LuceneResultSet( ScoreDoc[] scoreDocs ) {
             this.scoreDocs = scoreDocs;
-            
-            // build fieldSelector
-            final IRecordFieldSelector sel = getFieldSelector();
-            if (getFieldSelector() != null && sel != IRecordFieldSelector.ALL) {
-                fieldSelector = new DocumentStoredFieldVisitor() {
-                    @Override
-                    public Status needsField( FieldInfo fieldInfo ) throws IOException {
-                        if (fieldInfo.name.equals( LuceneRecordState.ID_FIELD )) {
-                            return Status.YES;
-                        }
-                        else if (sel.accept( fieldInfo.name )) { 
-                            return Status.YES;
-                        }
-                        return Status.NO;
-                    }
-                };
-            }
         }
 
         public void close() {
@@ -143,7 +119,7 @@ public class LuceneRecordQuery
         throws Exception {
             assert index < scoreDocs.length;
             int doc = scoreDocs[index].doc;
-            return store.get( doc, fieldSelector );
+            return store.get( doc, getFieldSelector() );
         }
 
         public Iterator<IRecordState> iterator() {

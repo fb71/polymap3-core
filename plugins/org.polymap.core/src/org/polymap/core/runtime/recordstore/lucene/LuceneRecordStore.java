@@ -33,8 +33,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -63,12 +61,14 @@ import org.polymap.core.runtime.cache.CacheConfig;
 import org.polymap.core.runtime.cache.CacheLoader;
 import org.polymap.core.runtime.cache.CacheManager;
 import org.polymap.core.runtime.recordstore.BaseRecordStore;
+import org.polymap.core.runtime.recordstore.IRecordFieldSelector;
 import org.polymap.core.runtime.recordstore.IRecordState;
 import org.polymap.core.runtime.recordstore.IRecordStore;
 import org.polymap.core.runtime.recordstore.QueryExpression;
 import org.polymap.core.runtime.recordstore.RecordQuery;
 import org.polymap.core.runtime.recordstore.ResultSet;
 import org.polymap.core.runtime.recordstore.SimpleQuery;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 /**
  * A record store backed by a Lucene index.
@@ -285,9 +285,7 @@ public final class LuceneRecordStore
         assert reader != null : "Store is closed.";
         assert id instanceof String : "Given record identifier is not a String: " + id;
         
-        Document doc = cache != null
-                ? cache.get( id, loader )
-                : loader.load( id );
+        Document doc = cache != null ? cache.get( id, loader ) : loader.load( id );
                 
         return doc != null ? new LuceneRecordState( LuceneRecordStore.this, doc, cache != null ) : null;
     }
@@ -303,7 +301,7 @@ public final class LuceneRecordStore
      *         {@link Document} of the recod might be shared with other records.
      * @throws Exception
      */
-    public LuceneRecordState get( int docnum, DocumentStoredFieldVisitor selector ) 
+    public LuceneRecordState get( int docnum, IRecordFieldSelector fieldSelector ) 
     throws Exception {
         assert reader != null : "Store is closed.";
 
@@ -323,13 +321,8 @@ public final class LuceneRecordStore
         Document doc = null;
         try {
             lock.readLock().lock();
-            if (selector != null) {
-                reader.document( docnum, selector );
-                doc = selector.getDocument();
-            }
-            else {
-                doc = reader.document( docnum );
-            }
+            doc = new Document( fieldSelector );
+            reader.document( docnum, doc );
         }
         finally {
             lock.readLock().unlock();
@@ -360,9 +353,15 @@ public final class LuceneRecordStore
                 // XXX direct way to load the Term???
                 TopDocs topDocs = searcher.search( new TermQuery( new Term( LuceneRecordState.ID_FIELD, id.toString() ) ), 1 );
                 //termDocs = reader.termDocs( new Term( LuceneRecordState.ID_FIELD, id.toString() ) );
-                return topDocs.scoreDocs.length > 0
-                        ? reader.document( topDocs.scoreDocs[0].doc )
-                        : null;
+                
+                if (topDocs.scoreDocs.length > 0) {
+                    Document doc = new Document();
+                    reader.document( topDocs.scoreDocs[0].doc, doc );
+                    return doc;
+                }
+                else {
+                    return null;
+                }
             }
             finally {
                 lock.readLock().unlock();
@@ -426,8 +425,8 @@ public final class LuceneRecordStore
                 //  - autCommit == false
                 //  - 8 concurrent thread
                 IndexWriterConfig config = new IndexWriterConfig( VERSION, analyzer )
-                        .setOpenMode( OpenMode.APPEND );
-                       // .setRAMBufferSizeMB( 1 );
+                        .setOpenMode( OpenMode.APPEND )
+                        .setRAMBufferSizeMB( MAX_RAMBUFFER_SIZE );
                 
                 // limit segment size for lower pauses on interactive indexing
                 LogByteSizeMergePolicy mergePolicy = new LogByteSizeMergePolicy();
@@ -452,7 +451,7 @@ public final class LuceneRecordStore
                 }
             }
 
-            Document doc = ((LuceneRecordState)record).getDocument();
+            Document doc = ((LuceneRecordState)record).document();
             
             // add
             if (record.id() == null) {
@@ -466,7 +465,7 @@ public final class LuceneRecordStore
             // update
             else {
                 Term idTerm = new Term( LuceneRecordState.ID_FIELD, (String)record.id() );
-                writer.updateDocument( idTerm, ((LuceneRecordState)record).getDocument() );
+                writer.updateDocument( idTerm, doc );
 
                 if (cache != null) {
                     cache.remove( record.id() );

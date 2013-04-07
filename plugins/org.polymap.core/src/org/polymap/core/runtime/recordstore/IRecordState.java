@@ -47,7 +47,7 @@ public interface IRecordState
      * 
      * @param key
      * @param value
-     * @return this
+     * @return The previous value, or null.
      */
     public abstract <T> IRecordState put( String key, T value );
 

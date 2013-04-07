@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 
 import org.polymap.core.runtime.recordstore.QueryExpression;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 /**
  * Provides common base methods.

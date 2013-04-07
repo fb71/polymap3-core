@@ -14,7 +14,6 @@
  */
 package org.polymap.core.runtime.recordstore.lucene;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
@@ -24,6 +23,7 @@ import org.apache.lucene.search.TermQuery;
 
 import org.polymap.core.runtime.recordstore.QueryExpression;
 import org.polymap.core.runtime.recordstore.QueryExpression.Equal;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 /**
  * Encode/decode boolean values. 
@@ -38,14 +38,8 @@ final class BooleanValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
         if (value instanceof Boolean) {
-            Field field = (Field)doc.getField( key+SUFFIX );
-            if (field != null) {
-                field.setStringValue( value.toString() );
-            }
-            else {
-                // XXX param indexec ignored
-                doc.add( new StringField( key+SUFFIX, value.toString(), Store.YES ) );
-            }
+            // XXX param indexec ignored
+            doc.put( new StringField( key+SUFFIX, value.toString(), Store.YES ) );
             return true;
         }
         else {
@@ -55,7 +49,7 @@ final class BooleanValueCoder
     
 
     public Object decode( Document doc, String key ) {
-        Field field = (Field)doc.getField( key+SUFFIX );
+        Field field = doc.getField( key+SUFFIX );
         return field != null ? Boolean.valueOf( field.stringValue() ) : null;
     }
 

@@ -14,7 +14,6 @@
  */
 package org.polymap.core.runtime.recordstore.lucene;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.search.BooleanClause;
@@ -31,6 +30,7 @@ import org.polymap.core.runtime.recordstore.QueryExpression;
 import org.polymap.core.runtime.recordstore.QueryExpression.BBox;
 import org.polymap.core.runtime.recordstore.QueryExpression.Greater;
 import org.polymap.core.runtime.recordstore.QueryExpression.Less;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 /**
  * Encode/Decode {@link Geometry} values using {@link NumericField} build-in support
@@ -74,7 +74,7 @@ public final class GeometryValueCoder
     
     public Object decode( Document doc, String key ) {
         if (doc.getField( key+FIELD_MAXX ) != null) {
-            Field field = (Field)doc.getField( key );
+            Field field = doc.getField( key );
             try {
                 return wkbReaders.get().read( field.binaryValue().bytes );
             }
@@ -93,20 +93,14 @@ public final class GeometryValueCoder
     }
 
 
-    public boolean encode( Document doc, String key, Object value, boolean indexed ) {
+    public boolean encode( Document doc, final String key, Object value, boolean indexed ) {
         if (value instanceof Geometry) {
             Geometry geom = (Geometry)value;
 
             // store geom -> WKT, JSON, ...
-            byte[] out = encode( geom );
+            final byte[] out = encode( geom );
 
-            Field field = (Field)doc.getField( key );
-            if (field != null) {
-                field.setBytesValue( out );
-            }
-            else {
-                doc.add( new StoredField( key, out ) );
-            }
+            doc.put( new StoredField( key, out ) );
 
             // store bbox
             Envelope envelop = geom.getEnvelopeInternal();
@@ -120,7 +114,7 @@ public final class GeometryValueCoder
             return false;
         }
     }
-    
+
 
     public Query searchQuery( QueryExpression exp ) {
         // BBOX

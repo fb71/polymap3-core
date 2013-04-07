@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, Polymap GmbH. All rights reserved.
+ * Copyright 2011-2013, Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -16,13 +16,13 @@ package org.polymap.core.runtime.recordstore.lucene;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.BytesRef;
 
 import org.polymap.core.runtime.recordstore.QueryExpression;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 /**
  * En/Decodes byte[] values.
@@ -37,13 +37,7 @@ public final class BinaryValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
         if (value instanceof byte[]) {
-            Field field = (Field)doc.getField( key );
-            if (field != null) {
-                field.setBytesValue( (byte[])value );
-            }
-            else {
-                doc.add( new StoredField( key, (byte[])value ) );
-            }
+            doc.put( new StoredField( key, (byte[])value ) );
             return true;
         }
         else {
@@ -53,9 +47,9 @@ public final class BinaryValueCoder
     
 
     public Object decode( Document doc, String key ) {
-        Field field = (Field)doc.getField( key );
+        Field field = doc.getField( key );
         if (field != null) {
-            BytesRef value = ((Field)doc.getField( key )).binaryValue();
+            BytesRef value = doc.getField( key ).binaryValue();
             return value != null ? value.bytes : null;
         }
         return null;

@@ -18,7 +18,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.LongField;
@@ -27,6 +26,7 @@ import org.apache.lucene.search.Query;
 
 import org.polymap.core.runtime.recordstore.QueryExpression;
 import org.polymap.core.runtime.recordstore.QueryExpression.Comparison;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 /**
  * En/Decode {@link Date} values using {@link NumericField} build-in support of
@@ -45,12 +45,7 @@ public final class DateValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
         if (value instanceof Date) {
-            Field field = (Field)doc.getField( key+SUFFIX );
-            if (field == null) {
-                field = new LongField( key+SUFFIX, ((Date)value).getTime(), Store.YES );
-                doc.add( field );
-            }
-            field.setLongValue( ((Date)value).getTime() );
+            doc.put( new LongField( key+SUFFIX, ((Date)value).getTime(), Store.YES ) );
             return true;
         }
         else {
@@ -60,7 +55,7 @@ public final class DateValueCoder
     
 
     public Object decode( Document doc, String key ) {
-        Field field = (Field)doc.getField( key+SUFFIX );
+        Field field = doc.getField( key+SUFFIX );
         if (field != null) {
             return new Date( field.numericValue().longValue() );
         }

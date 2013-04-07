@@ -15,7 +15,6 @@
 package org.polymap.core.runtime.recordstore.lucene;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.Term;
@@ -27,6 +26,7 @@ import org.apache.lucene.search.WildcardQuery;
 import org.polymap.core.runtime.recordstore.QueryExpression;
 import org.polymap.core.runtime.recordstore.QueryExpression.Equal;
 import org.polymap.core.runtime.recordstore.QueryExpression.Match;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 
 /**
@@ -41,14 +41,8 @@ final class StringValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
         if (value instanceof String) {
-            Field field = (Field)doc.getField( key );
-            if (field != null) {
-                field.setStringValue( (String)value );
-            }
-            else {
-                // FIXME indexed is ignore
-                doc.add( new StringField( key, (String)value, Field.Store.YES ) );
-            }
+            // FIXME indexed is ignore
+            doc.put( new StringField( key, (String)value, Field.Store.YES ) );
             return true;
         }
         else {
@@ -58,7 +52,8 @@ final class StringValueCoder
     
 
     public Object decode( Document doc, String key ) {
-        return doc.get( key );
+        Field field = doc.getField( key );
+        return field != null ? field.stringValue() : null;
     }
 
 

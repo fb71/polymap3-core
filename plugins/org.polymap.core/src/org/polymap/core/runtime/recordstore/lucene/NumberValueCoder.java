@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, Polymap GmbH. All rights reserved.
+ * Copyright 2011-2013, Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -17,7 +17,6 @@ package org.polymap.core.runtime.recordstore.lucene;
 import java.text.NumberFormat;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
@@ -30,6 +29,7 @@ import org.apache.lucene.search.WildcardQuery;
 import org.polymap.core.runtime.recordstore.QueryExpression;
 import org.polymap.core.runtime.recordstore.QueryExpression.Equal;
 import org.polymap.core.runtime.recordstore.QueryExpression.Match;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 
 /**
@@ -55,15 +55,7 @@ final class NumberValueCoder
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
         if (value instanceof Integer) {
             String formatted = nf.format( (value) );
-
-            Field field = (Field)doc.getField( key );
-            if (field == null) {
-                // XXX indexed ignored
-                field = new StringField( key, formatted, Store.YES ); 
-            }
-            else {
-                field.setStringValue( formatted );
-            }
+            doc.put( new StringField( key, formatted, Store.YES ) ); 
             return true;
         }
         else {
@@ -73,7 +65,7 @@ final class NumberValueCoder
     
 
     public Object decode( Document doc, String key ) {
-        return doc.get( key );
+        return doc.getField( key ).stringValue();
     }
 
 

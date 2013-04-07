@@ -16,7 +16,6 @@ package org.polymap.core.runtime.recordstore.lucene;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
@@ -34,6 +33,7 @@ import org.polymap.core.runtime.recordstore.QueryExpression.GreaterOrEqual;
 import org.polymap.core.runtime.recordstore.QueryExpression.Less;
 import org.polymap.core.runtime.recordstore.QueryExpression.LessOrEqual;
 import org.polymap.core.runtime.recordstore.QueryExpression.Match;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 
 /**
@@ -56,38 +56,21 @@ public final class NumericValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed, boolean stored ) {
         if (value instanceof Number) {
-            Field field = (Field)doc.getField( key );
-            if (field == null) {
-                if (value instanceof Integer) {
-                    // XXX param indexed ignored
-                    field = new IntField( key, (Integer)value, stored ? Store.YES : Store.NO );
-                }
-                else if (value instanceof Long) {
-                    field = new LongField( key, (Long)value, stored ? Store.YES : Store.NO );
-                }
-                else if (value instanceof Float) {
-                    field = new FloatField( key, (Float)value, stored ? Store.YES : Store.NO );
-                }
-                else if (value instanceof Double) {
-                    field = new DoubleField( key, (Double)value, stored ? Store.YES : Store.NO );
-                }
-                doc.add( field );
-            }
+            Field field = null;
             if (value instanceof Integer) {
-                field.setIntValue( (Integer)value );
+                // XXX param indexed ignored
+                field = new IntField( key, (Integer)value, stored ? Store.YES : Store.NO );
             }
             else if (value instanceof Long) {
-                field.setLongValue( (Long)value );
+                field = new LongField( key, (Long)value, stored ? Store.YES : Store.NO );
             }
             else if (value instanceof Float) {
-                field.setFloatValue( (Float)value );
+                field = new FloatField( key, (Float)value, stored ? Store.YES : Store.NO );
             }
             else if (value instanceof Double) {
-                field.setDoubleValue( (Double)value );
+                field = new DoubleField( key, (Double)value, stored ? Store.YES : Store.NO );
             }
-            else {
-                throw new RuntimeException( "Unknown Number type: " + value.getClass() );
-            }
+            doc.put( field );
             //log.debug( "encode(): " + field );
             return true;
         }

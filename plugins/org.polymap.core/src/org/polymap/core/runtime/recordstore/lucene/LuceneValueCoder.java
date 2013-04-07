@@ -14,10 +14,10 @@
  */
 package org.polymap.core.runtime.recordstore.lucene;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 
 import org.polymap.core.runtime.recordstore.QueryExpression;
+import org.polymap.core.runtime.recordstore.lucene.LuceneRecordState.Document;
 
 /**
  * A value coder is responsible for encode/decode a particular field value type.

@@ -15,24 +15,30 @@
 package org.polymap.core.runtime.recordstore.lucene;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-
 import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
+import com.google.common.base.Supplier;
+
+import org.polymap.core.runtime.recordstore.IRecordFieldSelector;
 import org.polymap.core.runtime.recordstore.IRecordState;
 
 /**
@@ -49,6 +55,96 @@ public final class LuceneRecordState
     
     private static long         idCount = System.currentTimeMillis();
     
+    /**
+     * 
+     */
+    public static class Document
+            extends StoredFieldVisitor 
+            implements Iterable<IndexableField> {
+        
+        private IRecordFieldSelector        fieldSelector;
+
+        private Map<String,IndexableField>  fields = new HashMap( 48 );
+
+        public Document( IRecordFieldSelector fieldSelector ) {
+            this.fieldSelector = fieldSelector;
+        }
+
+        public Document() {
+        }
+
+        public void add( Field field ) {
+            IndexableField previous = fields.put( field.name(), field );
+            if (previous != null) {
+                throw new IllegalStateException( "Field already exists: " + field.name() );
+            }
+        }
+        
+        public Field put( Field field ) {
+            return (Field)fields.put( field.name(), field );
+        }
+        
+        public boolean removeField( String key ) {
+            return fields.remove( key ) != null;
+        }
+        
+        public Field getField( String key ) {
+            return (Field)fields.get( key );
+        }
+
+        /** Get or create field. */
+        public Field getField( String key, Supplier<Field> supplier ) {
+            Field field = (Field)fields.get( key );
+            if (field == null) {
+                field = supplier.get();
+                put( field );
+                return field;
+            }
+            return field;
+        }
+
+        @Override
+        public Iterator<IndexableField> iterator() {
+            return fields.values().iterator();
+        }
+
+        @Override
+        public Status needsField( FieldInfo fieldInfo ) throws IOException {
+            if (fieldInfo.name.equals( LuceneRecordState.ID_FIELD )) {
+                return Status.YES;
+            }
+            else if (fieldSelector != null && fieldSelector.accept( fieldInfo.name )) { 
+                return Status.YES;
+            }
+            return Status.NO;
+        }
+        
+        @Override
+        public void binaryField( FieldInfo fieldInfo, byte[] value ) throws IOException {
+            add( new StoredField( fieldInfo.name, value ) );
+        }
+        @Override
+        public void stringField( FieldInfo fieldInfo, String value ) throws IOException {
+            add( new StoredField( fieldInfo.name, value ) );
+        }
+        @Override
+        public void intField( FieldInfo fieldInfo, int value ) throws IOException {
+            add( new StoredField( fieldInfo.name, value ) );
+        }
+        @Override
+        public void longField( FieldInfo fieldInfo, long value ) throws IOException {
+            add( new StoredField( fieldInfo.name, value ) );
+        }
+        @Override
+        public void floatField( FieldInfo fieldInfo, float value ) throws IOException {
+            add( new StoredField( fieldInfo.name, value ) );
+        }
+        @Override
+        public void doubleField( FieldInfo fieldInfo, double value ) throws IOException {
+            add( new StoredField( fieldInfo.name, value ) );
+        }
+    }
+
     
     // instance *******************************************
     
@@ -66,7 +162,7 @@ public final class LuceneRecordState
     }
 
     
-    Document getDocument() {
+    Document document() {
         return doc;
     }
 
@@ -87,15 +183,15 @@ public final class LuceneRecordState
 
     
     public Object id() {
-        return doc.get( ID_FIELD );
+        Field field = doc.getField( ID_FIELD );
+        return field != null ? field.stringValue() : null;
     }
 
     
     void createId() {
         assert doc.getField( ID_FIELD ) == null : "ID already set for this record";
-        
-        Field idField = new StringField( ID_FIELD, String.valueOf( idCount++ ), Store.YES );
-        doc.add( idField );
+
+        doc.add( new StringField( ID_FIELD, String.valueOf( idCount++ ), Store.YES ) );
     }
     
     
@@ -112,7 +208,8 @@ public final class LuceneRecordState
                         TopDocs topDocs = store.searcher.search( new TermQuery( new Term( LuceneRecordState.ID_FIELD, (String)id() ) ), 1 );
                         //TermDocs termDocs = store.reader.termDocs( new Term( LuceneRecordState.ID_FIELD, (String)id() ) );
                         if (topDocs.scoreDocs.length > 0) {
-                            doc = store.reader.document( topDocs.scoreDocs[0].doc );
+                            doc = new Document( doc.fieldSelector );
+                            store.reader.document( topDocs.scoreDocs[0].doc, doc );
                         }
                         else {
                             throw new RuntimeException( "Unable to copy Lucene document on write." );
@@ -136,10 +233,6 @@ public final class LuceneRecordState
         
         checkCopyOnWrite();
         
-        Field old = (Field)doc.getField( key );
-        if (old != null) {
-            doc.removeField( key );
-        }
         boolean indexed = store.getIndexFieldSelector().accept( key );
         store.valueCoders.encode( doc, key, value, indexed );
         
@@ -153,12 +246,12 @@ public final class LuceneRecordState
 
         checkCopyOnWrite();
         
-        Field lengthField = (Field)doc.getField( key + "_length" );
+        Field lengthField = doc.getField( key + "_length" );
         int length = -1;
         
         if (lengthField == null) {
             length = 1;
-            doc.add( new IntField( key + "_length", 1, Store.YES ) );
+            doc.put( new IntField( key + "_length", 1, Store.YES ) );
         }
         else {
             length = Integer.parseInt( lengthField.stringValue() ) + 1;
@@ -183,7 +276,7 @@ public final class LuceneRecordState
         // XXX try a lazy facade!?
         List<T> result = new ArrayList<T>();
         
-        String lengthString = doc.get( key + "_length" );
+        String lengthString = doc.getField( key + "_length" ).stringValue();
         int length = lengthString != null ? Integer.parseInt( lengthString ) : 0;
         for (int i=0; i<length; i++) {
             StringBuilder arrayKey = new StringBuilder( 32 )
@@ -204,7 +297,7 @@ public final class LuceneRecordState
     
     public Iterator<Entry<String,Object>> iterator() {
         return new Iterator<Entry<String, Object>>() {
-            private Iterator<IndexableField> it = doc.getFields().iterator();
+            private Iterator<IndexableField> it = doc.iterator();
             @Override
             public boolean hasNext() {
                 return it.hasNext();
