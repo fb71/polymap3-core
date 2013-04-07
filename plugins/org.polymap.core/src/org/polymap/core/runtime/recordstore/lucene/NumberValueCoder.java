@@ -19,8 +19,8 @@ import java.text.NumberFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
@@ -56,25 +56,16 @@ final class NumberValueCoder
         if (value instanceof Integer) {
             String formatted = nf.format( (value) );
 
-            Field field = (Field)doc.getFieldable( key );
+            Field field = (Field)doc.getField( key );
             if (field == null) {
-                field = new Field( key, formatted, Store.YES, indexed ? Index.NOT_ANALYZED : Index.NO ); 
+                // XXX indexed ignored
+                field = new StringField( key, formatted, Store.YES ); 
             }
             else {
-                field.setValue( formatted );
+                field.setStringValue( formatted );
             }
             return true;
         }
-//        // XXX just testing...
-//        else if (value instanceof Point) {
-//            Point p = (Point)value;
-//            String formatted = new StringBuilder( 128 )
-//                    .append( nf.format( Double.doubleToLongBits( p.getX() ) ) )
-//                    .append( '|' )
-//                    .append( nf.format( Double.doubleToLongBits( p.getY() ) ) )
-//                    .toString();
-//            return new Field( key, formatted, Store.YES, indexed ? Index.NOT_ANALYZED : Index.NO );
-//        }
         else {
             return false;
         }

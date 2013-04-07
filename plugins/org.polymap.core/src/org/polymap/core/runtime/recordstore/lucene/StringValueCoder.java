@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, Polymap GmbH. All rights reserved.
+ * Copyright 2011-2013, Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -17,8 +17,7 @@ package org.polymap.core.runtime.recordstore.lucene;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
@@ -42,13 +41,13 @@ final class StringValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
         if (value instanceof String) {
-            Field field = (Field)doc.getFieldable( key );
+            Field field = (Field)doc.getField( key );
             if (field != null) {
-                field.setValue( (String)value );
+                field.setStringValue( (String)value );
             }
             else {
-                doc.add( new Field( key, (String)value, 
-                        Store.YES, indexed ? Index.NOT_ANALYZED : Index.NO ) );
+                // FIXME indexed is ignore
+                doc.add( new StringField( key, (String)value, Field.Store.YES ) );
             }
             return true;
         }

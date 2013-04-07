@@ -32,7 +32,7 @@
 
 	<target name="load_m2_deps" unless="already_downloaded">
 		
-        <setproxy proxyhost="46.4.28.8" proxyport="3128"/>
+        <!-- setproxy proxyhost="46.4.28.8" proxyport="3128"/-->
 		
 		<!-- we can probably replace this with a reference to a pom.xml file -->
 		<!-- Use http://mvnrepository.com/ to look stuff up -->
@@ -53,8 +53,11 @@
 
             <!-- used for runtime.recordstore, lka/Atlas and others -->
             <!-- http://mvnrepository.com/artifact/org.apache.lucene -->
-            <dependency groupId="org.apache.lucene" artifactId="lucene-core" version="3.6.2" />
-            <dependency groupId="org.apache.lucene" artifactId="lucene-queryparser" version="3.6.2" />
+            <!--dependency groupId="org.apache.lucene" artifactId="lucene-core" version="3.6.2" />
+            <dependency groupId="org.apache.lucene" artifactId="lucene-queryparser" version="3.6.2" /-->
+            <dependency groupId="org.apache.lucene" artifactId="lucene-core" version="4.2.1" />
+            <dependency groupId="org.apache.lucene" artifactId="lucene-queryparser" version="4.2.1" />
+            <dependency groupId="org.apache.lucene" artifactId="lucene-analyzers-common" version="4.2.1" />
 
 			<!--dependency groupId="xmlrpc" artifactId="xmlrpc" version="2.0" /-->
 			<dependency groupId="org.apache.xmlrpc" artifactId="xmlrpc-client" version="3.0" />

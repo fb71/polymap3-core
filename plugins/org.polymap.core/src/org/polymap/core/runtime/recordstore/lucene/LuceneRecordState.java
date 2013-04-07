@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, 2012, Polymap GmbH. All rights reserved.
+ * Copyright 2011-2013, Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,15 +19,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 
 import org.polymap.core.runtime.recordstore.IRecordState;
 
@@ -72,12 +76,12 @@ public final class LuceneRecordState
     
     
     public String toString() {
-        StringBuilder result = new StringBuilder( "LuceneRecordState{" );
+        StringBuilder result = new StringBuilder( "LuceneRecordState[" );
         for (Entry<String,Object> entry : this) {
             result.append( entry.getKey() ).append( " = " ).append( entry.getValue() );
             result.append( ",\n    " );
         }
-        result.append( "}" );
+        result.append( "]" );
         return result.toString();
     }
 
@@ -88,9 +92,9 @@ public final class LuceneRecordState
 
     
     void createId() {
-        assert doc.getFieldable( ID_FIELD ) == null : "ID already set for this record";
+        assert doc.getField( ID_FIELD ) == null : "ID already set for this record";
         
-        Field idField = new Field( ID_FIELD, String.valueOf( idCount++ ), Store.YES, Index.NOT_ANALYZED );
+        Field idField = new StringField( ID_FIELD, String.valueOf( idCount++ ), Store.YES );
         doc.add( idField );
     }
     
@@ -104,20 +108,17 @@ public final class LuceneRecordState
                     
                     try {
                         store.lock.readLock().lock();
-                        TermDocs termDocs = store.reader.termDocs( new Term( LuceneRecordState.ID_FIELD, (String)id() ) );
-                        try {
-                            if (termDocs.next()) {
-                                doc = store.reader.document( termDocs.doc() );
-                            }
-                            else {
-                                throw new RuntimeException( "Unable to copy Lucene document on write." );
-                            }
+                        // XXX direct way to load TermDoc???
+                        TopDocs topDocs = store.searcher.search( new TermQuery( new Term( LuceneRecordState.ID_FIELD, (String)id() ) ), 1 );
+                        //TermDocs termDocs = store.reader.termDocs( new Term( LuceneRecordState.ID_FIELD, (String)id() ) );
+                        if (topDocs.scoreDocs.length > 0) {
+                            doc = store.reader.document( topDocs.scoreDocs[0].doc );
                         }
-                        finally {
-                            termDocs.close();
+                        else {
+                            throw new RuntimeException( "Unable to copy Lucene document on write." );
                         }
                     }
-                    catch (Exception e) {
+                    catch (IOException e) {
                         throw new RuntimeException( "Unable to copy Lucene document on write." );
                     }
                     finally {
@@ -135,7 +136,7 @@ public final class LuceneRecordState
         
         checkCopyOnWrite();
         
-        Fieldable old = doc.getFieldable( key );
+        Field old = (Field)doc.getField( key );
         if (old != null) {
             doc.removeField( key );
         }
@@ -152,16 +153,16 @@ public final class LuceneRecordState
 
         checkCopyOnWrite();
         
-        Field lengthField = (Field)doc.getFieldable( key + "_length" );
+        Field lengthField = (Field)doc.getField( key + "_length" );
         int length = -1;
         
         if (lengthField == null) {
             length = 1;
-            doc.add( new Field( key + "_length", "1", Store.YES, Index.NO ) );
+            doc.add( new IntField( key + "_length", 1, Store.YES ) );
         }
         else {
             length = Integer.parseInt( lengthField.stringValue() ) + 1;
-            lengthField.setValue( String.valueOf( length ) );
+            lengthField.setIntValue( length );
         }
         
         StringBuilder arrayKey = new StringBuilder( 32 )
@@ -201,28 +202,26 @@ public final class LuceneRecordState
     }
 
     
-    public Iterator<Entry<String, Object>> iterator() {
+    public Iterator<Entry<String,Object>> iterator() {
         return new Iterator<Entry<String, Object>>() {
-
-            private Iterator<Fieldable>     it = doc.getFields().iterator();
-
+            private Iterator<IndexableField> it = doc.getFields().iterator();
+            @Override
             public boolean hasNext() {
                 return it.hasNext();
             }
-
+            @Override
             public Entry<String, Object> next() {
                 return new Entry<String,Object>() {
-                    
-                    private Fieldable   field = it.next();
-                    
+                    private Field   field = (Field)it.next();
+                    @Override
                     public String getKey() {
                         return field.name();
                     }
-
+                    @Override
                     public Object getValue() {
                         return store.valueCoders.decode( doc, getKey() );
                     }
-
+                    @Override
                     public Object setValue( Object value ) {
                         Object old = getValue();
                         LuceneRecordState.this.put( getKey(), value );

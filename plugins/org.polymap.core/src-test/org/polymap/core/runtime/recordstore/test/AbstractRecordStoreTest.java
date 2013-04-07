@@ -69,7 +69,7 @@ public abstract class AbstractRecordStoreTest
     }
 
     
-    public void tst() throws Exception {
+    public void test() throws Exception {
         int loops = 1000;
         createRecords( loops );
         readRecords( loops );

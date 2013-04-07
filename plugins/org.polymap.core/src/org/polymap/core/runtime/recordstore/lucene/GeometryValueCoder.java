@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, Polymap GmbH. All rights reserved.
+ * Copyright 2011-2013, Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -16,10 +16,11 @@ package org.polymap.core.runtime.recordstore.lucene;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.NumericField;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKBReader;
@@ -72,10 +73,10 @@ public final class GeometryValueCoder
 
     
     public Object decode( Document doc, String key ) {
-        if (doc.getFieldable( key+FIELD_MAXX ) != null) {
-            Field field = (Field)doc.getFieldable( key );
+        if (doc.getField( key+FIELD_MAXX ) != null) {
+            Field field = (Field)doc.getField( key );
             try {
-                return wkbReaders.get().read( field.getBinaryValue() );
+                return wkbReaders.get().read( field.binaryValue().bytes );
             }
             catch (Exception e) {
                 try {
@@ -99,12 +100,12 @@ public final class GeometryValueCoder
             // store geom -> WKT, JSON, ...
             byte[] out = encode( geom );
 
-            Field field = (Field)doc.getFieldable( key );
+            Field field = (Field)doc.getField( key );
             if (field != null) {
-                field.setValue( out );
+                field.setBytesValue( out );
             }
             else {
-                doc.add( new Field( key, out ) );
+                doc.add( new StoredField( key, out ) );
             }
 
             // store bbox

@@ -18,12 +18,13 @@ import java.util.Iterator;
 
 import java.io.IOException;
 
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.FieldSelectorResult;
+import org.apache.lucene.document.DocumentStoredFieldVisitor;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TopDocs;
 
 import org.polymap.core.runtime.recordstore.IRecordFieldSelector;
@@ -69,21 +70,21 @@ public class LuceneRecordQuery
 
     public ResultSet execute() throws IOException {
         if (getSortKey() != null) {
-            int sortType = SortField.STRING;
+            Type sortType = SortField.Type.STRING;
             if (getSortType() == String.class) {
-                sortType = SortField.STRING;
+                sortType = SortField.Type.STRING;
             }
             else if (getSortType() == Integer.class) {
-                sortType = SortField.INT;
+                sortType = SortField.Type.INT;
             }
             else if (getSortType() == Long.class) {
-                sortType = SortField.LONG;
+                sortType = SortField.Type.LONG;
             }
             else if (getSortType() == Float.class) {
-                sortType = SortField.FLOAT;
+                sortType = SortField.Type.FLOAT;
             }
             else if (getSortType() == Double.class) {
-                sortType = SortField.DOUBLE;
+                sortType = SortField.Type.DOUBLE;
             }
             Sort sort = new Sort( new SortField( getSortKey(), sortType, getSortOrder() == DESC ) );
             TopDocs topDocs = store.searcher.search( luceneQuery, getMaxResults(), sort );
@@ -102,11 +103,11 @@ public class LuceneRecordQuery
     protected class LuceneResultSet
             implements ResultSet {
 
-        protected ScoreDoc[]          scoreDocs;
+        protected ScoreDoc[]                scoreDocs;
 
-        protected FieldSelector       idFieldSelector = new IdFieldSelector();
+//        protected FieldSelector       idFieldSelector = new IdFieldSelector();
         
-        protected FieldSelector       fieldSelector;
+        protected DocumentStoredFieldVisitor fieldSelector;
 
 
         protected LuceneResultSet( ScoreDoc[] scoreDocs ) {
@@ -115,15 +116,16 @@ public class LuceneRecordQuery
             // build fieldSelector
             final IRecordFieldSelector sel = getFieldSelector();
             if (getFieldSelector() != null && sel != IRecordFieldSelector.ALL) {
-                fieldSelector = new FieldSelector() {
-                    public FieldSelectorResult accept( String fieldName ) {
-                        if (fieldName.equals( LuceneRecordState.ID_FIELD )) {
-                            return FieldSelectorResult.LOAD;
+                fieldSelector = new DocumentStoredFieldVisitor() {
+                    @Override
+                    public Status needsField( FieldInfo fieldInfo ) throws IOException {
+                        if (fieldInfo.name.equals( LuceneRecordState.ID_FIELD )) {
+                            return Status.YES;
                         }
-                        else if (sel.accept( fieldName )) { 
-                            return FieldSelectorResult.LOAD;
+                        else if (sel.accept( fieldInfo.name )) { 
+                            return Status.YES;
                         }
-                        return FieldSelectorResult.NO_LOAD;
+                        return Status.NO;
                     }
                 };
             }
@@ -146,13 +148,12 @@ public class LuceneRecordQuery
 
         public Iterator<IRecordState> iterator() {
             return new Iterator<IRecordState>() {
-
                 private int         index;
-
+                @Override
                 public boolean hasNext() {
                     return index < scoreDocs.length;
                 }
-
+                @Override
                 public LuceneRecordState next() {
                     try {
                         return get( index++ );
@@ -161,7 +162,7 @@ public class LuceneRecordQuery
                         throw new RuntimeException( e );
                     }
                 }
-
+                @Override
                 public void remove() {
                     throw new UnsupportedOperationException( "Not supported." );
                 }
@@ -170,18 +171,18 @@ public class LuceneRecordQuery
     }
 
     
-    /**
-     * 
-     */
-    protected class IdFieldSelector
-            implements FieldSelector {
-
-        public FieldSelectorResult accept( String fieldName ) {
-            return fieldName == LuceneRecordState.ID_FIELD || fieldName.equals( LuceneRecordState.ID_FIELD )
-                    ? FieldSelectorResult.LOAD
-                    : FieldSelectorResult.NO_LOAD;
-        }
-
-    }
+//    /**
+//     * 
+//     */
+//    protected class IdFieldSelector
+//            implements FieldSelector {
+//
+//        public FieldSelectorResult accept( String fieldName ) {
+//            return fieldName == LuceneRecordState.ID_FIELD || fieldName.equals( LuceneRecordState.ID_FIELD )
+//                    ? FieldSelectorResult.LOAD
+//                    : FieldSelectorResult.NO_LOAD;
+//        }
+//
+//    }
 
 }

@@ -18,8 +18,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.BytesRef;
 
 import org.polymap.core.runtime.recordstore.QueryExpression;
 
@@ -36,12 +37,12 @@ public final class BinaryValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
         if (value instanceof byte[]) {
-            Field field = (Field)doc.getFieldable( key );
+            Field field = (Field)doc.getField( key );
             if (field != null) {
-                field.setValue( (byte[])value );
+                field.setBytesValue( (byte[])value );
             }
             else {
-                doc.add( new Field( key, (byte[])value ) );
+                doc.add( new StoredField( key, (byte[])value ) );
             }
             return true;
         }
@@ -52,13 +53,12 @@ public final class BinaryValueCoder
     
 
     public Object decode( Document doc, String key ) {
-        Fieldable field = doc.getFieldable( key );
-        if (field instanceof Field && field.isBinary()) {
-            return doc.getBinaryValue( key );
+        Field field = (Field)doc.getField( key );
+        if (field != null) {
+            BytesRef value = ((Field)doc.getField( key )).binaryValue();
+            return value != null ? value.bytes : null;
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
 

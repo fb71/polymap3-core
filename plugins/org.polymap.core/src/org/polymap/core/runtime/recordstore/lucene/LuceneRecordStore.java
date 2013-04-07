@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, 2012 Polymap GmbH. All rights reserved.
+ * Copyright 2011-2013 Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -32,21 +32,23 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.document.DocumentStoredFieldVisitor;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
@@ -82,7 +84,7 @@ public final class LuceneRecordStore
 
     private static Log log = LogFactory.getLog( LuceneRecordStore.class );
 
-    public static final Version     VERSION = Version.LUCENE_36;
+    public static final Version     VERSION = Version.LUCENE_42;
 
     /** Default: 3% of HEAP; 32M is good for 512M RAM fand merge size 16MB (Lucene 3). */
     public static final double      MAX_RAMBUFFER_SIZE = 10d / 100d * Runtime.getRuntime().maxMemory() / 1000000;
@@ -137,7 +139,7 @@ public final class LuceneRecordStore
 
     IndexSearcher                   searcher;
 
-    IndexReader                     reader;
+    DirectoryReader                 reader;
     
     /** Prevents {@link #reader} close/reopen by {@link LuceneUpdater} while in use. */
     ReadWriteLock                   lock = new ReentrantReadWriteLock();
@@ -152,8 +154,7 @@ public final class LuceneRecordStore
      * @param clean
      * @throws IOException
      */
-    public LuceneRecordStore( File indexDir, boolean clean ) 
-    throws IOException {
+    public LuceneRecordStore( File indexDir, boolean clean ) throws IOException {
         if (!indexDir.exists()) {
             indexDir.mkdirs();
         }
@@ -188,16 +189,14 @@ public final class LuceneRecordStore
      * 
      * @throws IOException
      */
-    public LuceneRecordStore() 
-    throws IOException {
+    public LuceneRecordStore() throws IOException {
         directory = new RAMDirectory();
         log.info( "    RAMDirectory: " + Arrays.asList( directory.listAll() ) );
         open( true );
     }
 
     
-    protected void open( boolean clean ) 
-    throws IOException {
+    protected void open( boolean clean ) throws IOException {
         // create or clear index
         if (directory.listAll().length == 0 || clean) {
             IndexWriterConfig config = new IndexWriterConfig( VERSION, analyzer )
@@ -207,7 +206,7 @@ public final class LuceneRecordStore
             log.info( "    Index created." );
         }
 
-        reader = IndexReader.open( directory );
+        reader = DirectoryReader.open( directory );
         searcher = new IndexSearcher( reader, executor );
     }
     
@@ -215,7 +214,6 @@ public final class LuceneRecordStore
     public void close() {
         try {
             if (searcher != null) {
-                searcher.close();
                 searcher = null;
             }
             if (reader != null) {
@@ -305,7 +303,7 @@ public final class LuceneRecordStore
      *         {@link Document} of the recod might be shared with other records.
      * @throws Exception
      */
-    public LuceneRecordState get( int docnum, FieldSelector fieldSelector ) 
+    public LuceneRecordState get( int docnum, DocumentStoredFieldVisitor selector ) 
     throws Exception {
         assert reader != null : "Store is closed.";
 
@@ -325,7 +323,13 @@ public final class LuceneRecordStore
         Document doc = null;
         try {
             lock.readLock().lock();
-            doc = reader.document( docnum, fieldSelector );
+            if (selector != null) {
+                reader.document( docnum, selector );
+                doc = selector.getDocument();
+            }
+            else {
+                doc = reader.document( docnum );
+            }
         }
         finally {
             lock.readLock().unlock();
@@ -350,19 +354,18 @@ public final class LuceneRecordStore
             implements CacheLoader<Object,Document,Exception> {
         
         public Document load( Object id ) throws Exception {
-            TermDocs termDocs = null;
             try {
                 log.trace( "LUCENE: termDocs: " + LuceneRecordState.ID_FIELD + " = " + id.toString() );
                 lock.readLock().lock();
-                termDocs = reader.termDocs( new Term( LuceneRecordState.ID_FIELD, id.toString() ) );
-                if (termDocs.next()) {
-                    return reader.document( termDocs.doc() );
-                }
-                return null;
+                // XXX direct way to load the Term???
+                TopDocs topDocs = searcher.search( new TermQuery( new Term( LuceneRecordState.ID_FIELD, id.toString() ) ), 1 );
+                //termDocs = reader.termDocs( new Term( LuceneRecordState.ID_FIELD, id.toString() ) );
+                return topDocs.scoreDocs.length > 0
+                        ? reader.document( topDocs.scoreDocs[0].doc )
+                        : null;
             }
             finally {
                 lock.readLock().unlock();
-                if (termDocs != null) { termDocs.close(); }
             }
         }
 
@@ -423,14 +426,14 @@ public final class LuceneRecordStore
                 //  - autCommit == false
                 //  - 8 concurrent thread
                 IndexWriterConfig config = new IndexWriterConfig( VERSION, analyzer )
-                        .setOpenMode( OpenMode.APPEND )
-                        .setRAMBufferSizeMB( MAX_RAMBUFFER_SIZE );
+                        .setOpenMode( OpenMode.APPEND );
+                       // .setRAMBufferSizeMB( 1 );
                 
                 // limit segment size for lower pauses on interactive indexing
                 LogByteSizeMergePolicy mergePolicy = new LogByteSizeMergePolicy();
                 mergePolicy.setMaxMergeMB( MAX_MERGE_SIZE );
                 config.setMergePolicy( mergePolicy );
-                config.setMaxBufferedDocs( IndexWriterConfig.DISABLE_AUTO_FLUSH );
+                //config.setMaxBufferedDocs( IndexWriterConfig.DISABLE_AUTO_FLUSH );
                 writer = new IndexWriter( directory, config );
             }
             catch (Exception e) {
@@ -508,8 +511,7 @@ public final class LuceneRecordStore
                 writer = null;
                 
                 lock.writeLock().lock();
-                searcher.close();
-                IndexReader newReader = IndexReader.openIfChanged( reader );
+                DirectoryReader newReader = DirectoryReader.openIfChanged( reader );
                 if (newReader != null) {
                     reader.close();
                     reader = newReader;

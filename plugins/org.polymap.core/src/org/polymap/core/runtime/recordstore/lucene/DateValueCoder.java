@@ -19,9 +19,9 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.document.NumericField;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.LongField;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 
@@ -45,9 +45,9 @@ public final class DateValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
         if (value instanceof Date) {
-            NumericField field = (NumericField)doc.getFieldable( key+SUFFIX );
+            Field field = (Field)doc.getField( key+SUFFIX );
             if (field == null) {
-                field = new NumericField( key+SUFFIX, Store.YES, indexed );
+                field = new LongField( key+SUFFIX, ((Date)value).getTime(), Store.YES );
                 doc.add( field );
             }
             field.setLongValue( ((Date)value).getTime() );
@@ -60,9 +60,9 @@ public final class DateValueCoder
     
 
     public Object decode( Document doc, String key ) {
-        Fieldable field = doc.getFieldable( key+SUFFIX );
-        if (field instanceof NumericField) {
-            return new Date( ((NumericField)field).getNumericValue().longValue() );
+        Field field = (Field)doc.getField( key+SUFFIX );
+        if (field != null) {
+            return new Date( field.numericValue().longValue() );
         }
         else {
             return null;

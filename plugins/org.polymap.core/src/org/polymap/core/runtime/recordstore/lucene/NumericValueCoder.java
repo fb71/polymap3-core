@@ -17,9 +17,13 @@ package org.polymap.core.runtime.recordstore.lucene;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.document.NumericField;
+import org.apache.lucene.document.DoubleField;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 
@@ -52,9 +56,21 @@ public final class NumericValueCoder
     
     public boolean encode( Document doc, String key, Object value, boolean indexed, boolean stored ) {
         if (value instanceof Number) {
-            NumericField field = (NumericField)doc.getFieldable( key );
+            Field field = (Field)doc.getField( key );
             if (field == null) {
-                field = new NumericField( key, stored ? Store.YES : Store.NO, indexed );
+                if (value instanceof Integer) {
+                    // XXX param indexed ignored
+                    field = new IntField( key, (Integer)value, stored ? Store.YES : Store.NO );
+                }
+                else if (value instanceof Long) {
+                    field = new LongField( key, (Long)value, stored ? Store.YES : Store.NO );
+                }
+                else if (value instanceof Float) {
+                    field = new FloatField( key, (Float)value, stored ? Store.YES : Store.NO );
+                }
+                else if (value instanceof Double) {
+                    field = new DoubleField( key, (Double)value, stored ? Store.YES : Store.NO );
+                }
                 doc.add( field );
             }
             if (value instanceof Integer) {
@@ -82,13 +98,8 @@ public final class NumericValueCoder
     
 
     public Object decode( Document doc, String key ) {
-        Fieldable field = doc.getFieldable( key );
-        if (field instanceof NumericField) {
-            return ((NumericField)field).getNumericValue();
-        }
-        else {
-            return null;
-        }
+        IndexableField field = doc.getField( key );
+        return field != null ? field.numericValue() : null;
     }
 
 
