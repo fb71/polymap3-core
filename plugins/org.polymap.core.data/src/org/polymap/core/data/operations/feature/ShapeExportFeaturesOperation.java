@@ -154,7 +154,28 @@ public class ShapeExportFeaturesOperation
                 = (FeatureStore<SimpleFeatureType, SimpleFeature>)shapeDs.getFeatureSource( typeName );
 
         // no tx needed; without tx saves alot of memory
+        
         shapeFs.addFeatures( retyped );
+        
+        // test code; slow but reads just one feature at a time
+//        FeatureIterator<SimpleFeature> it = retyped.features();
+//        try {
+//            while (it.hasNext()) {
+//                try {
+//                    SimpleFeature feature = it.next();
+//                    DefaultFeatureCollection coll = new DefaultFeatureCollection( null, null );
+//                    coll.add( feature );
+//                    //shapeFs.addFeatures( coll );
+//                    log.info( "Added: " +  feature );
+//                }
+//                catch (Exception e ) {
+//                    log.warn( "", e );
+//                }
+//            }
+//        }
+//        finally {
+//            it.close();
+//        }
         
         // open download        
         Polymap.getSessionDisplay().asyncExec( new Runnable() {

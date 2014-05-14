@@ -21,8 +21,10 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.collection.DecoratingFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.opengis.feature.Feature;
-import org.opengis.feature.IllegalAttributeException;
 import org.opengis.feature.type.FeatureType;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This decorator can be used to process/modify the features
@@ -34,7 +36,11 @@ import org.opengis.feature.type.FeatureType;
 public abstract class RetypingFeatureCollection<T extends FeatureType, F extends Feature>
         extends DecoratingFeatureCollection<T,F> {
 
+    private static Log log = LogFactory.getLog( RetypingFeatureCollection.class );
+
     private T                   targetSchema;
+    
+    private boolean             breakOnException = true;
     
     
     public RetypingFeatureCollection( FeatureCollection delegate, T targetSchema ) {
@@ -42,6 +48,16 @@ public abstract class RetypingFeatureCollection<T extends FeatureType, F extends
         this.targetSchema = targetSchema;
     }
     
+    
+    public boolean isBreakOnException() {
+        return breakOnException;
+    }
+    
+    public RetypingFeatureCollection<T,F> setBreakOnException( boolean breakOnException ) {
+        this.breakOnException = breakOnException;
+        return this;
+    }
+
     public T getSchema() {
         return targetSchema;
     }
@@ -88,8 +104,14 @@ public abstract class RetypingFeatureCollection<T extends FeatureType, F extends
             try {
                 return retype( delegateIt.next() );
             } 
-            catch (IllegalAttributeException e) {
-                throw new RuntimeException(e);
+            catch (Exception e) {
+                if (breakOnException) {
+                    throw new RuntimeException(e);
+                }
+                else {
+                    log.warn( "", e );
+                    return null;
+                }
             }
         }
 

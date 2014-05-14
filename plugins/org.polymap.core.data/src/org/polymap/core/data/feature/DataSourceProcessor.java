@@ -166,8 +166,14 @@ public class DataSourceProcessor
         // GetFeatures
         else if (r instanceof GetFeaturesRequest) {
             GetFeaturesRequest request = (GetFeaturesRequest)r;
-            FeatureSource fs = geores.resolve( FeatureSource.class, null );
-            getFeatures( fs, request.getQuery(), context );
+//            FileDataStore fds = geores.resolve( FileDataStore.class, null );
+//            if (fds != null) {
+//                getFeatures( fds, request.getQuery(), context );
+//            }
+//            else {
+                FeatureSource fs = geores.resolve( FeatureSource.class, null );
+                getFeatures( fs, request.getQuery(), context );
+//            }
             context.sendResponse( ProcessorResponse.EOP );
         }
         // GetFeaturesSize
@@ -232,6 +238,38 @@ public class DataSourceProcessor
             }
         }
     }
+
+
+//    protected void getFeatures( FileDataStore fds, Query query, ProcessorContext context )
+//    throws Exception {
+//        log.debug( "            Filter: " + query.getFilter() );
+//
+//        FeatureReader reader = fds.getFeatureReader( query, Transaction.AUTO_COMMIT );
+//        int currentChunkSize = 64;
+//        try {
+//            ArrayList<Feature> chunk = new ArrayList( currentChunkSize );
+//            while (reader.hasNext()) {
+//                Feature feature = reader.next();
+//
+//                chunk.add( feature );
+//                if (chunk.size() >= currentChunkSize) {
+//                    log.debug( "                sending chunk: " + chunk.size() );
+//                    context.sendResponse( new GetFeaturesResponse( chunk ) );
+//                    
+//                    currentChunkSize = Math.min( DEFAULT_CHUNK_SIZE, currentChunkSize * 2 );
+//                    chunk = new ArrayList( currentChunkSize );
+//                }
+//            }
+//            if (!chunk.isEmpty()) {
+//                chunk.trimToSize();
+//                log.debug( "                sending chunk: " + chunk.size() );
+//                context.sendResponse( new GetFeaturesResponse( chunk ) );
+//            }
+//        }
+//        finally {
+//            reader.close();
+//        }
+//    }
 
 
     protected List<FeatureId> addFeatures( FeatureStore fs, final Collection<Feature> features )
