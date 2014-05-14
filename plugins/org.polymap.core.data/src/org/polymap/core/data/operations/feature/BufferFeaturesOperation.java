@@ -62,6 +62,8 @@ import org.polymap.core.data.operation.FeatureOperationExtension;
 import org.polymap.core.data.operation.IFeatureOperation;
 import org.polymap.core.data.operation.IFeatureOperationContext;
 import org.polymap.core.data.util.Geometries;
+import org.polymap.core.model.security.ACLUtils;
+import org.polymap.core.model.security.AclPermission;
 import org.polymap.core.operation.OperationWizard;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.project.ui.util.SimpleFormData;
@@ -89,7 +91,7 @@ public class BufferFeaturesOperation
         super.init( _context );
         
         layer = (ILayer)context.getAdapter( ILayer.class );
-        return layer != null;
+        return layer != null && ACLUtils.checkPermission( layer, AclPermission.WRITE, false );
     }
 
     

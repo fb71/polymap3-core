@@ -130,11 +130,16 @@ class TimerDeferringListener
                 events = null;
                 delegate.handleEvent( dev );
             }
-            catch (Exception e) {
-                log.warn( "Error while handling defered events.", e );
+            catch (Throwable e) {
+                log.warn( "Error while handling deferred events.", e );
             }
             finally {
-                SessionUICallbackCounter.jobFinished( delegate );
+                try {
+                    SessionUICallbackCounter.jobFinished( delegate );
+                }
+                catch (Throwable e) {
+                    log.warn( "", e );
+                }
             }
         }
     };

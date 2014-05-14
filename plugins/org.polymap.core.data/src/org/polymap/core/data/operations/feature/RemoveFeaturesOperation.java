@@ -1,6 +1,6 @@
 /*
  * polymap.org
- * Copyright 2012, Falko Bräutigam. All rights reserved.
+ * Copyright (C) 2012-2014, Falko Bräutigam. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -26,6 +26,7 @@ import org.opengis.feature.FeatureVisitor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.identity.Identifier;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,8 +36,12 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.polymap.core.data.operation.DefaultFeatureOperation;
 import org.polymap.core.data.operation.FeatureOperationExtension;
 import org.polymap.core.data.operation.IFeatureOperation;
+import org.polymap.core.data.operation.IFeatureOperationContext;
 import org.polymap.core.data.operations.NewFeatureOperation;
 import org.polymap.core.data.util.ProgressListenerAdaptor;
+import org.polymap.core.model.security.ACLUtils;
+import org.polymap.core.model.security.AclPermission;
+import org.polymap.core.project.ILayer;
 
 /**
  * Removed features.
@@ -54,8 +59,15 @@ public class RemoveFeaturesOperation
     public static final FilterFactory ff = CommonFactoryFinder.getFilterFactory( GeoTools.getDefaultHints() );
 
     
-    public Status execute( IProgressMonitor monitor )
-    throws Exception {
+    @Override
+    public boolean init( IFeatureOperationContext _context ) {
+        super.init( _context );
+        ILayer layer = context.adapt( ILayer.class );
+        return layer == null || ACLUtils.checkPermission( layer, AclPermission.DELETE, false );
+    }
+
+
+    public Status execute( IProgressMonitor monitor ) throws Exception {
         monitor.beginTask( context.adapt( FeatureOperationExtension.class ).getLabel(), 10 );
         
         FeatureSource fs = context.featureSource();
