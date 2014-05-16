@@ -126,9 +126,15 @@ class TimerDeferringListener
         
         protected void doRun() {
             try {
-                DeferredEvent dev = new DeferredEvent( TimerDeferringListener.this, events );
-                events = null;
-                delegate.handleEvent( dev );
+                List<EventObject> localEvents = events;
+                if (localEvents == null) {
+                    log.warn( "events == null -> skipping handler." );
+                }
+                else {
+                    DeferredEvent dev = new DeferredEvent( TimerDeferringListener.this, localEvents );
+                    events = null;
+                    delegate.handleEvent( dev );
+                }
             }
             catch (Throwable e) {
                 log.warn( "Error while handling deferred events.", e );

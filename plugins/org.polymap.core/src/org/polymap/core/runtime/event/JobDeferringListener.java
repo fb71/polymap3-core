@@ -67,9 +67,15 @@ class JobDeferringListener
                     try {
                         job = null;
 
-                        final DeferredEvent dev = new DeferredEvent( JobDeferringListener.this, events );
-                        events = null;
-                        delegate.handleEvent( dev );
+                        List<EventObject> localEvents = events;
+                        if (localEvents == null) {
+                            log.warn( "events == null -> skipping handler." );
+                        }
+                        else {
+                            final DeferredEvent dev = new DeferredEvent( JobDeferringListener.this, localEvents );
+                            events = null;
+                            delegate.handleEvent( dev );
+                        }
                     }
                     finally {
                         SessionUICallbackCounter.jobFinished( delegate );                

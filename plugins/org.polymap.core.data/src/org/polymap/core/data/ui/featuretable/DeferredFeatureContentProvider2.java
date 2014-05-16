@@ -360,6 +360,9 @@ class DeferredFeatureContentProvider2
                 display.asyncExec( new Runnable() {
                     public void run() {
                         UICallBack.deactivate( UpdatorJob.class.getName() );
+                        if (viewer == null || viewer.getControl().isDisposed()) {
+                            return;
+                        }
 //                        // XXX Fix the "empty" table problem
                         if (sortedElements.length > 0) {
                             viewer.reveal( sortedElements[sortedElements.length-1] );
