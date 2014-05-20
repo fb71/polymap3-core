@@ -18,6 +18,9 @@ package org.polymap.core.data.ui.featuretable;
 import java.util.Comparator;
 import java.util.Date;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import org.opengis.feature.type.PropertyDescriptor;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
@@ -45,6 +48,8 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerColumn;
 
+import org.polymap.core.runtime.Polymap;
+
 /**
  *
  *
@@ -54,6 +59,9 @@ public class DefaultFeatureTableColumn
         implements IFeatureTableColumn {
 
     private static Log log = LogFactory.getLog( DefaultFeatureTableColumn.class );
+
+    public static final DateFormat  DF = new SimpleDateFormat( "yyyy-MM-dd", Polymap.getSessionLocale() );
+    public static final DateFormat  LONG_DF = new SimpleDateFormat( "dd.MM.yyyy", Polymap.getSessionLocale() );
 
     private FeatureTableViewer      viewer;
 
@@ -261,7 +269,15 @@ public class DefaultFeatureTableColumn
                 //log.info( "getText(): fid=" + featureElm.fid() + ", prop=" + prop.getName().getLocalPart() );
 
                 Object value = featureElm.getValue( getName() );
-                return value != null ? value.toString() : "";
+                if (value == null) {
+                    return "";
+                }
+                else if (value instanceof Date) {
+                    return DF.format( value );
+                }
+                else {
+                    return value.toString();
+                }
             }
             catch (Exception e) {
                 log.warn( "", e );
@@ -274,7 +290,15 @@ public class DefaultFeatureTableColumn
                 try {
                     IFeatureTableElement featureElm = (IFeatureTableElement)elm;
                     Object value = featureElm.getValue( getName() );
-                    return value != null ? value.toString() : null;
+                    if (value == null) {
+                        return "";
+                    }
+                    else if (value instanceof Date) {
+                        return LONG_DF.format( value );
+                    }
+                    else {
+                        return value.toString();
+                    }
                 }
                 catch (Exception e) {
                     log.warn( "", e );
