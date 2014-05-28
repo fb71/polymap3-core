@@ -14,6 +14,8 @@
  */
 package org.polymap.openlayers.rap.widget.util;
 
+import java.io.PrintStream;
+
 /**
  * Simple helper to build HTML/JavaScript code strings.
  *
@@ -37,6 +39,16 @@ public class Stringer {
         add( first, parts );
     }
 
+    public Stringer log() {
+        log( System.out );
+        return this;
+    }
+    
+    public Stringer log( PrintStream out ) {
+        out.println( toString() );
+        return this;
+    }
+    
     @Override
     public String toString() {
         return builder.toString();
