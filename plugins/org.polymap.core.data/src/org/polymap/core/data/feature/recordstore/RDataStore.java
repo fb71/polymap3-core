@@ -93,7 +93,7 @@ public class RDataStore
 
     
     protected void initSchemas() throws Exception {
-        ResultSet resultSet = store.find( new SimpleQuery().eq( "type", "FeatureType" ) );
+        ResultSet resultSet = store.find( new SimpleQuery().eq( "type", "FeatureType" ).setMaxResults( 100 ) );
 
         Exception exception = null;
         schemas = new HashMap( resultSet.count()*2 );
