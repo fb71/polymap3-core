@@ -495,7 +495,7 @@ public interface CatalogComposite
             // first pass 1.2 - use urlEquals on unCONNECTED service for subset
             // check
             for (IService service : persistentAndTransientServices()) {
-                if (service.getStatus() == Status.CONNECTED) {
+                if (service == null || service.getStatus() == Status.CONNECTED) {
                     continue; // already checked in pass 1.1
                 }
                 URL identifier = service.getIdentifier();
@@ -521,7 +521,8 @@ public interface CatalogComposite
             // the hope here is that a "friend" will still have data! May be tough for friends
             // to negotiate a match w/ a broken services - but there is still hope... 
             for (IService service : persistentAndTransientServices()) {
-                if( service.getStatus() == Status.CONNECTED 
+                if (service == null 
+                        || service.getStatus() == Status.CONNECTED 
                         || service.getStatus() == Status.NOTCONNECTED) {
                     continue; // already checked in pass 1.1-1.2                                    
                 }

@@ -276,8 +276,8 @@ public final class LuceneQueryDialect
             org.apache.lucene.search.Query luceneQuery = null;
             if (! filterQuery.equals( ALL )) {
                 luceneQuery = new BooleanQuery();
-                ((BooleanQuery)luceneQuery).add( filterQuery, BooleanClause.Occur.MUST );
                 ((BooleanQuery)luceneQuery).add( typeQuery, BooleanClause.Occur.MUST );
+                ((BooleanQuery)luceneQuery).add( filterQuery, BooleanClause.Occur.MUST );
             }
             else {
                 luceneQuery = typeQuery;

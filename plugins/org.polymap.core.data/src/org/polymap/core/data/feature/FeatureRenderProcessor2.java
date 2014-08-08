@@ -53,6 +53,7 @@ import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.Style;
 import org.opengis.feature.simple.SimpleFeature;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -232,29 +233,18 @@ public class FeatureRenderProcessor2
         log.debug( "using: " + mapContext );
         
         // render
-        
-        // Get default graphics device
 //        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        GraphicsDevice[] screens = ge.getScreenDevices();
-//        log.info( "IMAGE: headles=" + ge.isHeadlessInstance() );
+//        GraphicsConfiguration gc = ge.getDefaultScreenDevice().getDefaultConfiguration();
+//        VolatileImage result = gc.createCompatibleVolatileImage( width, height, Transparency.TRANSLUCENT );
 
         BufferedImage result = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
         result.setAccelerationPriority( 1 );
+
         final Graphics2D g = result.createGraphics();
 //        log.info( "IMAGE: accelerated=" + result.getCapabilities( g.getDeviceConfiguration() ).isAccelerated() );
         
         try {
-            StreamingRenderer renderer = new StreamingRenderer();
-
-            // error handler
-            renderer.addRenderListener( new RenderListener() {
-                public void featureRenderer( SimpleFeature feature ) {
-                }
-                public void errorOccurred( Exception e ) {
-                    log.error( "Renderer error: ", e );
-                    drawErrorMsg( g, "Fehler bei der Darstellung.", e );
-                }
-            });
+            final StreamingRenderer renderer = new StreamingRenderer();
 
             // rendering hints
             RenderingHints hints = new RenderingHints(
@@ -269,6 +259,27 @@ public class FeatureRenderProcessor2
 
             renderer.setJava2DHints( hints );
 //            g.setRenderingHints( hints );
+            
+            // error handler
+            renderer.addRenderListener( new RenderListener() {
+                int featureCount = 0;
+                @Override
+                public void featureRenderer( SimpleFeature feature ) {
+//                  if (++featureCount == 100) {
+//                      log.info( "Switch off antialiasing!" );
+//                      RenderingHints off = new RenderingHints(
+//                              RenderingHints.KEY_ANTIALIASING,
+//                              RenderingHints.VALUE_ANTIALIAS_OFF );
+//                      renderer.setJava2DHints( off );
+//                      g.setRenderingHints( off );
+//                  }
+                }
+                @Override
+                public void errorOccurred( Exception e ) {
+                    log.error( "Renderer error: ", e );
+                    drawErrorMsg( g, "Fehler bei der Darstellung.", e );
+                }
+            });
 
             // render params
             Map rendererParams = new HashMap();
