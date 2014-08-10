@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.polymap.core.data.ui.csvimport;
+package org.polymap.core.data.imex.csv;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ import org.polymap.core.catalog.actions.ResetServiceAction;
 import org.polymap.core.data.DataPlugin;
 import org.polymap.core.runtime.UIJob;
 
-import static org.polymap.core.data.ui.csvimport.Messages.i18n;
+import static org.polymap.core.data.imex.csv.Messages.i18n;
 
 /**
  * @author Andrea Antonello - www.hydrologis.com

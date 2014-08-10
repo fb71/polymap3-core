@@ -10,14 +10,28 @@
          point="org.eclipse.ui.importWizards">
       <wizard
             category="net.refractions.udig.catalog.ui_p3.dataImportCategory"
-            class="org.polymap.core.data.ui.csvimport.CsvImportWizard"
+            class="org.polymap.core.data.imex.csv.CsvImportWizard"
             icon="icons/prop_ps.gif"
             id="org.polymap.core.data.csvimport.CsvImportWizard"
-            name="CSV import">
+            name="CSV">
          <description>
             Import a file in the CSV format from the local file system into the workspace.
          </description>
       </wizard>
+      <wizard
+            category="net.refractions.udig.catalog.ui_p3.dataImportCategory"
+            class="org.polymap.core.data.feature.mdb.MdbImportWizard"
+            icon="icons/obj16/database_obj.gif"
+            id="org.polymap.core.data.MdbImportWizard"
+            name="MS-Access">
+      </wizard>
+      <!--wizard
+            category="net.refractions.udig.catalog.ui_p3.dataImportCategory"
+            class="org.polymap.core.data.imex.kml.KmlImportWizard"
+            icon="icons/obj16/msaccess_obj.gif"
+            id="org.polymap.core.data.KmlImportWizard"
+            name="KML">
+      </wizard-->
    </extension>
    <!--extension
          point="org.eclipse.ui.actionSets">
@@ -321,16 +335,6 @@
       </decorator>
    </extension>
    <extension
-         point="org.eclipse.ui.importWizards">
-      <wizard
-            category="net.refractions.udig.catalog.ui_p3.dataImportCategory"
-            class="org.polymap.core.data.feature.mdb.MdbImportWizard"
-            icon="icons/obj16/msaccess_obj.gif"
-            id="org.polymap.core.data.MdbImportWizard"
-            name="MS-Access">
-      </wizard>
-   </extension>
-   <extension
          point="org.eclipse.ui.viewActions">
       <viewContribution
             id="org.polymap.core.data.featureSelectionContribution"
@@ -523,19 +527,33 @@
             tooltip="%RemoveFeaturesOperation_tip">
       </featureOperation>
       <featureOperation
-            class="org.polymap.core.data.operations.feature.CsvExportFeatureOperation"
+            class="org.polymap.core.data.imex.csv.CsvExportFeatureOperation"
             icon="icons/etool16/exportas.gif"
-            id="org.polymap.core.data.operations.feature.CsvExportFeatureOperation"
+            id="org.polymap.core.data.imex.CsvExportFeatureOperation"
             label="%CsvExportFeatureOperation_label"
             tooltip="%CsvExportFeatureOperation_tip">
       </featureOperation>
       <featureOperation
-            class="org.polymap.core.data.operations.feature.ShapeExportFeaturesOperation"
+            class="org.polymap.core.data.imex.shape.ShapeExportFeaturesOperation"
             icon="icons/etool16/exportas.gif"
-            id="org.polymap.core.data.operations.feature.ShapeExportFeatureOperation"
+            id="org.polymap.core.data.imex.ShapeExportFeatureOperation"
             label="%ShapeExportFeaturesOperation_label"
             tooltip="%ShapeExportFeaturesOperation_tip">
       </featureOperation>
+      <featureOperation
+            class="org.polymap.core.data.imex.kml.KmlExportFeatureOperation"
+            icon="icons/etool16/exportas.gif"
+            id="org.polymap.core.data.imex.KmlExportFeatureOperation"
+            label="%KmlExportFeaturesOperation_label"
+            tooltip="%KmlExportFeaturesOperation_tip">
+      </featureOperation>
+      <!--featureOperation
+            class="org.polymap.core.data.imex.gpx.GpxExportFeatureOperation"
+            icon="icons/etool16/exportas.gif"
+            id="org.polymap.core.data.imex.GpxExportFeatureOperation"
+            label="%GpxExportFeaturesOperation_label"
+            tooltip="%GpxExportFeaturesOperation_tip">
+      </featureOperation-->
    </extension>
    <extension
          point="org.eclipse.rap.ui.serviceHandler">

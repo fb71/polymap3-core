@@ -1,6 +1,7 @@
 /*
  * JGrass - Free Open Source Java GIS http://www.jgrass.org 
- * (C) HydroloGIS - www.hydrologis.com 
+ * (C) HydroloGIS - www.hydrologis.com
+ * Copyright (C) 2014, Falko Bräutigam. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.polymap.core.data.ui.csvimport;
+package org.polymap.core.data.imex.csv;
 
 import java.util.Map;
 
@@ -38,7 +39,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -51,12 +51,14 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.polymap.core.project.ui.util.SelectionAdapter;
 import org.polymap.core.project.ui.util.SimpleFormData;
 
-import static org.polymap.core.data.ui.csvimport.Messages.i18n;
+import static org.polymap.core.data.imex.csv.Messages.i18n;
 
 /**
- * @author <a href="http://www.polymap.de">Falko Braeutigam</a>
+ * 
+ * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-public class CsvImportWizardPage2 extends WizardPage {
+public class CsvImportWizardPage2
+        extends WizardPage {
 
     private static Log log = LogFactory.getLog( CsvImportWizardPage2.class );
 
@@ -64,12 +66,10 @@ public class CsvImportWizardPage2 extends WizardPage {
     
     private FeatureTableControl       tableViewer;
     
-    private FeatureCollection<SimpleFeatureType, SimpleFeature> features;
+    private FeatureCollection<SimpleFeatureType,SimpleFeature> features;
 
     private Composite                 fileSelectionArea;
 
-    private Button                    memBtn, shpBtn;
-    
     private Text                      shpNameText;
 
     private String                    shpName = "csvimport";
@@ -83,11 +83,13 @@ public class CsvImportWizardPage2 extends WizardPage {
         setDescription( i18n( "CsvImportWizardPage.importasshape" ) );        
     }
 
+    
     @Override
     public CsvImportWizard getWizard() {
         return (CsvImportWizard)super.getWizard();
     }
 
+    
     public void createControl( Composite parent ) {
         getWizard().getShell().setSize( 520, 650 );
         
@@ -131,18 +133,22 @@ public class CsvImportWizardPage2 extends WizardPage {
         checkFinish();
     }
 
+    
 //    public int getImportTarget() {
 //        return importTarget;
 //    }
+    
     
     public String getShpName() {
         return shpName;
     }
     
+    
     public IResolve getTarget() {
         return target;
     }
 
+    
     public void setVisible( boolean visible ) {
         super.setVisible( visible );
 
@@ -152,6 +158,7 @@ public class CsvImportWizardPage2 extends WizardPage {
         }
     }
 
+    
     public void setFeatureCollection(
             FeatureCollection<SimpleFeatureType, SimpleFeature> csvFeatureCollection ) {
         this.features = csvFeatureCollection;
@@ -181,6 +188,7 @@ public class CsvImportWizardPage2 extends WizardPage {
             log.warn( "unhandled: ", e );
         }
     }
+
 
     protected void checkFinish() {
         setMessage( null );

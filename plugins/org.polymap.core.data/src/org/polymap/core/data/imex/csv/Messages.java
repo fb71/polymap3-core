@@ -21,7 +21,7 @@
  * $Id$
  */
 
-package org.polymap.core.data.ui.csvimport;
+package org.polymap.core.data.imex.csv;
 
 import org.eclipse.rwt.RWT;
 
@@ -35,7 +35,7 @@ import org.polymap.core.runtime.MessagesImpl;
  */
 public class Messages {
 
-    private static final String BUNDLE_NAME = DataPlugin.PLUGIN_ID + ".ui.csvimport.messages";
+    private static final String BUNDLE_NAME = DataPlugin.PLUGIN_ID + ".imex.csv.messages";
 
     private static final MessagesImpl   instance = new MessagesImpl( BUNDLE_NAME, Messages.class.getClassLoader() );
 

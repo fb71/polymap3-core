@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.polymap.core.data.FeatureStateTracker;
 import org.polymap.core.data.PipelineFeatureSource;
-import org.polymap.core.data.operations.feature.CsvExporter;
+import org.polymap.core.data.imex.csv.CsvExporter;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.runtime.entity.IEntityHandleable;
 import org.polymap.core.runtime.entity.IEntityStateListener;

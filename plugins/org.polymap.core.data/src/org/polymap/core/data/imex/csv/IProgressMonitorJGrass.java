@@ -1,4 +1,4 @@
-package org.polymap.core.data.ui.csvimport;
+package org.polymap.core.data.imex.csv;
 
 /**
  * A clone of eclipse's IProgressMonitor.

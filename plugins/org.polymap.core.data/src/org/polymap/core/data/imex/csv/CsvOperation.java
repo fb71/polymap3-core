@@ -20,7 +20,7 @@
  *
  * $Id$
  */
-package org.polymap.core.data.ui.csvimport;
+package org.polymap.core.data.imex.csv;
 
 /**
  * Defines a preprocessing operation that is defined the extension {@value #EXTENSION_POINT}. 

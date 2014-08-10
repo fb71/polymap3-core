@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.polymap.core.data.ui.csvimport;
+package org.polymap.core.data.imex.csv;
 
 import static com.google.common.collect.Iterables.toArray;
-import static org.polymap.core.data.ui.csvimport.Messages.i18n;
+import static org.polymap.core.data.imex.csv.Messages.i18n;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -80,6 +80,7 @@ import org.polymap.core.data.DataPlugin;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 /**
+ * 
  * @author Andrea Antonello - www.hydrologis.com
  */
 public class CsvImportWizardPage extends WizardPage {
@@ -108,6 +109,7 @@ public class CsvImportWizardPage extends WizardPage {
         setDescription( i18n( "CsvImportWizardPage.importasshape" ) ); //$NON-NLS-1$
     }
 
+    
     public void createControl( Composite parent ) {
         Composite fileSelectionArea = new Composite( parent, SWT.NONE );
         fileSelectionArea.setLayout( new GridLayout( 2, true ) );

@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, Polymap GmbH. All rights reserved.
+ * Copyright (C) 2014, Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package org.polymap.core.data.operations.feature;
+package org.polymap.core.data.imex.kml;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -21,7 +21,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
+import org.geotools.data.store.ReprojectingFeatureCollection;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.kml.KML;
+import org.geotools.kml.KMLConfiguration;
+import org.geotools.referencing.CRS;
+import org.geotools.xml.Encoder;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,9 +42,9 @@ import org.eclipse.core.runtime.OperationCanceledException;
 
 import org.polymap.core.data.operation.DefaultFeatureOperation;
 import org.polymap.core.data.operation.DownloadServiceHandler;
+import org.polymap.core.data.operation.DownloadServiceHandler.ContentProvider;
 import org.polymap.core.data.operation.FeatureOperationExtension;
 import org.polymap.core.data.operation.IFeatureOperation;
-import org.polymap.core.data.operation.DownloadServiceHandler.ContentProvider;
 import org.polymap.core.runtime.Polymap;
 
 /**
@@ -43,61 +52,65 @@ import org.polymap.core.runtime.Polymap;
  *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-public class CsvExportFeatureOperation
+public class KmlExportFeatureOperation
         extends DefaultFeatureOperation
         implements IFeatureOperation {
 
-    private static Log log = LogFactory.getLog( CsvExportFeatureOperation.class );
+    private static Log log = LogFactory.getLog( KmlExportFeatureOperation.class );
 
     
-    public Status execute( IProgressMonitor monitor )
-    throws Exception {
+    public Status execute( IProgressMonitor monitor ) throws Exception {
         monitor.beginTask( 
                 context.adapt( FeatureOperationExtension.class ).getLabel(),
                 context.features().size() );
     
-        final File f = File.createTempFile( "polymap-csv-export-", ".csv" );
+        final File f = File.createTempFile( "polymap-kml-export-", ".kml" );
         f.deleteOnExit();
-
         OutputStream out = new BufferedOutputStream( new FileOutputStream( f ) );
-        final CsvExporter exporter = new CsvExporter();
-
+        
+        FeatureCollection features = new ReprojectingFeatureCollection( context.features(), CRS.decode( "EPSG:4326" ) );
+        
         try {
-            exporter.setLocale( Polymap.getSessionLocale() );
-            exporter.write( context.features(), out, monitor );
+            Encoder encoder = new Encoder( new KMLConfiguration() );
+            encoder.setIndenting( true );
+            encoder.setEncoding( Charset.forName( "UTF-8" ) );
+            encoder.setNamespaceAware( false );
+            encoder.setOmitXMLDeclaration( false );
+            encoder.encode( features, KML.kml, out );
         }
         catch (OperationCanceledException e) {
             return Status.Cancel;
         }
         finally {
             IOUtils.closeQuietly( out );
+
+            log.info( FileUtils.readFileToString( f ) );
         }
 
         // open download        
         Polymap.getSessionDisplay().asyncExec( new Runnable() {
             public void run() {
                 String url = DownloadServiceHandler.registerContent( new ContentProvider() {
-
+                    @Override
                     public String getContentType() {
-                        return "text/csv; charset=" + exporter.getCharset();
+                        return "application/vnd.google-earth.kml+xml; charset=UTF-8";
                     }
-
+                    @Override
                     public String getFilename() {
-                        return "polymap-export.csv";
+                        return "polymap-export.kml";
                     }
-
+                    @Override
                     public InputStream getInputStream() throws Exception {
                         return new BufferedInputStream( new FileInputStream( f ) );
                     }
-
+                    @Override
                     public boolean done( boolean success ) {
                         f.delete();
                         return true;
                     }
-                    
                 });
                 
-                log.info( "CSV: download URL: " + url );
+                log.info( "Download URL: " + url );
 
 //                String filename = view.getLayer() != null
 //                        ? view.getLayer().getLabel() + "_export.csv" : "polymap3_export.csv";
@@ -113,28 +126,24 @@ public class CsvExportFeatureOperation
     }
 
 
-    public Status undo( IProgressMonitor monitor )
-    throws Exception {
+    public Status undo( IProgressMonitor monitor ) throws Exception {
         return Status.OK;
     }
 
-
-    public Status redo( IProgressMonitor monitor )
-    throws Exception {
+    public Status redo( IProgressMonitor monitor ) throws Exception {
         return Status.OK;
     }
-
 
     public boolean canExecute() {
         return true;
     }
 
     public boolean canRedo() {
-        return true;
+        return false;
     }
 
     public boolean canUndo() {
-        return true;
+        return false;
     }
     
 }
