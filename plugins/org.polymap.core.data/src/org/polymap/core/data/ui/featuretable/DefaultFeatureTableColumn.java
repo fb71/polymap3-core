@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 
 import org.opengis.feature.type.PropertyDescriptor;
@@ -62,6 +63,7 @@ public class DefaultFeatureTableColumn
 
     public static final DateFormat  DF = new SimpleDateFormat( "yyyy-MM-dd", Polymap.getSessionLocale() );
     public static final DateFormat  LONG_DF = new SimpleDateFormat( "dd.MM.yyyy", Polymap.getSessionLocale() );
+    public static final NumberFormat NF = NumberFormat.getInstance( Polymap.getSessionLocale() );
 
     private FeatureTableViewer      viewer;
 
@@ -275,6 +277,12 @@ public class DefaultFeatureTableColumn
                 else if (value instanceof Date) {
                     return DF.format( value );
                 }
+                else if (value instanceof Float || value instanceof Double) {
+                    return NF.format( ((Number)value).doubleValue() );
+                }
+                else if (value instanceof Integer || value instanceof Short || value instanceof Byte) {
+                    return NF.format( ((Number)value).intValue() );
+                }
                 else {
                     return value.toString();
                 }
@@ -291,13 +299,29 @@ public class DefaultFeatureTableColumn
                     IFeatureTableElement featureElm = (IFeatureTableElement)elm;
                     Object value = featureElm.getValue( getName() );
                     if (value == null) {
-                        return "";
+                        return null;
                     }
                     else if (value instanceof Date) {
-                        return LONG_DF.format( value );
+                        return "Date: " + getText( elm );
+                    }
+                    else if (value instanceof Float) {
+                        return "Float: " + getText( elm );
+                    }
+                    else if (value instanceof Double) {
+                        return "Double: " + getText( elm );
+                    }
+                    else if (value instanceof Integer) {
+                        return "Int: " + getText( elm );
+                    }
+                    else if (value instanceof Short) {
+                        return "Short: " + getText( elm );
+                    }
+                    else if (value instanceof Byte) {
+                        return "Byte: " + getText( elm );
                     }
                     else {
-                        return value.toString();
+                        String result = value.toString();
+                        return StringUtils.isEmpty( result ) ? null : result;
                     }
                 }
                 catch (Exception e) {
