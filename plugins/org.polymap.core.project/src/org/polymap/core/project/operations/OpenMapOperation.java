@@ -84,6 +84,19 @@ public class OpenMapOperation
         // set map extent
         try {
             monitor.subTask( Messages.get( "OpenMapOperation_calcLayersBounds" ) );
+            
+            if (map.getLayers().isEmpty()) {
+                display.asyncExec( new Runnable() {
+                    public void run() {
+                        MessageBox box = new MessageBox( page.getWorkbenchWindow().getShell() );
+                        box.setText( Messages.get( "OpenMapOperation_noLayersText" ) );
+                        box.setMessage( Messages.get( "OpenMapOperation_noLayersMsg" ) );
+                        box.open();
+                    }
+                });                
+                return Status.CANCEL_STATUS;
+            }
+            
             final ReferencedEnvelope bbox = map.getMaxExtent() == null
                     ? calcLayersBounds( map.getLayers(), map.getCRS(), monitor )
                     : map.getMaxExtent();
