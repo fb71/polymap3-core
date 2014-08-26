@@ -66,11 +66,6 @@ import org.polymap.core.project.LayerUseCase;
 import org.polymap.core.runtime.LazyInit;
 import org.polymap.core.runtime.PlainLazyInit;
 import org.polymap.core.runtime.SessionContext;
-import org.polymap.core.runtime.cache.Cache;
-import org.polymap.core.runtime.cache.CacheConfig;
-import org.polymap.core.runtime.cache.CacheLoader;
-import org.polymap.core.runtime.cache.CacheManager;
-
 import org.polymap.service.http.MapHttpServer;
 
 /**
@@ -98,7 +93,7 @@ public class SimpleWmsServer
     private IPipelineIncubator      pipelineIncubator = new DefaultPipelineIncubator();
 
     /** Maps layer name into corresponding Pipeline. */
-    private Cache<String,Pipeline>  pipelines;
+    private Map<String,Pipeline>    pipelines = new HashMap();
     
     private SessionContext          sessionContext;
     
@@ -110,15 +105,12 @@ public class SimpleWmsServer
     public void init( IMap _map ) {
         super.init( _map );
         this.sessionContext = SessionContext.current();
-
-        pipelineIncubator = new DefaultPipelineIncubator();
-        pipelines = CacheManager.instance().newCache( CacheConfig.DEFAULT.initSize( 16 ) );
     }
 
     
     public void destroy() {
         super.destroy();
-        pipelines.dispose();
+        pipelines = null;
     }
 
 
@@ -247,27 +239,29 @@ public class SimpleWmsServer
             throw new ServletException( "Wrong layers param: " + layerRenderKey );
         }
         
-        return pipelines.get( layerRenderKey, new CacheLoader<String,Pipeline,IOException>() {
-            public Pipeline load( String key ) throws IOException {
-                ILayer layer = findLayer( key );
-                IService service = findService( layer );
-                try {
-                    Pipeline pipeline = pipelineIncubator.newPipeline( LayerUseCase.ENCODED_IMAGE, layer.getMap(), layer, service );
-                    if (pipeline.length() == 0) {
-                        throw new ServiceException( "Unable to build processor pipeline for layer: " + layer );                        
+        Pipeline result = pipelines.get( layerRenderKey );
+        
+        if (result == null) {
+            synchronized (pipelines) {
+                result = pipelines.get( layerRenderKey );
+                if (result == null) {
+                    ILayer layer = findLayer( layerRenderKey );
+                    IService service = findService( layer );
+                    try {
+                        result = pipelineIncubator.newPipeline( LayerUseCase.ENCODED_IMAGE, layer.getMap(), layer, service );
+                        if (result.length() == 0) {
+                            throw new ServiceException( "Unable to build processor pipeline for layer: " + layer );                        
+                        }
+                        log.info( "PIPELINE build for: " + layerRenderKey + " (layer: " + layer.getLabel() + ")" );
+                        pipelines.put( layerRenderKey, result );
                     }
-                    log.info( "PIPELINE build for: " + layer.getLabel() );
-                    return pipeline;
-                }
-                catch (PipelineIncubationException e) {
-                    throw new RuntimeException( e );
+                    catch (PipelineIncubationException e) {
+                        throw new RuntimeException( e );
+                    }
                 }
             }
-
-            public int size() throws IOException {
-                return Cache.ELEMENT_SIZE_UNKNOW;
-            }
-        });
+        }
+        return result;
     }
 
 

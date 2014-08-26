@@ -354,7 +354,7 @@ public class RenderManager {
         /*
          * The delay collects events.
          * 
-         * Besides the delay helps ImageCacheProcessor (for example) to disable
+         * Besides the delay allows ImageCacheProcessor (for example) to disable
          * *before* the layer is reloaded.
          */
         @EventHandler(delay=500, display=true)
@@ -371,7 +371,10 @@ public class RenderManager {
                         updatePipelines = true;
                     }
                     else if ("edit".equals( ev.getPropertyName() )) {
-                        updatePipelines = true;
+                        if (descriptor != null) { 
+                            mapEditor.reloadLayer( descriptor ); 
+                        }
+//                        updatePipelines = true;
                     }
                     else if (PROP_OPACITY.equals( ev.getPropertyName() )) {
                         if (descriptor != null && descriptor.layer != null) {
@@ -390,8 +393,8 @@ public class RenderManager {
                         }
                     }
                     else if (PROP_STYLE.equals( ev.getPropertyName() )) {
-                        if (descriptor != null) {
-                            mapEditor.reloadLayer( descriptor );
+                        if (descriptor != null) { 
+                            mapEditor.reloadLayer( descriptor ); 
                         }
                     }
                     else if (PipelineHolder.PROP_PROCS.equals( ev.getPropertyName() )) {
