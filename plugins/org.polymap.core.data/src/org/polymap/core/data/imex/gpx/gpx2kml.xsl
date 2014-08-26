@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
-<!--
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:gpx="http://www.topografix.com/GPX/1/0">
+<!-- 
+    https://gist.github.com/wmanth/5413400 
 -->
+    
+<!-- <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:gpx="http://www.topografix.com/GPX/1/0"> -->
 <xsl:stylesheet version="1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-  xmlns:gpx10="http://www.topografix.com/GPX/1/1">
+  xmlns:gpx="http://www.topografix.com/GPX/1/1">
 
 <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" />
 
@@ -32,7 +34,8 @@
 
 <xsl:template match="gpx:trk">
   <Placemark>
-    <name><xsl:value-of select="name"/></name>
+    <name><xsl:value-of select="gpx:name"/></name>
+    <description><xsl:value-of select="gpx:type"/> - <xsl:value-of select="gpx:desc"/></description>
     <styleUrl>#route</styleUrl>
     <xsl:apply-templates select="gpx:trkseg"/>
   </Placemark>

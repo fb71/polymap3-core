@@ -105,7 +105,7 @@
             <dependency groupId="net.sourceforge.hatbox" artifactId="hatbox" version="1.0.b7" />
             <!-- dependency groupId="org.geotools.jdbc" artifactId="gt-jdbc-oracle" version="${geotools.version}" /-->
 
-			<dependency groupId="org.geotools" artifactId="gt-shapefile" version="${geotools.version}" />
+            <dependency groupId="org.geotools" artifactId="gt-shapefile" version="${geotools.version}" />
 			<dependency groupId="org.geotools" artifactId="gt-wfs" version="${geotools.version}" />
 			<dependency groupId="org.geotools" artifactId="gt-process" version="${geotools.version}" />
 			<!-- dependency groupId="org.geotools" artifactId="gt-charts" version="${geotools.version}" /-->

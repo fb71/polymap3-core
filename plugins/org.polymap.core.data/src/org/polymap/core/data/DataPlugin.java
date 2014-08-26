@@ -14,13 +14,6 @@
  */
 package org.polymap.core.data;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-
-import org.polymap.core.ImageRegistryHelper;
-import org.polymap.core.geohub.FeatureCollectionFactory;
-import org.polymap.core.geohub.LayerFeatureSelectionManager;
-import org.polymap.core.project.ILayer;
-
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.filter.Filter;
@@ -30,6 +23,14 @@ import org.osgi.framework.BundleContext;
 import org.eclipse.swt.graphics.Image;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.wizard.WizardDialog;
+
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+
+import org.polymap.core.ImageRegistryHelper;
+import org.polymap.core.geohub.FeatureCollectionFactory;
+import org.polymap.core.geohub.LayerFeatureSelectionManager;
+import org.polymap.core.project.ILayer;
 
 /**
  * 
@@ -63,6 +64,9 @@ public class DataPlugin
     public void start( BundleContext context ) throws Exception {
         super.start( context );
         plugin = this;
+        
+        // XXX
+        WizardDialog.setDialogHelpAvailable( true );
         
         LayerFeatureSelectionManager.setFeatureCollectionFactory(
                 new FeatureCollectionFactory() {

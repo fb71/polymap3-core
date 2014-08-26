@@ -9,8 +9,7 @@ if (body.addEventListener) {
     body.addEventListener( "drop", dropHandler, false );
 }
    
-function dropHandler( ev ) {
-    
+function dropHandler( ev ) {    
     // upload files
     var files = ev.dataTransfer.files;
     if (files.length > 0) {
@@ -33,6 +32,8 @@ function dropHandler( ev ) {
         var eventText = ev.dataTransfer.getData( 'Text' );
         endTransmission( eventText );
     }
+    ev.stopPropagation();
+    ev.preventDefault();
 }
 
 function endTransmission( eventText ) {

@@ -255,8 +255,11 @@ public class ImageCacheProcessor
             
             EventManager.instance().subscribe( this, new EventFilter<EventObject>() {
                 public boolean apply( EventObject ev ) {
+                    if (LayerListener.this.layer == null) {
+                        return false;
+                    }
                     // EntityStateEvent
-                    if (ev instanceof EntityStateEvent) {
+                    else if (ev instanceof EntityStateEvent) {
                         EntityStateEvent eev = (EntityStateEvent)ev;
                         return eev.getEventType() == EntityStateEvent.EventType.COMMIT; //ev.isMySession();
                     }

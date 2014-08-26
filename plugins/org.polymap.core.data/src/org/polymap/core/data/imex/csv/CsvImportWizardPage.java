@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -71,6 +72,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.WizardPage;
 
+import org.eclipse.ui.PlatformUI;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -107,6 +110,12 @@ public class CsvImportWizardPage extends WizardPage {
         super( ID );
         setTitle( pageName );
         setDescription( i18n( "CsvImportWizardPage.importasshape" ) ); //$NON-NLS-1$
+    }
+
+
+    @Override
+    public void performHelp() {
+        PlatformUI.getWorkbench().getHelpSystem().displayHelpResource( "CSVImport" );
     }
 
     

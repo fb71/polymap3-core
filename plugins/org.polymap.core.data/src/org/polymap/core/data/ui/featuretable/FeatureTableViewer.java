@@ -99,6 +99,7 @@ public class FeatureTableViewer
 
 
     public void dispose() {
+        getTable().dispose();
         listeners.clear();
         listeners = null;
         displayed.clear();
@@ -262,7 +263,7 @@ public class FeatureTableViewer
 
 
     public void setContent( FeatureCollection coll ) {
-        setContentProvider( new FeatureCollectionContentProvider( coll ) );
+        setContentProvider( new FeatureCollectionContentProvider() );
         setInput( coll );
     }
 

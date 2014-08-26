@@ -15,7 +15,15 @@
  */
 package org.polymap.core.data.ui.featuretable;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import java.io.IOException;
+
 import org.geotools.feature.FeatureCollection;
+import org.geotools.util.NullProgressListener;
+import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureVisitor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,32 +40,42 @@ public class FeatureCollectionContentProvider
 
     private static Log log = LogFactory.getLog( FeatureCollectionContentProvider.class );
 
-    private FeatureCollection           delegate;
+    private FeatureCollection           features;
 
 
-    public FeatureCollectionContentProvider( FeatureCollection delegate ) {
-        this.delegate = delegate;
+    public FeatureCollectionContentProvider() {
     }
 
 
-    @Override
-    public Object[] getElements( Object inputElement ) {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
-    }
-
-
-    @Override
-    public void dispose() {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+    public FeatureCollectionContentProvider( FeatureCollection features ) {
+        this.features = features;
     }
 
 
     @Override
     public void inputChanged( Viewer viewer, Object oldInput, Object newInput ) {
-        // XXX Auto-generated method stub
-        throw new RuntimeException( "not yet implemented." );
+        this.features = (FeatureCollection)newInput;
+    }
+
+
+    @Override
+    public Object[] getElements( Object input ) {
+        try {
+            final List<IFeatureTableElement> result = new ArrayList();
+            features.accepts( new FeatureVisitor() {
+                public void visit( Feature feature ) {
+                    result.add( new CollectionContentProvider.FeatureTableElement( feature ) );
+                }
+            }, new NullProgressListener() );
+            return result.toArray();
+        }
+        catch (IOException e) {
+            throw new RuntimeException( e );
+        }
+    }
+
+    @Override
+    public void dispose() {
     }
 
 }

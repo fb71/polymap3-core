@@ -105,13 +105,18 @@ public class CatalogImportDropListener
                 }
                 URL url = f.toURI().toURL();
                 List<IService> services = factory.createService( url );
-                for (IService service : services) {
-                    added.add( FilenameUtils.getBaseName( f.getName() ) );
-                    ICatalog catalog = CatalogPlugin.getDefault().getLocalCatalog();
-                    AddServiceOperation op = new AddServiceOperation( catalog, service );
-                    OperationSupport.instance().execute( op, false, false );
+                if (services.isEmpty()) {
+                    f.delete();
+                }
+                else {
+                    for (IService service : services) {
+                        added.add( FilenameUtils.getBaseName( f.getName() ) );
+                        ICatalog catalog = CatalogPlugin.getDefault().getLocalCatalog();
+                        AddServiceOperation op = new AddServiceOperation( catalog, service );
+                        OperationSupport.instance().execute( op, false, false );
 
-                    new MessageJob( service ).schedule();
+                        new MessageJob( service ).schedule();
+                    }
                 }
             }
             return null;

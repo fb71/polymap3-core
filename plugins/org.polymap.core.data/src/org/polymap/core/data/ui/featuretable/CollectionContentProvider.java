@@ -50,11 +50,13 @@ public class CollectionContentProvider
     }
 
 
+    @Override
     public void inputChanged( Viewer viewer, Object oldInput, Object newInput ) {
         this.features = (Iterable<? extends Feature>)newInput;
     }
 
 
+    @Override
     public Object[] getElements( Object input ) {
         log.debug( "getElements(): input=" + input.getClass().getName() );
         List<IFeatureTableElement> result = new ArrayList();
@@ -72,7 +74,7 @@ public class CollectionContentProvider
     /**
      *
      */
-    public class FeatureTableElement
+    public static class FeatureTableElement
             implements IFeatureTableElement {
 
         private Feature         feature;

@@ -24,6 +24,7 @@ import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -70,9 +71,9 @@ public class ChooseTargetWizardPage
 
     private Composite                 fileSelectionArea;
 
-    private Text                      shpNameText;
+    private Text                      typeNameText;
 
-    private String                    shpName = "csvimport";
+    private String                    typeName;
     
     private IResolve                  target;
 
@@ -90,6 +91,16 @@ public class ChooseTargetWizardPage
     }
 
     
+    public IResolve getTarget() {
+        return target;
+    }
+
+    
+    public String getTypeName() {
+        return typeName;
+    }
+
+
     @Override
     public void createControl( Composite parent ) {
         getWizard().getShell().setSize( 520, 650 );
@@ -106,20 +117,20 @@ public class ChooseTargetWizardPage
         l.setText( i18n.get( "defaultTypename" ) );
         l.setLayoutData( SimpleFormData.offset( 5 ).left( 0 ).top( 0 ).create() );
         
-//        shpName = getWizard().getCsvFilename();
-        shpNameText = new Text( inputGroup, SWT.BORDER );
-        shpNameText.setLayoutData( SimpleFormData.offset( 5 ).left( l ).right( 100 ).create() );
-        shpNameText.setText( shpName );
-        shpNameText.addModifyListener( new ModifyListener() {
+//        typeName = getWizard().getCsvFilename();
+        typeNameText = new Text( inputGroup, SWT.BORDER );
+        typeNameText.setLayoutData( SimpleFormData.offset( 5 ).left( l ).right( 100 ).create() );
+        typeNameText.setText( typeName != null ? typeName : "" );
+        typeNameText.addModifyListener( new ModifyListener() {
             public void modifyText( ModifyEvent ev ) {
-//                shpName = shpNameText.getText();
-//                log.info( "shpName= " + shpName );
+                typeName = typeNameText.getText();
+                log.info( "typeName= " + typeName );
 //                getWizard().createCsvFeatureCollection();
             }
         });
         
         CatalogTreeViewer catalogViewer = new CatalogTreeViewer( inputGroup, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, true );
-        catalogViewer.getControl().setLayoutData( SimpleFormData.offset( 5 ).left( 0 ).right( 100 ).top( shpNameText ).height( 150 ).bottom( 100 ).create() );
+        catalogViewer.getControl().setLayoutData( SimpleFormData.offset( 5 ).left( 0 ).right( 100 ).top( typeNameText ).height( 150 ).bottom( 100 ).create() );
         catalogViewer.setInput( CatalogPlugin.getDefault().getLocalCatalog() );
         catalogViewer.addSelectionChangedListener( new ISelectionChangedListener() {
             public void selectionChanged( SelectionChangedEvent ev ) {
@@ -135,19 +146,7 @@ public class ChooseTargetWizardPage
     }
 
     
-//    public int getImportTarget() {
-//        return importTarget;
-//    }
-//    
-//    
-//    public String getShpName() {
-//        return shpName;
-//    }
     
-    
-    public IResolve getTarget() {
-        return target;
-    }
 
     
 //    public void setVisible( boolean visible ) {
@@ -196,6 +195,10 @@ public class ChooseTargetWizardPage
         
         if (target == null) {
             setMessage( i18n.get( "notarget" ), WARNING );
+            setPageComplete( false );
+        }
+        if (StringUtils.isEmpty( typeName )) {
+            setMessage( i18n.get( "notypename" ), WARNING );
             setPageComplete( false );
         }
     }

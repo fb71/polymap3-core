@@ -15,9 +15,14 @@
 package org.polymap.core.workbench.dnd;
 
 import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
+
+import org.polymap.core.CorePlugin;
 import org.polymap.core.runtime.ListenerList;
 import org.polymap.core.runtime.SessionSingleton;
 
@@ -29,6 +34,8 @@ import org.polymap.core.runtime.SessionSingleton;
 public class DesktopDndSupport
         extends SessionSingleton {
 
+    public static final String          EXTENSION_POINT_ID = CorePlugin.PLUGIN_ID + ".workbench.dnd.handlers";
+
     public static DesktopDndSupport instance() {
         return instance( DesktopDndSupport.class );
     }
@@ -38,8 +45,25 @@ public class DesktopDndSupport
     private static Log log = LogFactory.getLog( DesktopDndSupport.class );
     
     private ListenerList<DesktopDropListener> listeners = new ListenerList(); 
-    
 
+    
+    protected DesktopDndSupport() {
+        // extensions
+        IConfigurationElement[] exts = Platform.getExtensionRegistry().getConfigurationElementsFor( EXTENSION_POINT_ID ); 
+        log.debug( "servlet extensions found: " + exts.length );
+        
+        for (IConfigurationElement ext : exts) {
+            try {
+                DesktopDropListener handler = (DesktopDropListener)ext.createExecutableExtension( "class" );
+                addDropListener( handler );
+            }
+            catch (Exception e) {
+                throw new RuntimeException( e );
+            }
+        }
+    }
+
+    
     public boolean addDropListener( DesktopDropListener l ) {
 //        SessionContext context = SessionContext.current();
 //        assert context != null;

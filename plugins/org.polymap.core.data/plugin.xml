@@ -25,13 +25,20 @@
             id="org.polymap.core.data.MdbImportWizard"
             name="MS-Access">
       </wizard>
-      <!--wizard
+      <wizard
             category="net.refractions.udig.catalog.ui_p3.dataImportCategory"
             class="org.polymap.core.data.imex.kml.KmlImportWizard"
-            icon="icons/obj16/msaccess_obj.gif"
+            icon="icons/obj16/kml.png"
             id="org.polymap.core.data.KmlImportWizard"
             name="KML">
-      </wizard-->
+      </wizard>
+      <wizard
+            category="net.refractions.udig.catalog.ui_p3.dataImportCategory"
+            class="org.polymap.core.data.imex.gpx.GpxImportWizard"
+            icon="icons/prop_ps.gif"
+            id="org.polymap.core.data.GpxImportWizard"
+            name="GPX (1.1)">
+      </wizard>
    </extension>
    <!--extension
          point="org.eclipse.ui.actionSets">
@@ -610,6 +617,15 @@
                class="net.refractions.udig.catalog.IResolveFolder">
          </destination>
       </action>
+   </extension>
+   <extension
+         point="org.polymap.core.workbench.dnd.handlers">
+      <handler
+            class="org.polymap.core.data.imex.kml.KmlDesktopDropListener">
+      </handler>
+      <handler
+            class="org.polymap.core.data.imex.gpx.GpxDesktopDropListener">
+      </handler>
    </extension>
    <!--extension
          point="net.refractions.udig.catalog.ServiceExtension">

@@ -26,7 +26,6 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -255,8 +254,13 @@ public class CopyFeaturesOperation2
                                 fb.set( destGeom.getLocalName(), geom );
                                 return fb.buildFeature( feature.getIdentifier().getID() );
                             }
+                            // Geometry -> anything
+                            else if (geom instanceof Geometry) {
+                                fb.set( destGeom.getLocalName(), geom );
+                                return fb.buildFeature( feature.getIdentifier().getID() );
+                            }
                             else {
-                                throw new UnsupportedOperationException( "Unsupported geometry transformation: " + destGeom.getType().getBinding().getSimpleName() );
+                                throw new UnsupportedOperationException( "Unsupported geometry transformation: " + geom.getClass().getSimpleName() + " -> " + destGeom.getType().getBinding().getSimpleName() );
                             }
                         }
                         catch (RuntimeException e) {
@@ -418,8 +422,8 @@ public class CopyFeaturesOperation2
 
             return new RetypingFeatureCollection( src, null ) {
                 @Override
-                public FeatureType getSchema() {
-                    return processor.getFeatureType();
+                public SimpleFeatureType getSchema() {
+                    return (SimpleFeatureType)processor.getFeatureType();
                 }
                 @Override
                 protected Feature retype( Feature feature ) {

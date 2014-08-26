@@ -17,9 +17,9 @@ package org.polymap.core.ui;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
@@ -31,6 +31,19 @@ public class FormDataFactory {
 
     private static Log log = LogFactory.getLog( FormDataFactory.class );
 
+    public enum Alignment {
+            /** the side will be attached to the top side of the specified control */
+            TOP,
+            /** the side will be attached to the bottom side of the specified control */
+            BOTTOM,
+            /** the side will be attached to the left side of the specified control */
+            LEFT,
+            /** the side will be attached to the right side of the specified control */
+            RIGHT,
+            /** the side will be centered on the same side of the specified control */
+            CENTER
+    }
+    
     // static factories ***********************************
     
     /**
@@ -84,7 +97,7 @@ public class FormDataFactory {
         this.defaultOffset = defaultOffset;
     }
 
-    public <T extends Composite> T applyTo( T composite ) {
+    public <T extends Control> T applyTo( T composite ) {
         composite.setLayoutData( create() );
         return composite;
     }
@@ -176,6 +189,11 @@ public class FormDataFactory {
         return this;
     }
 
+    public FormDataFactory right( Control control, int offset, Alignment align ) {
+        formData.right = new FormAttachment( control, offset, align( align ) );
+        return this;
+    }
+
     // top
 
     public FormDataFactory top( int num ) {
@@ -194,6 +212,11 @@ public class FormDataFactory {
 
     public FormDataFactory top( Control control, int offset ) {
         formData.top = new FormAttachment( control, offset );
+        return this;
+    }
+
+    public FormDataFactory top( Control control, int offset, Alignment align ) {
+        formData.top = new FormAttachment( control, offset, align( align ) );
         return this;
     }
 
@@ -218,4 +241,16 @@ public class FormDataFactory {
         return this;
     }
 
+    // alignment
+    
+    protected int align( Alignment align ) {
+        switch (align) {
+            case TOP : return SWT.TOP;
+            case BOTTOM : return SWT.BOTTOM;
+            case LEFT : return SWT.LEFT;
+            case RIGHT : return SWT.RIGHT;
+            case CENTER : return SWT.CENTER;
+            default : throw new RuntimeException( "should never happen" );
+        }
+    }
 }

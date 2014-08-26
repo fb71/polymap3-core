@@ -20,6 +20,8 @@ import java.beans.PropertyChangeListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.eclipse.swt.widgets.Display;
+
 import org.eclipse.rwt.SessionSingletonBase;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -28,14 +30,17 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ListenerList;
 
 import org.polymap.core.project.ui.PartListenerAdapter;
+import org.polymap.core.runtime.Polymap;
 
 /**
  * The session dependent part of the {@link MapEditorPlugin} API and
@@ -69,42 +74,60 @@ public class ProjectPluginSession
 
 
     protected ProjectPluginSession() {
-        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        Display display = Polymap.getSessionDisplay();
+        if (display != null) {
+            display.asyncExec( new Runnable() {
+                public void run() {
+                    IWorkbench workbench = PlatformUI.getWorkbench();
+                    if (workbench == null) {
+                        return;
+                    }
+                    IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+                    if (window == null) {
+                        return;
+                    }
+                    IWorkbenchPage page = window.getActivePage();
+                    if (page == null) {
+                        return;
+                    }
 
-        // selection listener
-        page.addSelectionListener( new ISelectionListener() {
-            public void selectionChanged( IWorkbenchPart part, ISelection sel ) {
-                log.debug( "selection: " + sel );
-                if (sel instanceof IStructuredSelection) {
-                    //
-                    Object elm = ((IStructuredSelection)sel).getFirstElement();
-                    if (elm != null && elm instanceof IMap) {
-                        selectedMap = (IMap)elm;
-                    }
-                    fireEvent( part );
+                    // selection listener
+                    page.addSelectionListener( new ISelectionListener() {
+                        public void selectionChanged( IWorkbenchPart part, ISelection sel ) {
+                            log.debug( "selection: " + sel );
+                            if (sel instanceof IStructuredSelection) {
+                                //
+                                Object elm = ((IStructuredSelection)sel).getFirstElement();
+                                if (elm != null && elm instanceof IMap) {
+                                    selectedMap = (IMap)elm;
+                                }
+                                fireEvent( part );
+                            }
+                        }
+                    });
+                    
+                    // part listener
+                    page.addPartListener( new PartListenerAdapter() {
+                        public void partActivated( IWorkbenchPart part ) {
+                            if (part instanceof IEditorPart) {
+                                IEditorInput input = ((IEditorPart)part).getEditorInput();
+                                if (input instanceof IAdaptable) {
+                                    selectedMap = (IMap)((IAdaptable)input).getAdapter( IMap.class );
+                                    fireEvent( part );
+                                }
+                            }
+                        }
+                        public void partOpened( IWorkbenchPart part ) {
+                            partActivated( part );
+                        }
+                    });
                 }
-            }
-        });
-        
-        // part listener
-        page.addPartListener( new PartListenerAdapter() {
-            public void partActivated( IWorkbenchPart part ) {
-                if (part instanceof IEditorPart) {
-                    IEditorInput input = ((IEditorPart)part).getEditorInput();
-                    if (input instanceof IAdaptable) {
-                        selectedMap = (IMap)((IAdaptable)input).getAdapter( IMap.class );
-                        fireEvent( part );
-                    }
-                }
-            }
-            public void partOpened( IWorkbenchPart part ) {
-                partActivated( part );
-            }
-        });
+            });
+        }
     }
 
     
-    protected void fireEvent( IWorkbenchPart part) {
+    protected void fireEvent( IWorkbenchPart part ) {
         // fire event
         PropertyChangeEvent ev = new PropertyChangeEvent( part, "selectedMap", null, selectedMap );
         for (Object listener : mapSelectionListeners.getListeners()) {

@@ -6,6 +6,7 @@ Bundle-Version: 3.1.0.qualifier
 Bundle-Activator: org.polymap.core.data.DataPlugin
 Bundle-Vendor: polymap.org
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.help;bundle-version="3.5.0",
  org.polymap.core;bundle-version="3.1.0",
  org.polymap.core.model;bundle-version="3.1.0",
  org.polymap.core.catalog;bundle-version="3.1.0",

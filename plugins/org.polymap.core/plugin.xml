@@ -5,6 +5,7 @@
    <extension-point id="org.polymap.core.data.ows.wms" name="WMS Server" schema="schema/org.polymap.core.data.ows.wms.exsd"/>
    <extension-point id="org.polymap.core.operation.concerns" name="Operation Concerns" schema="schema/operation.concerns.exsd"/>
    <extension-point id="org.polymap.core.security.AuthorizationModule" name="AuthorizationModule" schema="schema/AuthorizationModule.exsd"/>
+   <extension-point id="org.polymap.core.workbench.dnd.handlers" name="Desktop D&apos;n&apos;D Handlers" schema="schema/dnd.handlers.exsd"/>
    <extension
          point="org.eclipse.rap.ui.entrypoint">
       <entrypoint

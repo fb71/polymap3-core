@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package org.polymap.core.data.imex.kml;
+package org.polymap.core.data.imex.gpx;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,16 +30,16 @@ import org.polymap.core.runtime.IMessages;
  *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-public class KmlUploadPage
+public class GpxUploadPage
         extends FileUploadPage
         implements IWizardPage, UploadListener {
 
-    private static Log log = LogFactory.getLog( KmlUploadPage.class );
+    private static Log log = LogFactory.getLog( GpxUploadPage.class );
 
-    private static final IMessages      i18n = Messages.forPrefix( "KmlImportWizard_KmlUploadPage" );
+    private static final IMessages      i18n = Messages.forPrefix( "GpxImportWizard_GpxUploadPage" );
 
     
-    protected KmlUploadPage() {
+    protected GpxUploadPage() {
         super();
         setTitle( i18n.get( "title" ) );
     }

@@ -18,11 +18,18 @@
  */
 package org.polymap.core.data.imex.csv;
 
+import static org.polymap.core.data.imex.csv.Messages.i18n;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import net.refractions.udig.catalog.IResolve;
+import net.refractions.udig.catalog.IResolveFolder;
+import net.refractions.udig.catalog.IService;
+import net.refractions.udig.ui.ExceptionDetailsDialog;
 
 import org.geotools.data.DataAccess;
 import org.geotools.data.FeatureStore;
@@ -31,14 +38,9 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import net.refractions.udig.catalog.IResolve;
-import net.refractions.udig.catalog.IResolveFolder;
-import net.refractions.udig.catalog.IService;
-import net.refractions.udig.ui.ExceptionDetailsDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -50,8 +52,6 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.polymap.core.catalog.actions.ResetServiceAction;
 import org.polymap.core.data.DataPlugin;
 import org.polymap.core.runtime.UIJob;
-
-import static org.polymap.core.data.imex.csv.Messages.i18n;
 
 /**
  * @author Andrea Antonello - www.hydrologis.com
@@ -70,17 +70,20 @@ public class CsvImportWizard extends Wizard implements INewWizard {
 
     public CsvImportWizard() {
         super();
+        setNeedsProgressMonitor( false );
+        setHelpAvailable( true );
     }
 
+    @Override
     public void init( IWorkbench workbench, IStructuredSelection selection ) {
         setWindowTitle( i18n( "CsvImportWizard.csvimport" ) );
         setDefaultPageImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
                 DataPlugin.PLUGIN_ID, "icons/workset_wiz.png" ) );
-        setNeedsProgressMonitor(true);
         page1 = new CsvImportWizardPage( i18n( "CsvImportWizard.csvimport" ), params );
         page2 = new CsvImportWizardPage2( i18n( "CsvImportWizard.csvimport" ), params );
     }
 
+    @Override
     public void addPages() {
         super.addPages();
         addPage( page1 );

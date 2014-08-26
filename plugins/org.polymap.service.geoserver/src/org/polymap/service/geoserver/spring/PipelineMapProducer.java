@@ -156,7 +156,7 @@ public class PipelineMapProducer
             }
         }
         
-        // several layers -> render into one image
+        // multiple layers -> render into one image
         else {
             List<Job> jobs = new ArrayList();
             final Map<MapLayer, Image> images = new HashMap();
@@ -166,15 +166,14 @@ public class PipelineMapProducer
                 final ILayer layer = loader.findLayer( mapLayer );
                 // job
                 UIJob job = new UIJob( getClass().getSimpleName() + ": " + layer.getLabel() ) {
-                    protected void runWithException( IProgressMonitor monitor )
-                    throws Exception {
+                    protected void runWithException( IProgressMonitor monitor ) throws Exception {
                         try {
+                            // XXX this excludes Cache304 (which support EncodedImageResponse only)
                             Pipeline pipeline = loader.getOrCreatePipeline( layer, LayerUseCase.IMAGE );
 
                             GetMapRequest targetRequest = prepareProcessorRequest();
                             pipeline.process( targetRequest, new ResponseHandler() {
-                                public void handle( ProcessorResponse pipeResponse )
-                                throws Exception {
+                                public void handle( ProcessorResponse pipeResponse ) throws Exception {
                                     Image layerImage = ((ImageResponse)pipeResponse).getImage();
                                     images.put( mapLayer, layerImage );
                                 }
