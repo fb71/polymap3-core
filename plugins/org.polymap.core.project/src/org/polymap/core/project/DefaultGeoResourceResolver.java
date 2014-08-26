@@ -122,7 +122,7 @@ public class DefaultGeoResourceResolver
         job.setShowProgressDialog( null, true );
         job.schedule();
         
-        boolean success = job.joinAndDispatch( 15000 );
+        boolean success = job.joinAndDispatch( 30000 );
         
         if (!success) {
             job.cancelAndInterrupt();
