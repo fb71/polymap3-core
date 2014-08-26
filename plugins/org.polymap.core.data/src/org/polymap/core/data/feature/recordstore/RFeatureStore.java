@@ -162,7 +162,13 @@ public class RFeatureStore
                         else if (feature instanceof SimpleFeature) {
                             RFeature newFeature = newFeature();
                             for (Property prop : feature.getProperties()) {
-                                newFeature.getProperty( prop.getName() ).setValue( prop.getValue() );
+                                Property newProp = newFeature.getProperty( prop.getName() );
+                                if (newProp == null) {
+                                    log.warn( "No such property: " + prop.getName() + " in Schema: " + getSchema() );
+                                }
+                                else {
+                                    newProp.setValue( prop.getValue() );
+                                }
                             }
                             txState.updater().store( newFeature.state );
                             fids.add( newFeature.getIdentifier() );

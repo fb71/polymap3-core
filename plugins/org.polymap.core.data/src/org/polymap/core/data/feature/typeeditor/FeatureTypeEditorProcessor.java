@@ -62,6 +62,8 @@ import org.polymap.core.data.feature.GetFeaturesRequest;
 import org.polymap.core.data.feature.GetFeaturesResponse;
 import org.polymap.core.data.feature.GetFeaturesSizeRequest;
 import org.polymap.core.data.feature.GetFeaturesSizeResponse;
+import org.polymap.core.data.feature.ModifyFeaturesResponse;
+import org.polymap.core.data.feature.RemoveFeaturesRequest;
 import org.polymap.core.data.pipeline.PipelineProcessor;
 import org.polymap.core.data.pipeline.ProcessorRequest;
 import org.polymap.core.data.pipeline.ProcessorResponse;
@@ -169,6 +171,10 @@ public class FeatureTypeEditorProcessor
             Query transformed = transformQuery( query, context );
             context.sendRequest( new GetFeaturesSizeRequest( transformed ) );
         }
+        // RemoveFeatures
+        else if (r instanceof RemoveFeaturesRequest) {
+            context.sendRequest( r );
+        }
         else {
             throw new UnsupportedOperationException( Messages.get( "FeatureTypeEditorProcessor_unsupported", r.getClass().getSimpleName() ) );
         }
@@ -186,6 +192,10 @@ public class FeatureTypeEditorProcessor
         }
         // GetFeaturesSize
         else if (r instanceof GetFeaturesSizeResponse) {
+            context.sendResponse( r );
+        }
+        // ModifyFeature (after remove)
+        else if (r instanceof ModifyFeaturesResponse) {
             context.sendResponse( r );
         }
         // GetFeatures
