@@ -88,7 +88,8 @@ public class OpenLayersMap
 	//private int[]                      scales;
 	
 	
-    public OpenLayersMap(OpenLayersWidget widget,Projection projection,Projection display_projection,String units,Bounds maxExtent,float maxResolution) {
+    public OpenLayersMap( OpenLayersWidget widget, Projection projection,
+            Projection display_projection, String units, Bounds maxExtent, float maxResolution ) {
         this.widget = widget;
         this.projection = projection;
         this.display_projection = display_projection;
@@ -96,7 +97,14 @@ public class OpenLayersMap
         this.units = units;
         this.maxExtent = maxExtent;
         
-		super.create_with_widget ("new OpenLayers.Map( { div : document.getElementById( this._id),	controls : []	,projection: " +projection.getJSObjRef() +" , displayProjection: " +display_projection.getJSObjRef() + " , units: '" + units + "' , maxExtent: " + maxExtent.getJSObjRef() + " , maxResolution: " + maxResolution + " });",widget);
+		super.create_with_widget( new Stringer( "new OpenLayers.Map( {",
+		        "div: document.getElementById( this._id),",
+		        "controls: [],",
+		        "projection: ", projection.getJSObjRef(), ",",
+		        "displayProjection: ", display_projection.getJSObjRef() + ",",
+		        "units: '", units, "',",
+		        "maxExtent: ", maxExtent.getJSObjRef(), ",",
+		        "maxResolution: ", maxResolution, "});" ).toString(), widget);
 	}
 	
 	public OpenLayersMap(OpenLayersWidget widget) {
@@ -118,7 +126,6 @@ public class OpenLayersMap
 		super.addObjModCode("removeLayer",layer2rm);
 	}
 		
-    
     /**
      * Move the given layer to the specified (zero-based) index in the layer list,
      * changing its z-index in the map display. Use map.getLayerIndex() to find out
