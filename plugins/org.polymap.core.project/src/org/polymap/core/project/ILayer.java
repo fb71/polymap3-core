@@ -54,6 +54,7 @@ public interface ILayer
     public static final String      PROP_GEORESID = "georesId";
     public static final String      PROP_STYLE = "style";
     public static final String      PROP_EDIT = "edit";
+    public static final String      PROP_TILESIZE = "tilesize";
     
     public static final String      PROP_LAYERSTATUS = "layerstatus";
 
@@ -202,4 +203,16 @@ public interface ILayer
     @TransientProperty(PROP_EDIT)
     public void setEditable( boolean editable );
 
+    /**
+     * The tile size of this layert. 0 signals that this layer should be displayed
+     * as single tile.
+     */
+    public int getTileSize();
+    
+    /**
+     * The tile size of this layert. 0 signals that this layer should be displayed
+     * as single tile.
+     */
+    @ModelProperty(PROP_TILESIZE)
+    public void setTileSize( int tileSize );
 }

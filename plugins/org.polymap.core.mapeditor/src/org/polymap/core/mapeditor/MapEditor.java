@@ -350,8 +350,14 @@ public class MapEditor
         olayer.setFormat( "image/png" );
         olayer.setVisibility( true );
         olayer.setIsBaseLayer( false );
-//        olayer.setSingleTile( true );
-        olayer.setTileSize( new Size( 400, 400 ) );
+        
+        int tileSize = descriptor.layer.getTileSize();
+        if (tileSize > 0) {
+            olayer.setTileSize( new Size( tileSize, tileSize ) );
+        }
+        else {
+            olayer.setSingleTile( true );
+        }
         olayer.setBuffer( 0 );
         olayer.setOpacity( ((double)descriptor.opacity) / 100 );
         olayer.setTransitionEffect( Layer.TRANSITION_RESIZE );

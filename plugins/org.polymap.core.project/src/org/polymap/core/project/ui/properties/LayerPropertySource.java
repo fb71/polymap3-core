@@ -88,6 +88,7 @@ public class LayerPropertySource
                 new PropertyDescriptor( "datacrs", i18n( "label_dataCrs" ) ),
                 new GeoresPropertyDescriptor( ILayer.PROP_GEORESID, i18n( "label_geores" ), layer ),
                 new RWTTextPropertyDescriptor( ILayer.PROP_ORDERKEY, i18n( "label_zPriority" ) ),
+                new RWTTextPropertyDescriptor( ILayer.PROP_TILESIZE, i18n( "label_tileSize" ) ),
                 opacityDescr
         };
         return result;
@@ -151,6 +152,10 @@ public class LayerPropertySource
                 Integer result = layer.getOpacity();
                 return result != null ? result.toString() : "100";
             }
+            else if (id.equals( ILayer.PROP_TILESIZE )) {
+                Integer result = layer.getTileSize();
+                return result.toString();
+            }
             else {
                 return i18n( "unknownValue" );
             }
@@ -189,6 +194,10 @@ public class LayerPropertySource
             }
             else if (id.equals( ILayer.PROP_OPACITY )) {
                 op.init( ILayer.class, layer, ILayer.PROP_OPACITY, new Integer( value.toString() ) );
+                OperationSupport.instance().execute( op, false, false );
+            }
+            else if (id.equals( ILayer.PROP_TILESIZE )) {
+                op.init( ILayer.class, layer, ILayer.PROP_TILESIZE, new Integer( value.toString() ) );
                 OperationSupport.instance().execute( op, false, false );
             }
             else if (id.equals( ILayer.PROP_CRSCODE )) {

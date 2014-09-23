@@ -18,6 +18,7 @@ import static org.polymap.core.project.ILayer.PROP_GEORESID;
 import static org.polymap.core.project.ILayer.PROP_OPACITY;
 import static org.polymap.core.project.ILayer.PROP_ORDERKEY;
 import static org.polymap.core.project.ILayer.PROP_STYLE;
+import static org.polymap.core.project.ILayer.PROP_TILESIZE;
 
 import java.util.EventObject;
 import java.util.HashSet;
@@ -383,6 +384,9 @@ public class RenderManager {
                         else {
                             updatePipelines = true;
                         }
+                    }
+                    else if (PROP_TILESIZE.equals( ev.getPropertyName() )) {
+                        updatePipelines = true;
                     }
                     else if (PROP_ORDERKEY.equals( ev.getPropertyName() )) {
                         if (descriptor != null && descriptor.layer != null) {

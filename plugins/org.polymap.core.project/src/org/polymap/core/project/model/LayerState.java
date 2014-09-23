@@ -88,6 +88,9 @@ public interface LayerState
     @UseDefaults
     Property<Integer>               opacity();
 
+    @Optional
+    Property<Integer>               tileSize();
+
 
     /**
      * Transient fields and methods.
@@ -394,6 +397,18 @@ public interface LayerState
         
         public void setEditable( boolean editable ) {
             this.editable = editable;
+        }
+
+        @Override
+        public int getTileSize() {
+            Integer result = tileSize().get();
+            return result != null ? result : 400;
+        }
+
+        @Override
+        public void setTileSize( int tileSize ) {
+            assert tileSize >= 0;
+            tileSize().set( tileSize );
         }
 
     }
