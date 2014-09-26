@@ -190,7 +190,7 @@ public class CorePlugin
         System.setProperty( "org.apache.commons.logging.simplelog.log.org.polymap.core.project.impl.MapImpl", "debug" );
         //System.setProperty( "org.apache.commons.logging.simplelog.log.org.polymap.core.qi4j", "debug" );
         
-        //System.setProperty( "org.apache.commons.logging.simplelog.log.org.polymap.rhei.data", "debug" );
+        //System.setProperty( "org.apache.commons.logging.simplelog.log.org.polymap.rhei.data.entitystore", "debug" );
         //System.setProperty( "org.apache.commons.logging.simplelog.log.org.polymap.rhei.data.entityfeature.EntitySourceProcessor", "info" );
         //System.setProperty( "org.apache.commons.logging.simplelog.log.org.polymap.rhei.navigator", "debug" );
 

@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, Polymap GmbH. All rights reserved.
+ * Copyright (C) 2011-2014, Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -17,9 +17,11 @@ package org.polymap.core.runtime.recordstore.lucene;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKBReader;
@@ -104,7 +106,14 @@ public final class GeometryValueCoder
                 field.setValue( out );
             }
             else {
-                doc.add( new Field( key, out ) );
+                field = new Field( key, out );
+
+                // optimize memory
+                // http://searchhub.org/2009/09/02/scaling-lucene-and-solr/
+                field.setIndexOptions( IndexOptions.DOCS_ONLY );
+                field.setOmitNorms( true );
+                
+                doc.add( field );
             }
 
             // store bbox

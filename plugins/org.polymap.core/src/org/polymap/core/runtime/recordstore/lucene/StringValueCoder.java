@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright 2011, Polymap GmbH. All rights reserved.
+ * Copyright (C) 2011-2014, Polymap GmbH. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,6 +19,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
@@ -47,8 +48,14 @@ final class StringValueCoder
                 field.setValue( (String)value );
             }
             else {
-                doc.add( new Field( key, (String)value, 
-                        Store.YES, indexed ? Index.NOT_ANALYZED : Index.NO ) );
+                field = new Field( key, (String)value, Store.YES, indexed ? Index.NOT_ANALYZED : Index.NO );
+                
+                // optimize memory
+                // http://searchhub.org/2009/09/02/scaling-lucene-and-solr/
+                field.setIndexOptions( IndexOptions.DOCS_ONLY );
+                field.setOmitNorms( true );
+                
+                doc.add( field );
             }
             return true;
         }

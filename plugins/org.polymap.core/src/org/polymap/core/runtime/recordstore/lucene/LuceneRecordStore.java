@@ -50,7 +50,9 @@ import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Constants;
 import org.apache.lucene.util.DummyConcurrentLock;
 import org.apache.lucene.util.Version;
@@ -160,10 +162,21 @@ public final class LuceneRecordStore
         }
         
         directory = null;
+        // limit mmap memory to 1GB
+        // seems that bigger mmap indexes slow down performance
+        long dbSize = FileUtils.sizeOfDirectory( indexDir );
+        long mmapLimit = Long.parseLong( System.getProperty( "org.polymap.core.LuceneRecordStore.mmaplimit", "1000" ) ) * 1000000;
+        if (dbSize > mmapLimit) {
+            directory = Constants.WINDOWS
+                    ? new SimpleFSDirectory( indexDir, null )
+                    : new NIOFSDirectory( indexDir, null );
+            open( clean );
+        }
+        
         // use mmap on 32bit Linux of index size < 100MB
         // more shared memory results in system stall under rare conditions
-        if (Constants.LINUX && !Constants.JRE_IS_64BIT && MMapDirectory.UNMAP_SUPPORTED
-                && FileUtils.sizeOfDirectory( indexDir ) < 100*1024*1024) {
+        else if (Constants.LINUX && !Constants.JRE_IS_64BIT && MMapDirectory.UNMAP_SUPPORTED
+                && dbSize < 100*1024*1024) {
             try {
                 directory = new MMapDirectory( indexDir, null );
                 open( clean );
@@ -173,6 +186,7 @@ public final class LuceneRecordStore
             }
         }
         
+        // default
         if (searcher == null) {
             directory = FSDirectory.open( indexDir );
             open( clean );
