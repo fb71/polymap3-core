@@ -15,8 +15,7 @@
  */
 package org.polymap.core.data.operations.featuretype;
 
-import org.geotools.data.DataStore;
-
+import org.geotools.data.DataAccess;
 import net.refractions.udig.catalog.IGeoResource;
 import net.refractions.udig.catalog.IResolve;
 import net.refractions.udig.catalog.IResolveFolder;
@@ -81,7 +80,7 @@ public class CreateFeatureTypeAction
             if (elm instanceof IResolve
                     || elm instanceof IResolveFolder) {
                 service = (IResolve)elm;
-                action.setEnabled( service.canResolve( DataStore.class ) );
+                action.setEnabled( service.canResolve( DataAccess.class ) );
             }
 
             // check ACL permission
