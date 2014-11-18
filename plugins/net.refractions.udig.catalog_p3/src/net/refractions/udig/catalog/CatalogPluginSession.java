@@ -69,7 +69,7 @@ public class CatalogPluginSession {
     /**
      * The constructor.
      */
-    protected CatalogPluginSession() {
+    public CatalogPluginSession() {
         super();
 
         loadCatalogs();
