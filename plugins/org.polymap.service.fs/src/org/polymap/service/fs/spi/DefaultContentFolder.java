@@ -21,7 +21,7 @@ import java.util.TreeMap;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.httpclient.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -99,9 +99,7 @@ public class DefaultContentFolder
         
         // upload via browser
         if (this instanceof IContentWriteable) {
-            // FIXME hard coded servlet path
-            String basePath = FilenameUtils.normalizeNoEndSeparator( getPath().toString() );
-            String path = "/webdav" + basePath; // + "/" + r.getName();
+            String path = "./";
             w.writeText(
                     "<form action=\"" + path + "\"" +
                     "  enctype=\"multipart/form-data\" method=\"post\">" +
@@ -132,17 +130,20 @@ public class DefaultContentFolder
             w.open( "tr" );
             w.begin( "tr" ).writeAtt( "style", c++%2==0 ? "background:#f0f0f0;" : "background:#ffffff;" ).open();
             w.open( "td" );
-            // FIXME hard coded servlet path
-//            String basePath = FilenameUtils.normalizeNoEndSeparator( node.getPath().toString() );
-//            String path = "/webdav" + basePath /*+ "/" + node.getName()*/;
-            String path = node.getName() + (node instanceof IContentFolder ? "/" : "");
-            log.debug( path );
+            try {
+                String path = node.getName() + (node instanceof IContentFolder ? "/" : "");
+                path = new URI( path, false ).toString();
+                log.debug( path );
 
-            w.begin( "a" ).writeAtt( "href", path ).open().writeText( node.getName() ).close();
+                w.begin( "a" ).writeAtt( "href", path ).open().writeText( node.getName() ).close();
 
-//            w.begin( "a" ).writeAtt( "href", "#" ).writeAtt( "onclick",
-//                    "editDocument('" + path + "')" ).open().writeText( "(edit with office)" )
-//                    .close();
+//              w.begin( "a" ).writeAtt( "href", "#" ).writeAtt( "onclick",
+//              "editDocument('" + path + "')" ).open().writeText( "(edit with office)" )
+//              .close();
+            }
+            catch (Exception e) {
+                throw new RuntimeException( e );
+            }
 
             w.close( "td" );
             
