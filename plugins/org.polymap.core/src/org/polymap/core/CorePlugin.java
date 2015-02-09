@@ -18,6 +18,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import java.io.IOException;
+import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -227,12 +228,13 @@ public class CorePlugin
 	}
 
 
-    public void start( final BundleContext context )
-    throws Exception {
+    public void start( final BundleContext context ) throws Exception {
         super.start( context );
         log.debug( "start..." );
         plugin = this;
-        
+
+        Authenticator.setDefault( new DialogAuthenticator() );
+
         System.setProperty( "http.agent", "Polymap3 (http://polymap.org/polymap3/)" );
         System.setProperty( "https.agent", "Polymap3 (http://polymap.org/polymap3/)" );
 
@@ -246,8 +248,7 @@ public class CorePlugin
     }
 
 
-    public void stop( BundleContext context )
-    throws Exception {
+    public void stop( BundleContext context ) throws Exception {
         log.debug( "stop..." );
         
         httpServiceTracker.close();

@@ -4,7 +4,6 @@ import java.util.PropertyResourceBundle;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -101,7 +100,8 @@ public class UiPlugin extends AbstractUIPlugin  {
     public void start( BundleContext context ) throws Exception {
         super.start(context);
         iconsUrl = context.getBundle().getEntry(ICONS_PATH);
-        Authenticator.setDefault(new UDIGAuthenticator());
+        // falko: removed in favour of polymap authenticator
+        //Authenticator.setDefault(new UDIGAuthenticator());
         /*
          * TODO Further code can nuke the previously set authenticator. Proper security access
          * should be configured to prevent this.
