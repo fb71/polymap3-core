@@ -103,6 +103,7 @@ public class DialogAuthenticator
             log.info( "got prompted entry: " + entry.name + "/" + entry.passwd );
             return new PasswordAuthentication( entry.name, entry.passwd.toCharArray() );
         }
+        
         // no entry yet or already tried (hence wrong) -> prompt for password
         else if (entry == null || triedUrlKeys.contains( urlKey )) {
             log.info( "no entry or already tried (wrong): " +  urlKey );
@@ -125,6 +126,7 @@ public class DialogAuthenticator
                 promptedUrlKeys.remove( urlKey );                
             }
         }
+        
         // use stored
         else {
             log.info( "stored passwd: " +  urlKey );
@@ -136,7 +138,9 @@ public class DialogAuthenticator
 
     private String requestUrlKey() {
         try {
-            return URLEncoder.encode( getRequestingURL().toString(), "UTF-8" );
+            String url = getRequestingURL().toString();
+            String baseUrl = StringUtils.substringBefore( url, "?" );
+            return URLEncoder.encode( baseUrl, "UTF-8" );
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException( e );

@@ -15,6 +15,8 @@
 package org.polymap.core.mapeditor.contextmenu;
 
 import java.util.Collections;
+import java.util.List;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -28,6 +30,7 @@ import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -95,14 +98,26 @@ public class WmsFeatureInfoContribution
                             
                             // GetFeatureInfo supported?
                             if (caps.getRequest().getGetFeatureInfo() != null) {
+                                List<String> formats = caps.getRequest().getGetFeatureInfo().getFormats();
                                 log.info( "Possible formats: " + layer.getLabel() );
-                                log.info( "    " + Iterables.toString( caps.getRequest().getGetFeatureInfo().getFormats() ) );
+                                log.info( "    " + Iterables.toString( formats ) );
                               
+                                String format = formats.contains( "text/html" ) ? "text/html" : null;
+                                format = format == null && formats.contains( "text/plain" ) ? "text/plain" : format;
+//                                format = format == null && formats.contains( "application/vnd.ogc.gml" ) ? "application/vnd.ogc.gml" : format;
+                                
+                                // no format !?
+                                if (format == null) {
+                                    log.warn( Messages.get( "WmsFeatureInfoContribution_noFormat", layer.getLabel() ) + ", Formate: " + Iterables.toString( formats ) );
+//                                    PolymapWorkbench.handleError( MapEditorPlugin.PLUGIN_ID, this, 
+//                                            Messages.get( "WmsFeatureInfoContribution_noFormat", layer.getLabel() ), 
+//                                            new Exception( "Formate: " + Iterables.toString( formats ) ) );
+                                }
                                 // rough check if any feature is covered
-                                String plain = issueRequest( geores, "text/plain", false );
-                                log.info( "Plain: " + plain );
+                                String plain = issueRequest( geores, format, false );
+                                log.info( "Plain: " + StringUtils.abbreviate( plain, 200 ) );
                                 if (plain.length() > 50 ) {
-                                    awaitAndFillMenuEntry( layer, geores );
+                                    awaitAndFillMenuEntry( layer, geores, format );
                                 }
                             }
                         }
@@ -131,11 +146,11 @@ public class WmsFeatureInfoContribution
     }
 
     
-    protected void awaitAndFillMenuEntry( ILayer layer, final IGeoResource geores ) {
+    protected void awaitAndFillMenuEntry( ILayer layer, final IGeoResource geores, final String format ) {
         final String label = Messages.get( "WmsFeatureInfoContribution_label", layer.getLabel() );
         final Action action = new Action( label ) {
             public void run() {
-                String content = issueRequest( geores, "text/html", true );
+                String content = issueRequest( geores, format, true );
                 openHelpWindow( label, content );
             }            
         };
@@ -165,7 +180,9 @@ public class WmsFeatureInfoContribution
 
             GetFeatureInfoRequest featureInfoRequest = wms.createGetFeatureInfoRequest( mapRequest );
             featureInfoRequest.setFeatureCount( 100 );
-            featureInfoRequest.setInfoFormat( format );
+            if (format != null) {
+                featureInfoRequest.setInfoFormat( format );
+            }
             featureInfoRequest.setQueryLayers( Collections.singleton( wmsLayer ) );
             featureInfoRequest.setQueryPoint( site.widgetMousePosition().x, site.widgetMousePosition().y );
             
@@ -199,6 +216,7 @@ public class WmsFeatureInfoContribution
         }
     }
 
+    
     protected void openHelpWindow( String title, String html ) {
         Shell parentShell = PolymapWorkbench.getShellToParentOn();
         Shell window = new Shell( parentShell, SWT.CLOSE | SWT.TITLE | SWT.MAX | SWT.RESIZE | SWT.APPLICATION_MODAL );

@@ -321,7 +321,6 @@ public class GeoServerLoader
             catch (Exception e) {
                 log.error( "Error while creating catalog: " + e.getLocalizedMessage() );
                 log.debug( "", e );
-                break;
             }
                 
             // DataStore
