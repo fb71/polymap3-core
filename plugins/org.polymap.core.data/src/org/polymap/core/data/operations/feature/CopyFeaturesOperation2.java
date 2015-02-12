@@ -51,6 +51,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizardPage;
 
 import org.eclipse.core.commands.operations.IUndoableOperation;
@@ -75,6 +77,8 @@ import org.polymap.core.data.ui.featuretypeeditor.ValueViewerColumn;
 import org.polymap.core.data.util.Geometries;
 import org.polymap.core.data.util.ProgressListenerAdaptor;
 import org.polymap.core.data.util.RetypingFeatureCollection;
+import org.polymap.core.model.security.ACLUtils;
+import org.polymap.core.model.security.AclPermission;
 import org.polymap.core.operation.OperationWizard;
 import org.polymap.core.operation.OperationWizardPage;
 import org.polymap.core.project.ILayer;
@@ -124,8 +128,7 @@ public class CopyFeaturesOperation2
     }
 
     
-    public Status execute( IProgressMonitor monitor )
-    throws Exception {
+    public Status execute( IProgressMonitor monitor ) throws Exception {
         monitor.beginTask( context.adapt( FeatureOperationExtension.class ).getLabel(), 10 );
 
         source = (PipelineFeatureSource)context.featureSource();
@@ -150,12 +153,24 @@ public class CopyFeaturesOperation2
             }
         });
 
+        // ChooseLayerPage
         final ChooseLayerPage chooseLayerPage = new ChooseLayerPage(
                 i18n.get( "ChooseLayerPage_title" ),
                 i18n.get( "ChooseLayerPage_description" ),
                 true );
         ILayer layer = context.adapt( ILayer.class );
-        chooseLayerPage.preset( layer );
+        if (ACLUtils.checkPermission( layer, AclPermission.WRITE, false )) {
+            chooseLayerPage.preset( layer );
+        }
+        chooseLayerPage.addFilter( new ViewerFilter() {
+            @Override
+            public boolean select( Viewer viewer, Object parentElm, Object elm ) {
+                if (elm instanceof ILayer) {
+                    return ACLUtils.checkPermission( (ILayer)elm, AclPermission.WRITE, false );
+                }
+                return true;
+            }
+        });
         wizard.addPage( chooseLayerPage );
         final FeatureEditorPage2 featureEditorPage = new FeatureEditorPage2();
         wizard.addPage( featureEditorPage );

@@ -68,6 +68,8 @@ import org.polymap.core.data.pipeline.Pipeline;
 import org.polymap.core.data.pipeline.PipelineIncubationException;
 import org.polymap.core.data.pipeline.ProcessorResponse;
 import org.polymap.core.data.pipeline.ResponseHandler;
+import org.polymap.core.model.security.ACLUtils;
+import org.polymap.core.model.security.AclPermission;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.project.LayerUseCase;
 import org.polymap.core.runtime.SessionContext;
@@ -303,6 +305,19 @@ public class PipelineFeatureSource
 
     // FeatureStore ***************************************
 
+    protected void checkWritePermission() {
+        try {
+            ACLUtils.checkPermission( getLayer(), AclPermission.WRITE, true );
+        }
+        catch (SecurityException e) {
+            throw e;
+        }
+        catch (Throwable e) {
+            log.error( "Error while checking WRITE permission for layer.", e );
+        }
+    }
+    
+    
     public void setTransaction( Transaction transaction ) {
         log.warn( "PipelinedFeatureSource: no transaction support as updates are bufferd by LayerFeatureBufferManager!" );
     }
@@ -317,6 +332,8 @@ public class PipelineFeatureSource
     public List<FeatureId> addFeatures( FeatureCollection<SimpleFeatureType,SimpleFeature> features,
             final ProgressListener monitor )
             throws IOException {
+        checkWritePermission();
+        
         monitor.started();
 
 //        FeatureType schema = getSchema();
@@ -401,6 +418,7 @@ public class PipelineFeatureSource
 
     public void removeFeatures( Filter filter )
     throws IOException {
+        checkWritePermission();
         try {
             // request
             RemoveFeaturesRequest request = new RemoveFeaturesRequest( filter );
@@ -435,6 +453,7 @@ public class PipelineFeatureSource
 
     public void modifyFeatures( AttributeDescriptor[] type, Object[] value, Filter filter )
     throws IOException {
+        checkWritePermission();
         try {
             // request
             ModifyFeaturesRequest request = new ModifyFeaturesRequest( type, value, filter );

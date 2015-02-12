@@ -1,5 +1,8 @@
 package org.polymap.core.data.operations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -11,6 +14,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 
@@ -34,6 +38,8 @@ public class ChooseLayerPage
 
     private ProjectTreeViewer           viewer;
     
+    private List<ViewerFilter>          filters = new ArrayList();
+    
     private ILayer                      result;
 
     private boolean                     mandatory;
@@ -56,6 +62,11 @@ public class ChooseLayerPage
     public void preset( ILayer layer ) {
         result = layer;
     }
+
+    
+    public void addFilter( ViewerFilter filter ) {
+        filters.add( filter );
+    }
     
     
     public ILayer getResult() {
@@ -71,8 +82,11 @@ public class ChooseLayerPage
         setControl( contents );
 
         viewer = new ProjectTreeViewer( contents, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER );
-        viewer.setRootMap( ProjectRepository.instance().getRootMap() );
         viewer.getTree().setLayoutData( new SimpleFormData().fill().create() );
+        viewer.setRootMap( ProjectRepository.instance().getRootMap() );
+        for (ViewerFilter filter : filters) {
+            viewer.addFilter( filter );
+        }
         
         viewer.addDoubleClickListener( new IDoubleClickListener() {
             public void doubleClick( DoubleClickEvent ev ) {

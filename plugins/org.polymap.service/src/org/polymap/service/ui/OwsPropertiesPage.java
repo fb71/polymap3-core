@@ -23,17 +23,25 @@ import org.apache.commons.logging.LogFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
+
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
+
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.dialogs.AdaptableForwarder;
 
 import org.eclipse.core.runtime.IAdaptable;
 
+import org.polymap.core.model.security.ACL;
+import org.polymap.core.model.security.ACLUtils;
+import org.polymap.core.model.security.AclPermission;
 import org.polymap.core.operation.OperationSupport;
 import org.polymap.core.project.IMap;
 import org.polymap.core.project.operations.SetPropertyOperation;
@@ -70,6 +78,25 @@ public class OwsPropertiesPage
     public OwsPropertiesPage() {
         super( FLAT );
         setDescription( Messages.get( "OwsPropertiesPage_description", ServicesPlugin.getDefault().getServicesBaseUrl() ) );
+    }
+
+    @Override
+    @SuppressWarnings("restriction")
+    protected Control createContents( Composite parent ) {
+        // XXX see PropertyDialogAction for more detail
+        final ACL acl = getElement() instanceof AdaptableForwarder
+                ? (ACL)((AdaptableForwarder)getElement()).getAdapter( ACL.class )
+                : (ACL)getElement();
+        
+        // check permission
+        if (!ACLUtils.checkPermission( acl, AclPermission.WRITE, false )) {
+            Label l = new Label( parent, SWT.NONE );
+            l.setText( "Keine Zugriffsberechtigung." );
+            return l;
+        }
+        else {
+            return super.createContents( parent );
+        }
     }
 
     public IAdaptable getElement() {
