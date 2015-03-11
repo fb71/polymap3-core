@@ -285,6 +285,27 @@ public final class Polymap {
     }
 
     
+    public boolean validatePassword( String username, String passwd ) {
+        String jaasConfigFile = "jaas_config.txt";
+        File configFile = new File( getWorkspacePath().toFile(), jaasConfigFile );
+
+        ServicesCallbackHandler.challenge( username, passwd );
+        
+        // create secureContext
+        try {
+            ILoginContext sc = LoginContextFactory.createContext( SERVICES_LOGIN_CONFIG, configFile.toURI().toURL() );
+            sc.login();
+            return true;
+        }
+        catch (MalformedURLException e) {
+            throw new RuntimeException( "Should never happen.", e );
+        }
+        catch (LoginException e) {
+            return false;
+        }
+    }
+    
+    
     public void login( String username, String passwd ) throws LoginException {
         // init params are not available in services
         initHttpParams = new HashMap();
