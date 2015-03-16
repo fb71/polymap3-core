@@ -56,7 +56,7 @@ public class FsContentProvider
 
     private static Log log = LogFactory.getLog( FsContentProvider.class );
 
-    private List<FsFolder>          roots;
+    protected List<FsFolder>            roots;
     
     
     public FsContentProvider() {
@@ -92,7 +92,7 @@ public class FsContentProvider
             if (!dir.exists()) {
                 throw new IllegalArgumentException( "Directory does not exists: " + dir );
             }
-            String role = params[1].trim();
+            //String role = params[1].trim();
             String alias = params.length > 2 ? params[2].trim() : dir.getName();
             
             roots.add( new FsFolder( alias, parentPath, this, dir ) );
@@ -100,6 +100,7 @@ public class FsContentProvider
     }
 
 
+    @Override
     public List<? extends IContentNode> getChildren( IPath path ) {
         // check admin
         if (!SecurityUtils.isAdmin( Polymap.instance().getPrincipals())) {
@@ -113,7 +114,8 @@ public class FsContentProvider
 
         // folder
         IContentFolder parent = getSite().getFolder( path );
-        if (parent instanceof FsFolder) {
+        if (parent instanceof FsFolder
+                && ((FsFolder)parent).getProvider() == this) {
             File[] files = ((FsFolder)parent).getDir().listFiles();
             List<IContentNode> result = new ArrayList( files.length );
             

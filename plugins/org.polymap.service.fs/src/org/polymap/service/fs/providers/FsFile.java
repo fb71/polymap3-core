@@ -42,7 +42,7 @@ import org.polymap.service.fs.spi.Range;
  *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-class FsFile
+public class FsFile
         extends DefaultContentNode
         implements IContentFile, IContentMoveable, IContentDeletable {
 

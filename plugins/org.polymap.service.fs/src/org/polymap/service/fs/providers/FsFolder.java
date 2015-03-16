@@ -43,7 +43,7 @@ import org.polymap.service.fs.spi.NotAuthorizedException;
  * 
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-class FsFolder
+public class FsFolder
         extends DefaultContentFolder
         implements IContentPutable, IContentWriteable, IMakeFolder, IContentMoveable, IContentDeletable {
 
