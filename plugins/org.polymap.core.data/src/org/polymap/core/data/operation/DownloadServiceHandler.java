@@ -83,7 +83,7 @@ public class DownloadServiceHandler
      * Registers the given provider for downloading. An unique id of the newly
      * registered download is build automatically.
      * 
-     * @param provider
+     * @param provider <b>(Softly referenced!)</b>
      * @return The download URL for the given provider.
      */
     public static String registerContent( ContentProvider provider ) {
@@ -95,7 +95,7 @@ public class DownloadServiceHandler
      * Registers the given provider for downloading.
      * 
      * @param id
-     * @param provider
+     * @param provider <b>(Softly referenced!)</b>
      * @return The download URL for the given provider.
      */
     public static String registerContent( String id, ContentProvider provider ) {

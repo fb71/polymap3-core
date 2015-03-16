@@ -221,7 +221,7 @@ public class FeatureTableViewer
             ISelection sel = new StructuredSelection( search );
             setSelection( sel, reveal );
         }
-        getTable().layout();
+        getTable().layout( true );
     }
 
 
