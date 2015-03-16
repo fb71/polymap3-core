@@ -11,8 +11,8 @@
 # Provides: polymap3_work
 # Required-Start: $network
 # Required-Stop: $network
-# Default-Start: 3 5
-# Default-Stop: 0 1 2 6
+# Default-Start: 2
+# Default-Stop: 2
 # Description: Start a POLYMAP3 service instance
 ### END INIT INFO
 
