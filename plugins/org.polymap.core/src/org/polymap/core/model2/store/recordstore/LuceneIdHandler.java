@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright (C) 2014, Falko Bräutigam. All rights reserved.
+ * Copyright (C) 2014-2015, Falko Bräutigam. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -41,11 +41,22 @@ class LuceneIdHandler
 //            BooleanQuery.setMaxClauseCount( fidFilter.getIdentifiers().size() );
 //        }
 
-        BooleanQuery result = new BooleanQuery();
-        org.apache.lucene.search.Query fidQuery = builder.valueCoders.searchQuery( 
-                new QueryExpression.Equal( LuceneRecordState.ID_FIELD, predicate.id ) );
-        result.add( fidQuery, BooleanClause.Occur.SHOULD );
-        return result;
+        if (predicate.ids.length == 1) {
+            return idQuery( predicate.ids[0] );
+        }
+        else {
+            BooleanQuery result = new BooleanQuery();
+            for (Object id : predicate.ids) {
+                result.add( idQuery( id ), BooleanClause.Occur.SHOULD );
+            }
+            return result;
+        }
     }
 
+    
+    protected org.apache.lucene.search.Query idQuery( Object id ) {
+        return builder.valueCoders.searchQuery( 
+                new QueryExpression.Equal( LuceneRecordState.ID_FIELD, id ) );        
+    }
+    
 }

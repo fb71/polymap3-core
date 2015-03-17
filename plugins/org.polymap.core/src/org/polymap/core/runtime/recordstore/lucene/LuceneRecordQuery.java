@@ -131,7 +131,7 @@ public class LuceneRecordQuery
             
             // build fieldSelector
             final IRecordFieldSelector sel = getFieldSelector();
-            if (getFieldSelector() != null && sel != IRecordFieldSelector.ALL) {
+            if (sel != null && sel != IRecordFieldSelector.ALL) {
                 fieldSelector = new FieldSelector() {
                     public FieldSelectorResult accept( String fieldName ) {
                         if (fieldName.equals( LuceneRecordState.ID_FIELD )) {
@@ -156,7 +156,7 @@ public class LuceneRecordQuery
 
         public LuceneRecordState get( int index )
         throws Exception {
-            assert index < scoreDocs.length;
+            assert index < scoreDocs.length : "Index out of range: " + index + " !< " + scoreDocs.length;
             int doc = scoreDocs[index].doc;
             return store.get( doc, fieldSelector );
         }

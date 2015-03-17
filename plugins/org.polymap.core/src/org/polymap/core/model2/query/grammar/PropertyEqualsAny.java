@@ -14,34 +14,39 @@
  */
 package org.polymap.core.model2.query.grammar;
 
-import org.polymap.core.model2.Association;
 import org.polymap.core.model2.Composite;
-import org.polymap.core.model2.Entity;
+import org.polymap.core.model2.Property;
 import org.polymap.core.model2.engine.TemplateProperty;
 
 /**
+ * The "IN" operator, allows to compare the value of a property with multiple values.
+ * True if any of the given values equals the property value.
  * 
- *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-public class AssociationEquals<T extends Entity>
-        extends Predicate {
+public class PropertyEqualsAny<T>
+        extends ComparisonPredicate<T> {
 
-    public TemplateProperty<T>      assoc;
+    public T[]                  values;
+
     
-
-    public AssociationEquals( TemplateProperty<T> assoc, BooleanExpression sub ) {
-        super( sub );
-        assert children.length == 1;
-        assert children[0] != null;
-        this.assoc = assoc;
+    public PropertyEqualsAny( TemplateProperty<T> prop, T[] values ) {
+        super( prop, null );
+        this.values = values;
     }
+
 
     @Override
     public boolean evaluate( Composite target ) {
-        Association<T> targetProp = targetProp( target, assoc );
-        Entity entity = targetProp.get();
-        return entity != null && children[0].evaluate( entity );
+        String propName = prop.getInfo().getName();
+        Object propValue = ((Property)target.info().getProperty( propName ).get( target )).get();
+        
+        for (T v : values) {
+            if (v.equals( propValue )) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }

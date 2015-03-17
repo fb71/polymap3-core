@@ -93,17 +93,23 @@ class RecordCompositeState
 
     @Override
     public StoreProperty loadProperty( PropertyInfo info ) {
+        // association
         if (info.isAssociation()) {
-            return new PropertyImpl( info );
+            return info.getMaxOccurs() > 1 
+                    ? new CollectionPropertyImpl( info )
+                    : new PropertyImpl( info );
         }
-        else if (info.getMaxOccurs() > 1) {
-            return new CollectionPropertyImpl( info ); 
-        }
+        // composite
         else if (Composite.class.isAssignableFrom( info.getType() )) {
-            return new CompositePropertyImpl( info );
+            return info.getMaxOccurs() > 1 
+                    ? new CompositeCollectionPropertyImpl( info )
+                    : new CompositePropertyImpl( info );
         }
+        // primitive
         else {
-            return new PropertyImpl( info );
+            return info.getMaxOccurs() > 1 
+                    ? new CollectionPropertyImpl( info )
+                    : new PropertyImpl( info );
         }
     }
 
@@ -202,9 +208,7 @@ class RecordCompositeState
 
         @Override
         public Object createValue() {
-            RecordCompositeState result = new RecordCompositeState( state, buildCollKey( size() ) );
-            state.put( buildKey( key(), "__size__" ), size() + 1 );
-            return result;
+            throw new RuntimeException( "createValue() is not allowed for primitive value properties." );
         }
 
         @Override
@@ -216,8 +220,8 @@ class RecordCompositeState
         @Override
         public Iterator iterator() {
             return new Iterator() {
-                private int size = size();
-                private int index = 0;
+                int size = size();
+                int index = 0;
 
                 @Override
                 public boolean hasNext() {
@@ -226,12 +230,7 @@ class RecordCompositeState
 
                 @Override
                 public Object next() {
-                    if (Composite.class.isAssignableFrom( getInfo().getType() )) {
-                        return new RecordCompositeState( state, buildCollKey( index++ ) );
-                    }
-                    else {
-                        return state.get( buildCollKey( index++ ) );
-                    }
+                    return state.get( buildCollKey( index++ ) );
                 }
 
                 @Override
@@ -284,6 +283,50 @@ class RecordCompositeState
             return true;
         }
 
+    }
+
+    
+    /**
+     * 
+     */
+    class CompositeCollectionPropertyImpl
+            extends CollectionPropertyImpl {
+
+        protected CompositeCollectionPropertyImpl( PropertyInfo info ) {
+            super( info );
+        }
+
+        @Override
+        public Object createValue() {
+            RecordCompositeState result = new RecordCompositeState( state, buildCollKey( size() ) );
+            state.put( buildKey( key(), "__size__" ), size() + 1 );
+            return result;
+        }
+
+        @Override
+        public Iterator iterator() {
+            return new Iterator() {
+                int size = size();
+                int index = 0;
+
+                @Override
+                public boolean hasNext() {
+                    return index < size;
+                }
+
+                @Override
+                public Object next() {
+                    assert Composite.class.isAssignableFrom( getInfo().getType() );
+                    return new RecordCompositeState( state, buildCollKey( index++ ) );
+                }
+
+                @Override
+                public void remove() {
+                    CompositeCollectionPropertyImpl.this.remove( index );
+                }
+            };
+        }
+        
     }
     
 }

@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright (C) 2014, Falko Bräutigam. All rights reserved.
+ * Copyright (C) 2015, Falko Bräutigam. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -24,24 +24,20 @@ import org.polymap.core.model2.engine.TemplateProperty;
  *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-public class AssociationEquals<T extends Entity>
-        extends Predicate {
+public class TheAssociationQuantifier<T extends Entity>
+        extends Quantifier<Association<T>,T> {
 
-    public TemplateProperty<T>      assoc;
-    
-
-    public AssociationEquals( TemplateProperty<T> assoc, BooleanExpression sub ) {
-        super( sub );
-        assert children.length == 1;
-        assert children[0] != null;
-        this.assoc = assoc;
+    public TheAssociationQuantifier( Association<T> prop, BooleanExpression subExp ) {
+        super( Type.THE_ONLY, prop, subExp );
     }
 
+    
     @Override
     public boolean evaluate( Composite target ) {
-        Association<T> targetProp = targetProp( target, assoc );
-        Entity entity = targetProp.get();
-        return entity != null && children[0].evaluate( entity );
+        Association<T> targetProp = targetProp( target, (TemplateProperty<T>)prop );
+        T composite = targetProp.get();
+
+        return composite != null ? subExp().evaluate( composite ) : false;
     }
-    
+
 }

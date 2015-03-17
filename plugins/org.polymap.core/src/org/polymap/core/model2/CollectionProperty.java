@@ -21,8 +21,8 @@ import javax.annotation.Nullable;
 import org.polymap.core.model2.runtime.ValueInitializer;
 
 /**
- * A multi-value property of a {@link Composite}. Possible types are simple values (
- * {@link Number}, {@link Boolean}, {@link String}, {@link Date}, {@link Enum}) or
+ * A multi-value property of a {@link Composite}. Possible types are primitive values
+ * ({@link Number}, {@link Boolean}, {@link String}, {@link Date}, {@link Enum}) or
  * {@link Composite} values.
  * 
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
@@ -30,6 +30,18 @@ import org.polymap.core.model2.runtime.ValueInitializer;
 public interface CollectionProperty<T>
         extends PropertyBase<T>, Collection<T> {
 
+//    /**
+//     * Returns a {@link Expressions#template(Class,EntityRepository) template} for
+//     * querying members of this collection.
+//     */
+//    public T any();
+//    
+//    /**
+//     * Returns a {@link Expressions#template(Class,EntityRepository) template} for
+//     * querying members of this collection.
+//     */
+//    public T all();
+    
     /**
      * Creates a new element and adds it to this collection. For {@link Composite}
      * properties: this method allows the initialize the {@link Composite} value of

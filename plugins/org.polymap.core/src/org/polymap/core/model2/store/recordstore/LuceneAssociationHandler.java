@@ -14,13 +14,17 @@
  */
 package org.polymap.core.model2.store.recordstore;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
 import org.polymap.core.model2.engine.TemplateProperty;
 import org.polymap.core.model2.query.grammar.AssociationEquals;
 import org.polymap.core.model2.query.grammar.IdPredicate;
+import org.polymap.core.model2.runtime.ModelRuntimeException;
 import org.polymap.core.runtime.recordstore.QueryExpression;
 
 /**
@@ -37,10 +41,29 @@ public class LuceneAssociationHandler
     public Query handle( AssociationEquals expression ) {
         // Id
         if (expression.children[0] instanceof IdPredicate) {
-            Object id = ((IdPredicate)expression.children[0]).id;
+            IdPredicate predicate = (IdPredicate)expression.children[0];
+
             TemplateProperty assoc = expression.assoc;
-            String fieldname = LuceneQueryBuilder.fieldname( assoc ).toString();
-            return builder.valueCoders.searchQuery( new QueryExpression.Equal( fieldname, id ) ); 
+            String fieldname = prefixedFieldname( assoc );
+            
+            log( "ID", fieldname + " is/in " + ArrayUtils.toString( predicate.ids ) );
+            //assert predicate.ids.length == 1 : "Ids != 1 for Association: " + expression.assoc.getInfo().getName() + ", ids:" + ArrayUtils.toString( predicate.ids );
+            
+            if (predicate.ids.length == 0) {
+                throw new ModelRuntimeException( "Ids == 0 for Association: " + expression.assoc.getInfo().getName() );                
+            }
+            else if (predicate.ids.length == 1) {
+                Object id = predicate.ids[0];
+                return builder.valueCoders.searchQuery( new QueryExpression.Equal( fieldname, id ) );
+            }
+            else {
+                BooleanQuery result = new BooleanQuery();
+                for (Object id : predicate.ids) {
+                    Query sub = builder.valueCoders.searchQuery( new QueryExpression.Equal( fieldname, id ) );
+                    result.add( sub, BooleanClause.Occur.SHOULD );
+                }
+                return result;
+            }
         }
         // sub-expression
         else {

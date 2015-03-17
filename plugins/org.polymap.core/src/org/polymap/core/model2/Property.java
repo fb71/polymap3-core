@@ -22,7 +22,7 @@ import org.polymap.core.model2.runtime.ModelRuntimeException;
 import org.polymap.core.model2.runtime.ValueInitializer;
 
 /**
- * A single property of a {@link Composite}. Possible types are simple values (
+ * A single property of a {@link Composite}. Possible types are primitive values (
  * {@link Number}, {@link Boolean}, {@link String}, {@link Date}, {@link Enum}) or
  * {@link Composite} values.
  * <p/>

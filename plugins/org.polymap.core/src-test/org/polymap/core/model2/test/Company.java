@@ -20,6 +20,7 @@ import org.polymap.core.model2.Association;
 import org.polymap.core.model2.CollectionProperty;
 import org.polymap.core.model2.Concerns;
 import org.polymap.core.model2.Entity;
+import org.polymap.core.model2.ManyAssociation;
 import org.polymap.core.model2.MaxOccurs;
 import org.polymap.core.model2.Property;
 import org.polymap.core.model2.store.feature.SRS;
@@ -48,14 +49,19 @@ public class Company
     protected CollectionProperty<String>    docs;
 
     
-//    @MaxOccurs(100)
-//    protected CollectionProperty<Employee>  employees;
+    protected ManyAssociation<Employee>     employees;
     
 
-//    public void addEmployee( Employee employee ) {
-//        methodProlog( "addEmployee", employee );
-//        employees.add( employee );
-//        //employee.company().s
-//    }
+    public void addEmployee( final Employee employee ) {
+        employees.add( employee );
+        
+//        employees.createElement( new ValueInitializer<Association<Employee>>() {
+//            @Override
+//            public Association<Employee> initialize( Association<Employee> proto ) throws Exception {
+//                proto.set( employee );
+//                return proto;
+//            }
+//        });
+    }
     
 }

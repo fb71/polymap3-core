@@ -14,6 +14,8 @@
  */
 package org.polymap.core.model2.store.recordstore;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.Query;
 
 import org.polymap.core.model2.Entity;
@@ -27,6 +29,8 @@ import org.polymap.core.model2.query.grammar.BooleanExpression;
  */
 abstract class LuceneExpressionHandler<T extends BooleanExpression> {
 
+    private static final Log log = LogFactory.getLog( LuceneExpressionHandler.class );
+    
     protected LuceneQueryBuilder        builder;
     
     protected Class<? extends Entity>   resultType;
@@ -36,10 +40,25 @@ abstract class LuceneExpressionHandler<T extends BooleanExpression> {
     
     
     /**
-     * @see LuceneQueryBuilder#fieldname(org.polymap.core.model2.engine.TemplateProperty)
+     * @see LuceneQueryBuilder#simpleFieldname(TemplateProperty)
      */
-    public static StringBuilder fieldname( TemplateProperty property ) {
-        return LuceneQueryBuilder.fieldname( property );
+    public String simpleFieldname( TemplateProperty property ) {
+        return LuceneQueryBuilder.simpleFieldname( property );
     }
 
+    /**
+     * @see LuceneQueryBuilder#prefixedFieldname(TemplateProperty)
+     */
+    public String prefixedFieldname( TemplateProperty property ) {
+        return builder.prefixedFieldname( property );
+    }
+
+    public void log( String op, Object... params ) {
+        StringBuilder buf = new StringBuilder( 256 );
+        for (Object param : params) {
+            buf.append( buf.length() > 0 ? ", " : "" );
+            buf.append( param.toString() );
+        }
+        log.debug( builder.logIndent + op + " : " + buf.toString() );    
+    }
 }

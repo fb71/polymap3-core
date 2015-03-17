@@ -17,10 +17,14 @@ package org.polymap.core.model2.engine;
 import java.util.AbstractCollection;
 import java.util.Iterator;
 
-import org.polymap.core.model2.CollectionProperty;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterators;
+
+import org.polymap.core.model2.Entity;
+import org.polymap.core.model2.ManyAssociation;
 import org.polymap.core.model2.runtime.EntityRuntimeContext;
 import org.polymap.core.model2.runtime.PropertyInfo;
-import org.polymap.core.model2.runtime.ValueInitializer;
+import org.polymap.core.model2.runtime.UnitOfWork;
 import org.polymap.core.model2.store.StoreCollectionProperty;
 
 /**
@@ -28,24 +32,25 @@ import org.polymap.core.model2.store.StoreCollectionProperty;
  *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-class CollectionPropertyImpl<T>
+class ManyAssociationImpl<T extends Entity>
         extends AbstractCollection<T>
-        implements CollectionProperty<T> {
+        implements ManyAssociation<T> {
 
-    protected EntityRuntimeContext          entityContext;
+    private EntityRuntimeContext            context;
 
-    protected StoreCollectionProperty<T>    storeProp;
+    /** Holding the ids of the associated Entities. */
+    private StoreCollectionProperty<Object> storeProp;
     
 
-    public CollectionPropertyImpl( EntityRuntimeContext context, StoreCollectionProperty storeProp ) {
-        this.entityContext = context;
+    public ManyAssociationImpl( EntityRuntimeContext context, StoreCollectionProperty storeProp ) {
+        this.context = context;
         this.storeProp = storeProp;
     }
 
-    @Override
-    public T createElement( ValueInitializer<T> initializer ) {
-        throw new RuntimeException( "not yet..." );
-    }
+//    @Override
+//    public T createElement( ValueInitializer<T> initializer ) {
+//        throw new RuntimeException( "not yet..." );
+//    }
 
     @Override
     public PropertyInfo getInfo() {
@@ -61,17 +66,27 @@ class CollectionPropertyImpl<T>
 
     @Override
     public Iterator<T> iterator() {
-        return storeProp.iterator();
+        return Iterators.transform( storeProp.iterator(), new Function<Object,T>() {
+
+            UnitOfWork              uow = context.getUnitOfWork();
+            
+            Class<? extends Entity> entityType = getInfo().getType();
+            
+            @Override
+            public T apply( Object id ) {
+                return (T)uow.entity( entityType, id );
+            }
+        });
     }
 
     @Override
     public boolean add( T elm ) {
-        return storeProp.add( elm );
+        return storeProp.add( elm.id() );
     }
 
     @Override
     public String toString() {
-        return "Property[name:" + getInfo().getName() + ",value=" + super.toString() + "]";
+        return "ManyAssociation[name:" + getInfo().getName() + ",value=" + super.toString() + "]";
     }
 
 }

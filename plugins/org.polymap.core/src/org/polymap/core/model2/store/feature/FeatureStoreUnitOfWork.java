@@ -197,7 +197,7 @@ public class FeatureStoreUnitOfWork
 
     @Override
     public Collection executeQuery( Query query ) {
-        assert query.expression == null || query.expression instanceof Filter : "Wrong query expression type: " + query.expression;
+        assert query.expression == null || query.expression instanceof FilterExpression : "Wrong query expression type: " + query.expression;
         try {
             // schema
             FeatureStore fs = featureSource( query.resultType() );
@@ -205,7 +205,8 @@ public class FeatureStoreUnitOfWork
 
             // features
             DefaultQuery featureQuery = new DefaultQuery( schema.getName().getLocalPart() );
-            featureQuery.setFilter( query.expression != null ? (Filter)query.expression : Filter.INCLUDE );
+            Filter filter = query.expression != null ? ((FilterExpression)query.expression).getFilter() : null;
+            featureQuery.setFilter( filter != null ? filter : Filter.INCLUDE );
             // load all properties as we actually use the features via the #found buffer
             //featureQuery.setPropertyNames( new String[] {} );
             featureQuery.setStartIndex( query.firstResult );

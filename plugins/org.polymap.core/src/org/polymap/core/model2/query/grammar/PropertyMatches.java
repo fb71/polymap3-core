@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright (C) 2014, Falko Bräutigam. All rights reserved.
+ * Copyright (C) 2014-2015, Falko Bräutigam. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -17,7 +17,6 @@ package org.polymap.core.model2.query.grammar;
 import org.apache.commons.io.FilenameUtils;
 
 import org.polymap.core.model2.Composite;
-import org.polymap.core.model2.Property;
 import org.polymap.core.model2.engine.TemplateProperty;
 
 /**
@@ -32,6 +31,7 @@ public class PropertyMatches<T>
 
     protected char  multiWildcard = '*';
     
+    
     public PropertyMatches( TemplateProperty<T> prop, T value, char singleWildcard, char multiWildcard ) {
         super( prop, value );
     }
@@ -42,11 +42,7 @@ public class PropertyMatches<T>
 
     @Override
     public boolean evaluate( Composite target ) {
-        if (prop.getTraversed() != null) {
-            throw new UnsupportedOperationException( "Composite properties is not yet supported." );
-        }
-        String propName = prop.getInfo().getName();
-        Object propValue = ((Property)target.info().getProperty( propName ).get( target )).get();
+        Object propValue = propValue( target, prop );
         return propValue != null 
                 ? FilenameUtils.wildcardMatch( propValue.toString(), value.toString() )
                 : false;

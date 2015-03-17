@@ -24,6 +24,7 @@ import org.polymap.core.model2.CollectionProperty;
 import org.polymap.core.model2.Composite;
 import org.polymap.core.model2.Computed;
 import org.polymap.core.model2.Immutable;
+import org.polymap.core.model2.ManyAssociation;
 import org.polymap.core.model2.MaxOccurs;
 import org.polymap.core.model2.NameInStore;
 import org.polymap.core.model2.PropertyBase;
@@ -70,7 +71,8 @@ public class PropertyInfoImpl<T>
 
     @Override
     public boolean isAssociation() {
-        return Association.class.isAssignableFrom( field.getType() );
+        return Association.class.isAssignableFrom( field.getType() )
+                || ManyAssociation.class.isAssignableFrom( field.getType() );
     }
 
     @Override
@@ -95,12 +97,14 @@ public class PropertyInfoImpl<T>
 
     @Override
     public int getMaxOccurs() {
-        if (CollectionProperty.class.isAssignableFrom( field.getType() )) {
+        if (CollectionProperty.class.isAssignableFrom( field.getType() )
+                || ManyAssociation.class.isAssignableFrom( field.getType() )) {
             return field.getAnnotation( MaxOccurs.class ) != null
                     ? field.getAnnotation( MaxOccurs.class ).value()
                     : Integer.MAX_VALUE;
         }
         else {
+            assert field.getAnnotation( MaxOccurs.class ) == null : "@MaxOccurs is not allowed on single value properties.";
             return 1;
         }
     }

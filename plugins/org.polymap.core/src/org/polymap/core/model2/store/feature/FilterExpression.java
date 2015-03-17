@@ -1,6 +1,6 @@
 /* 
  * polymap.org
- * Copyright (C) 2014, Falko Bräutigam. All rights reserved.
+ * Copyright (C) 2015, Falko Bräutigam. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -12,31 +12,41 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package org.polymap.core.model2.query.grammar;
+package org.polymap.core.model2.store.feature;
+
+import org.opengis.filter.Filter;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.polymap.core.model2.Composite;
-import org.polymap.core.model2.Property;
-import org.polymap.core.model2.engine.TemplateProperty;
+import org.polymap.core.model2.query.grammar.BooleanExpression;
 
 /**
  * 
+ *
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-public class PropertyEquals<T>
-        extends ComparisonPredicate<T> {
+public class FilterExpression
+        extends BooleanExpression {
 
-    public PropertyEquals( TemplateProperty<T> prop, T value ) {
-        super( prop, value );
+    private static Log log = LogFactory.getLog( FilterExpression.class );
+
+    private Filter          filter;
+    
+    
+    public FilterExpression( Filter filter ) {
+        assert filter != null;
+        this.filter = filter;
+    }
+
+    public Filter getFilter() {
+        return filter;
     }
 
     @Override
     public boolean evaluate( Composite target ) {
-        Property<T> targetProp = targetProp( target, prop );
-        return value.equals( targetProp.get() );
-        
-//        String propName = prop.getInfo().getName();
-//        Object propValue = ((Property)target.info().getProperty( propName ).get( target )).get();
-//        return value.equals( propValue );
+        return filter.evaluate( target );
     }
-    
+
 }
