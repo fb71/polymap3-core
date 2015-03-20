@@ -49,10 +49,10 @@ function endTransmission( eventText ) {
         var params = eventText ? 'eventText=' + encodeURIComponent( eventText ) : '';
         xhr.send( params );    
         
-        // force UI update?
+        // force UI update
         qx.ui.core.Widget.flushGlobalQueues();
         var req = org.eclipse.swt.Request.getInstance();
-        req.enableUICallBack();
+        req.send();
     }, 500 );
 }
 

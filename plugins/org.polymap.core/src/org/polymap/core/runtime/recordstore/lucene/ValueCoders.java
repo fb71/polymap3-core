@@ -14,12 +14,12 @@
  */
 package org.polymap.core.runtime.recordstore.lucene;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import org.polymap.core.runtime.recordstore.QueryExpression;
 
@@ -44,7 +44,8 @@ public final class ValueCoders {
     
     private LuceneValueCoder[]          valueCoders = DEFAULT_CODERS;
     
-    private Map<String,LuceneValueCoder> keyCoderMap = new HashMap( 64 );
+    private Cache<String,LuceneValueCoder> keyCoderMap = CacheBuilder.newBuilder()
+            .concurrencyLevel( 2 ).initialCapacity( 64 ).softValues().build();
     
 
     protected ValueCoders( LuceneRecordStore store ) {
@@ -69,9 +70,14 @@ public final class ValueCoders {
     
     
     public boolean encode( Document doc, String key, Object value, boolean indexed ) {
-        LuceneValueCoder valueCoder = keyCoderMap.get( key );
+        // keyCoderMap is not synchronized for better concurrency; 
+        // inserting same key twice is not a problem
+        LuceneValueCoder valueCoder = keyCoderMap.getIfPresent( key );
         if (valueCoder != null) {
-            valueCoder.encode( doc, key, value, indexed );
+            boolean success = valueCoder.encode( doc, key, value, indexed );
+            if (!success) {
+                throw new RuntimeException( "Cached ValueCoder does not work: " + valueCoder.getClass().getSimpleName() + " -> " + key );
+            }
             return true;
         }
         for (LuceneValueCoder candidate : valueCoders) {
@@ -88,7 +94,7 @@ public final class ValueCoders {
         if (key == null) {
             return null;
         }
-        LuceneValueCoder valueCoder = keyCoderMap.get( key );
+        LuceneValueCoder valueCoder = keyCoderMap.getIfPresent( key );
         if (valueCoder != null) {
             return (T)valueCoder.decode( doc, key );
         }
