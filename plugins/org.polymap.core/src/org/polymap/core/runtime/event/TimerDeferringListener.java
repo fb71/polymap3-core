@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import org.polymap.core.Messages;
-import org.polymap.core.runtime.UIThreadExecutor;
 import org.polymap.core.runtime.session.SessionContext;
 
 /**
@@ -43,28 +42,27 @@ class TimerDeferringListener
 
     private static Log log = LogFactory.getLog( TimerDeferringListener.class );
 
-    private static Timer                scheduler = new Timer( "DeferringListener.Scheduler", true );
+    private static Timer                scheduler = new Timer( "TimerDeferringListener.scheduler", true );
 
     private SchedulerTask               task;
     
-    private SessionContext              sessionContext = SessionContext.current();
+    private SessionContext              sessionContext;
     
 
     public TimerDeferringListener( EventListener delegate, int delay, int maxEvents ) {
         super( delegate, delay, maxEvents );
+        this.sessionContext = SessionContext.current();
     }
 
     
     @Override
     public void handleEvent( EventObject ev ) throws Exception {
-        if (task == null) {
-            synchronized (this) {
-                if (task == null) {
-                    task = new SchedulerTask().schedule();
-                }
+        synchronized (this) {
+            if (task == null) {
+                task = new SchedulerTask().schedule();
             }
+            task.events.add( ev );
         }
-        task.events.add( ev );
     }
 
     
@@ -79,7 +77,6 @@ class TimerDeferringListener
         public SchedulerTask schedule() {
             try {
                 scheduler.schedule( this, delay );
-                SessionUICallbackCounter.jobStarted( delegate );
             }
             catch (IllegalStateException e) {
                 // Timer already cancelled (?)
@@ -93,11 +90,17 @@ class TimerDeferringListener
         public void run() {
             // primarily for testing; Eclipse's JobManager < 3.7.x does schedule in JUnit
             if (sessionContext == null) {
+                assert !isDisplayListener();
                 doRun();
             }
             // avoid overhead of a Job if events are handled in UI thread anyway
-            else if (delegate instanceof DisplayingListener) {
-                sessionContext.execute( () -> doRun() );
+            else if (isDisplayListener()) {
+                sessionContext.execute( () -> {
+                    doRun();
+                    
+                    events.forEach( ev -> 
+                            SessionUICallbackCounter.instance().jobFinished( TimerDeferringListener.this ) );
+                });
             }
             else {
                 Job job = new Job( Messages.get( "DeferringListener_jobTitle" ) ) {
@@ -110,27 +113,22 @@ class TimerDeferringListener
                 job.setSystem( true );
                 job.schedule();
             }
-
-            // use the TimerThread to cleanup the task queue
-            //scheduler.purge();
         }
 
         
         protected void doRun() {
-            try {
-                synchronized (TimerDeferringListener.this) {
-                    TimerDeferringListener.this.task = null;
+            synchronized (TimerDeferringListener.this) {
+                TimerDeferringListener.this.task = null;
+            }
+
+            if (!events.isEmpty()) {
+                try {
+                    DeferredEvent dev = new DeferredEvent( TimerDeferringListener.this, events );
+                    delegate.handleEvent( dev );
                 }
-                
-                DeferredEvent dev = new DeferredEvent( TimerDeferringListener.this, events );
-                delegate.handleEvent( dev );
-            }
-            catch (Exception e) {
-                log.warn( "Error while handling defered events.", e );
-            }
-            finally {
-                // release current request *after* events have been handled in the display thread
-                UIThreadExecutor.async( () -> SessionUICallbackCounter.jobFinished( delegate ) );
+                catch (Throwable e) {
+                    log.warn( "Error while handling deferred events.", e );
+                }
             }
         }
     };

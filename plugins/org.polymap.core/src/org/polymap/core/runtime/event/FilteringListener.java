@@ -30,6 +30,7 @@ class FilteringListener
     private static Log log = LogFactory.getLog( FilteringListener.class );
 
     private EventFilter[]           filters;
+
     
     
     public FilteringListener( EventListener delegate, EventFilter... filters ) {
@@ -40,14 +41,33 @@ class FilteringListener
 
 
     @Override
+    public void handlePublishEvent( EventObject ev ) {
+        //
+        if (delegate instanceof DeferringListener
+                && ((DeferringListener)delegate).isDisplayListener()
+                && appliesFor( ev )) {
+            
+            super.handlePublishEvent( ev );
+        }
+    }
+
+
+    @Override
     public void handleEvent( EventObject ev ) throws Exception {
+        if (appliesFor( ev )) {
+            delegate.handleEvent( ev );
+        }
+    }
+
+    
+    protected boolean appliesFor( EventObject ev ) {
         for (EventFilter filter : filters) {
             if (!filter.apply( ev )) {
                 //log.debug( "Offending filter: " + filter + "\n           event: " + ev + ")" );
-                return;
+                return false;
             }
         }
-        delegate.handleEvent( ev );
+        return true;
     }
     
 }

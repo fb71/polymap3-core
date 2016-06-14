@@ -15,6 +15,7 @@
 package org.polymap.core.runtime.event;
 
 import java.util.EventObject;
+import java.util.Objects;
 
 import org.polymap.core.runtime.session.SessionContext;
 
@@ -65,7 +66,9 @@ abstract class ScopeEventFilter
         
         @Override
         public boolean apply( EventObject ev ) {
-            return session != null && session.equals( EventManager.publishSession() );
+            SessionContext publishingSession = SessioningListener.publishingContext( ev );
+            //SessionContext publishingSession = EventManager.publishSession();
+            return Objects.equals( session, publishingSession );
         }
 
         public String toString() {

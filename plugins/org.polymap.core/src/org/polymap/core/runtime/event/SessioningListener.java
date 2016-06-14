@@ -15,8 +15,8 @@
 package org.polymap.core.runtime.event;
 
 import java.util.EventObject;
-import java.util.concurrent.Callable;
-
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
@@ -33,7 +33,19 @@ class SessioningListener
 
     private static Log log = LogFactory.getLog( SessioningListener.class );
     
-//    private static ConcurrentMap<String,List> sessionListenerKeys = new ConcurrentHashMap( 32, .75f, 4 );
+    private static Map<EventObject,SessionContext>  publishingContexts = new ConcurrentHashMap();
+    
+    /**
+     * 
+//     * @deprecated Depends on {@link EventListener#handlePublishEvent(EventObject)}.
+     */
+    public static SessionContext publishingContext( EventObject ev ) {
+        //assert publishingContexts.containsKey( ev ) : "No publishing SessionContext.";
+        return publishingContexts.get( ev );    
+    }
+    
+    
+    // instance *******************************************
     
     private SessionContext          session;
     
@@ -41,6 +53,7 @@ class SessioningListener
 
     private Class                   handlerClass;
     
+
     /**
      * 
      * @param delegate
@@ -54,49 +67,46 @@ class SessioningListener
         this.session = session;
         this.mapKey = mapKey;
         this.handlerClass = handlerClass;
-        
-//        //
-//        List listenerKeys = sessionListenerKeys.get( session.getSessionKey() );
-//        if (listenerKeys == null) {
-//            listenerKeys = Collections.synchronizedList( new ArrayList() );
-//            List<SessionContext> previous = sessionListenerKeys.putIfAbsent( session.getSessionKey(), listenerKeys );
-//            if (previous == null) {
-//                this.session.addSessionListener( new ISessionListener() {
-//                    String sessionKey = session.getSessionKey();
-//                    public void beforeDestroy() {
-//                        List l = sessionListenerKeys.remove( sessionKey );
-//                        if (l != null) {
-//                            for (Object key : new ArrayList( l )) {
-//                                EventManager.instance().removeKey( key );
-//                            }
-//                        }
-//                    }
-//                });
-//            }
-//            else {
-//                listenerKeys = previous;
-//            }
-//        }
-//        listenerKeys.add( mapKey );
     }
+
+    
+    
+    @Override
+    public void handlePublishEvent( EventObject ev ) {
+        //
+        publishingContexts.put( ev, SessionContext.current() );
+
+        //
+        if (session != null && !session.isDestroyed()) {
+            session.execute( () -> {
+                SessioningListener.super.handlePublishEvent( ev );
+            });
+        }
+    }
+
+
 
     @Override
     public void handleEvent( final EventObject ev ) throws Exception {
-        if (session != null) {
-            if (!session.isDestroyed()) {
-                session.execute( new Callable() {
-                    public Object call() throws Exception {
+        try {
+            if (session != null) {
+                if (!session.isDestroyed()) {
+                    session.execute( () -> {
                         delegate.handleEvent( ev );
                         return null;
-                    }
-                });
+                    });
+                }
+                else {
+                    log.warn( "Removing event handler for destroyed session: " + session.getClass().getSimpleName() + ", handler: " + handlerClass );
+                    EventManager.instance().removeKey( mapKey );
+                    session = null;
+                    delegate = null;
+                }
             }
-            else {
-                log.warn( "Removing event handler for destroyed session: " + session.getClass().getSimpleName() + ", handler: " + handlerClass );
-                EventManager.instance().removeKey( mapKey );
-                session = null;
-                delegate = null;
-            }
+        }
+        finally {
+            publishingContexts.remove( ev );
+            log.debug( "Global publishingContexts: " + publishingContexts.size() );
         }
     }
 

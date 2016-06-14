@@ -141,6 +141,19 @@ class AnnotatedEventListener
     }
 
     
+    @Override
+    public void handlePublishEvent( EventObject ev ) {
+        if (handlerRef != null) {
+            Object handler = handlerRef.get();
+            if (handler != null) {
+                for (EventListener m : methods) {
+                    m.handlePublishEvent( ev );
+                }
+            }
+        }
+    }
+
+
     public Integer getMapKey() {
         return mapKey;
     }
@@ -197,6 +210,11 @@ class AnnotatedEventListener
                     handlerMethod.invoke( handler, new Object[] {ev} );
                 }
             }
+        }
+
+
+        @Override
+        public void handlePublishEvent( EventObject ev ) {
         }
     }
     

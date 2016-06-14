@@ -35,6 +35,12 @@ abstract class DecoratingListener
     }
 
 
+    @Override
+    public void handlePublishEvent( EventObject ev ) {
+        delegate.handlePublishEvent( ev );
+    }
+
+
     /**
      * All event handling is serialized in one {@link Thread}. So this method is
      * called from this event {@link DispatcherThread} only. There is no need to
